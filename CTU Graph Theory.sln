@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35027.167
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CTU Graph Theory", "CTU Graph Theory\CTU Graph Theory.csproj", "{AE0BCA85-A0C1-4034-9337-22D297208DCB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CTU Graph Theory.Desktop", "CTU Graph Theory.Desktop\CTU Graph Theory.Desktop.csproj", "{BBDC5FC8-DF60-4FB8-A7DB-DBAFB3469809}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AE0BCA85-A0C1-4034-9337-22D297208DCB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE0BCA85-A0C1-4034-9337-22D297208DCB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE0BCA85-A0C1-4034-9337-22D297208DCB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE0BCA85-A0C1-4034-9337-22D297208DCB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BBDC5FC8-DF60-4FB8-A7DB-DBAFB3469809}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BBDC5FC8-DF60-4FB8-A7DB-DBAFB3469809}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BBDC5FC8-DF60-4FB8-A7DB-DBAFB3469809}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BBDC5FC8-DF60-4FB8-A7DB-DBAFB3469809}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0DF9764D-5158-4FFC-B9EC-53DCA7A64DC4}
+	EndGlobalSection
+EndGlobal

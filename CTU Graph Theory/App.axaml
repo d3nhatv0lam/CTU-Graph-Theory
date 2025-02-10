@@ -1,0 +1,45 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="CTU_Graph_Theory.App"
+			 xmlns:local="using:CTU_Graph_Theory"
+			 xmlns:themes="clr-namespace:Material.Styles.Themes;assembly=Material.Styles"
+			 xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             RequestedThemeVariant="Default">
+             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+
+	<Application.DataTemplates>
+		<local:ViewLocator/>
+	</Application.DataTemplates>
+
+	<Application.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+
+				<!--// Theme color //-->
+				<themes:CustomMaterialTheme>
+					<themes:CustomMaterialTheme.Palettes>
+						<themes:CustomMaterialThemeResources x:Key="Dark"
+													PrimaryColor="Purple"
+													SecondaryColor="#04C9F0" />
+						<themes:CustomMaterialThemeResources x:Key="Light"
+													PrimaryColor="Purple"
+													SecondaryColor="#0271A4" />
+					</themes:CustomMaterialTheme.Palettes>
+				</themes:CustomMaterialTheme>
+
+			</ResourceDictionary.MergedDictionaries>
+
+			<SolidColorBrush x:Key="PrimaryColor" Color="#1e5aaa"/>
+			<SolidColorBrush x:Key="SecondaryColor" Color="#ffffff"/>
+			<SolidColorBrush x:Key="BackgoundColor" Color="#f5f5f5"/>
+		</ResourceDictionary>
+	</Application.Resources>
+	
+    <Application.Styles>
+        <FluentTheme />
+		<materialIcons:MaterialIconStyles />
+		<themes:MaterialTheme BaseTheme="Inherit" PrimaryColor="Purple" SecondaryColor="Lime" />
+		<StyleInclude Source="avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml" />
+		
+	</Application.Styles>
+</Application>
