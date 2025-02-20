@@ -64,7 +64,7 @@ public class MainViewModel : ViewModelBase
     {
         int i = 0;
         ViewLocatorNodes.Add(new ViewLocatorNode(i++, Material.Icons.MaterialIconKind.InformationVariantBoxOutline, "Thông tin sản phẩm"));
-        ViewLocatorNodes.Add(new ViewLocatorNode(i++, Material.Icons.MaterialIconKind.ChartTimelineVariantShimmer, "Nhập đồ thị"));
+        ViewLocatorNodes.Add(new ViewLocatorNode(i++, Material.Icons.MaterialIconKind.ChartTimelineVariantShimmer, "Trực quan đồ thị"));
     }
 
     private void ObservableInit()

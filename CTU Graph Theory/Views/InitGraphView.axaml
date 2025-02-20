@@ -111,7 +111,7 @@
 			<Panel Background="Gray"/>
 		</Border>
 		
-		<Grid Grid.Column="2" RowDefinitions="* 0.6*" ColumnDefinitions="* *">
+		<Grid Grid.Column="2" RowDefinitions="* 0.4*" ColumnDefinitions="* 0.8*">
 			
  
 			<Border Grid.Row="0" Grid.Column="0" Padding="10">
@@ -135,11 +135,14 @@
 							</agc:GraphPanel.Transitions>
 							
 							<agc:GraphPanel.Styles>
+								
+								<!--// Node Style Area //--> 
 								<Style Selector="agc|TextSticker">
 									<Setter Property="Background" Value="Transparent"/>
 									<Style Selector="^:pointerover">
 										<Setter Property="Background" Value="Red"/>
 									</Style>
+									
 								</Style>
 
 								<Style Selector="agc|TextSticker.NotShow">
@@ -150,13 +153,27 @@
 								<Style Selector="agc|TextSticker.Show">
 									<Setter Property="Opacity" Value="1"/>
 								</Style>
-
-								<Style Selector="agc|Connection">
-									<Setter Property="Brush" Value="Black"/>
-									<Style Selector="^:pointerover">
-										<Setter Property="Brush" Value="Red"/>
-									</Style>
+								
+								<Style Selector="agc|TextSticker.NotVisited">
+									<Setter Property="BorderForeground" Value="Black"/>
+								
 								</Style>
+								
+								<Style Selector="agc|TextSticker.Visited">
+									<Setter Property="BorderForeground" Value="Red"/>
+								</Style>
+
+								<Style Selector="agc|TextSticker.Pending">
+									<Setter Property="BorderForeground" Value="#FFCC00"/>
+								</Style>
+								
+									<!--// Connection //-->
+
+								<!--<Style Selector="agc|Connection">
+									<Style Selector="^:pointerover">
+										<Setter Property="Brush" Value="Blue"/>
+									</Style>
+								</Style>-->
 
 								<Style Selector="agc|Connection.NotShow">
 									<Setter Property="Opacity" Value="0"/>
@@ -165,6 +182,15 @@
 								<Style Selector="agc|Connection.Show">
 									<Setter Property="Opacity" Value="1"/>
 								</Style>
+								
+								<Style Selector="agc|Connection.NotVisited">
+									<Setter Property="Brush" Value="Black"/>
+								</Style>
+								<Style Selector="agc|Connection.Visited">
+									<Setter Property="Brush" Value="Red"/>
+								</Style>
+							
+								
 							</agc:GraphPanel.Styles>
 
 							
@@ -173,6 +199,9 @@
 								<DataTemplate DataType="{x:Type model:Vertex}">
 									<agc:TextSticker Classes.Show="{Binding IsShowVertex}"
 													 Classes.NotShow ="{Binding !IsShowVertex}"
+													 Classes.NotVisited ="{Binding !IsVisited}"
+													 Classes.Visited ="{Binding IsVisited}"
+													 Classes.Pending ="{Binding IsPending}"
 													 BorderThickness="1"
 													 Text="{Binding Title}"
 													 Shape="Ellipse"
@@ -182,27 +211,25 @@
 								<DataTemplate DataType="{x:Type model:ShowableEdge}">
 									<agc:Connection Classes.NotShow="{Binding !IsShowEdge}" 
 													Classes.Show="{Binding IsShowEdge}"
-													PointerExited="Connection_PointerExited"
-													PointerEntered="Connection_PointerEntered" 
+													Classes.Visited="{Binding IsVisited}"
+													Classes.NotVisited ="{Binding !IsVisited}"
+													PropertyChanged="Connection_PropertyChanged"
 													/>
 								</DataTemplate>
 
-								<DataTemplate DataType="{x:Type agc:Edge}">
-									<agc:Connection
-										VerticalAlignment="Stretch"
-										HorizontalAlignment="Stretch"
-										Brush="Blue"
-									/>
-								</DataTemplate>
 								
 
 							</agc:GraphPanel.DataTemplates>
 						</agc:GraphPanel>
-
+					
 				</paz:ZoomBorder>
 			</Border>
+			
+		
+		<Button Grid.Row="0" Grid.Column="1" Command="{Binding RunBFSCommand}"></Button>
 
 		</Grid>
+	
 
 
 		

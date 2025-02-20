@@ -24,4 +24,8 @@
     <PackageReference Include="Material.Avalonia" Version="3.9.1" />
     <PackageReference Include="Material.Icons.Avalonia" Version="2.2.0" />
   </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Views\BFSView.axaml" />
+  </ItemGroup>
 </Project>

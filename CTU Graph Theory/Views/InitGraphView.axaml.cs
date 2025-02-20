@@ -9,6 +9,7 @@ using AvaloniaGraphControl;
 using CTU_Graph_Theory.Models;
 using CTU_Graph_Theory.ViewModels;
 using ReactiveUI;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Reactive.Disposables;
 
@@ -28,18 +29,9 @@ public partial class InitGraphView : ReactiveUserControl<InitGraphViewModel>
         //});
     }
 
-
-    private void Connection_PointerEntered(object? sender, PointerEventArgs e)
-    {
-
-        if (sender is Connection edgeLine)
-        {
-            ((InitGraphViewModel)this.DataContext)?.UpdateEdgeColor(edgeLine);
-        }
-
-    }
-
-    private void Connection_PointerExited(object? sender, PointerEventArgs e)
+    // redraw Connection
+    // idk why it can't auto redraw?
+    private void Connection_PropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
     {
         if (sender is Connection edgeLine)
         {

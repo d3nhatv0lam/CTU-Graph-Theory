@@ -41,21 +41,78 @@ namespace CTU_Graph_Theory.Models
             return u;
         }
 
-        public ShowableEdge GetEdge(Vertex u, Vertex v)
-        {
+        public ShowableEdge? GetEdge(Vertex u, Vertex v)
+        {   
             
             foreach (ShowableEdge edge in this.Edges)
             {
-                Vertex? v1 = edge.Head as Vertex;
-                Vertex? v2 = edge.Tail as Vertex;
+                Vertex? v1 = edge.Tail as Vertex;
+                Vertex? v2 = edge.Head as Vertex;
 
-                if (_GraphType == GraphType.Directed)
-                    if (u.Title == v1?.Title && v.Title == v2?.Title) return edge;
-                    else
-                    if ((u.Title == v1?.Title && v.Title == v2?.Title) || (u.Title == v2?.Title && v.Title == v1?.Title)) return edge;
+                 if (_GraphType == GraphType.Directed)
+                    {
+                     if (u.Title == v1?.Title && v.Title == v2?.Title) return edge;
+                    }
+                else
+                    if ((u.Title == v1?.Title && v.Title == v2?.Title) 
+                    || (u.Title == v2?.Title && v.Title == v1?.Title)) return edge;
             }
             // don't find
             return null;
+        }
+
+        public bool Adjacent(Vertex u, Vertex v) 
+        {
+            if (GetEdge(u, v) == null) return false;
+            return true;
+        }
+
+        public List<Vertex> NeighboursOfVertex(Vertex x)
+        {
+            List<Vertex> neighboursVertex = new List<Vertex>();
+            if (x == Vertex.EmptyVertex) return neighboursVertex;
+
+            foreach (ShowableEdge edge in this.Edges) 
+            {
+                Vertex  u = (Vertex)edge.Tail,
+                        v = (Vertex)edge.Head;
+                if (v == Vertex.EmptyVertex) continue;
+
+                if (x == u) neighboursVertex.Add(v);
+                else 
+                if (_GraphType == GraphType.UnDirected && x == v) neighboursVertex.Add(u);
+            }
+            neighboursVertex.Sort((x, y) => x.Title.CompareTo(y.Title));
+            return neighboursVertex;
+        }
+
+
+
+        public void UnVisitAndClearParentAll()
+        {
+            Vertex u;
+            foreach(ShowableEdge edge in this.Edges)
+            {
+                // clean Edge
+                edge.IsVisited = false;
+                // clean Vertex
+                if (edge.Tail != null)
+                {
+                    u = (Vertex)edge.Tail;
+                    u.IsVisited = false;
+                    u.IsPending = false;
+                    u.ParentVertex = null;
+                }
+                if (edge.Head != null)
+                {
+                    u = (Vertex)edge.Head;
+                    if (u == Vertex.EmptyVertex) continue;
+                    u.IsVisited = false;
+                    u.IsPending = false;
+                    u.ParentVertex = null;
+                }
+
+            }
         }
 
         public static CustomGraph CreateNewGraphFromChangeGraphType(CustomGraph graph, GraphType newType)
@@ -96,8 +153,8 @@ namespace CTU_Graph_Theory.Models
                 
                 if (nodeData.Length == 0 || nodeData.Length > 3) continue;
                 // node1 - node2 - weight
-                Vertex u = null, v = null; long weight;
-                ShowableEdge newEdge = null;
+                Vertex? u = null, v = null; long weight;
+                ShowableEdge? newEdge = null;
 
                 switch (nodeData.Length)
                 {

@@ -1,7 +1,7 @@
 ﻿
 using Avalonia.Controls;
-using AvaloniaEdit;
 using AvaloniaGraphControl;
+using CTU_Graph_Theory.Algorithms;
 using CTU_Graph_Theory.Models;
 using DynamicData;
 
@@ -26,8 +26,11 @@ namespace CTU_Graph_Theory.ViewModels
         private int _vertexCount = 0;
         private bool _isDirectedGraph = false;
         private string _graphData = string.Empty;
+
+        public BFS _bfs = new BFS();
         
         public ReactiveCommand<RadioButton, Unit> ChangeGraphTypeCommand { get; private set; }
+        public ReactiveCommand<Unit,Unit> RunBFSCommand { get; private set; }
 
         public CustomGraph MainGraph
         {
@@ -45,6 +48,7 @@ namespace CTU_Graph_Theory.ViewModels
             set => this.RaiseAndSetIfChanged(ref _graphData, value);
         }
 
+        GraphPanel al;
 
         public InitGraphViewModel()
         {
@@ -75,6 +79,8 @@ namespace CTU_Graph_Theory.ViewModels
                 Select(graphData => CustomGraph.CreateNewGraphFromStringLineData(graphData, GetGraphType(_isDirectedGraph))).
                 ObserveOn(RxApp.MainThreadScheduler).
                 Subscribe(newGraph => { MainGraph = newGraph; VertexCount = MainGraph.VetexCount; });
+
+            
         }
 
         private void InitCommand()
@@ -86,6 +92,8 @@ namespace CTU_Graph_Theory.ViewModels
                 if (string.IsNullOrWhiteSpace(radioButtonContent)) return;
                  ChangeGraphType(radioButtonContent);
             });
+
+            RunBFSCommand = ReactiveCommand.Create<Unit>(_ => { _bfs.RunAlgorithms(MainGraph, (Vertex)(((ShowableEdge)MainGraph.Edges.First()).Tail)); });
         }
 
         private CustomGraph.GraphType GetGraphType(bool isDirectedGraph)

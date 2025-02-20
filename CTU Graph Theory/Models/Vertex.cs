@@ -14,12 +14,29 @@ namespace CTU_Graph_Theory.Models
     public class Vertex : ReactiveObject
     {
         public static Vertex EmptyVertex = new Vertex("empty", Visible.NotShow);
-        public string Title {  get; private set; }
-        public bool IsShowVertex { get; private set; }
+
         public enum Visible
         {
             NotShow,
             Show
+        }
+        public string Title {  get; private set; }
+        public bool IsShowVertex { get; set; }
+
+        // cần để duyệt đồ thị và update UI
+
+        public bool _isVisited = false;
+        public bool _isPending = false;
+        public Vertex? ParentVertex { get; set; } = null;
+        public bool IsVisited
+        {
+            get => _isVisited;
+            set => this.RaiseAndSetIfChanged(ref _isVisited, value);
+        }
+        public bool IsPending
+        {
+            get => _isPending;
+            set => this.RaiseAndSetIfChanged(ref _isPending, value);
         }
 
         public Vertex(string title, Visible isShowVertex = Visible.Show)
@@ -39,6 +56,11 @@ namespace CTU_Graph_Theory.Models
                     break;
             }
             return isVisible;
+        }
+
+        public override string ToString()
+        {
+            return Title;
         }
     }
 }
