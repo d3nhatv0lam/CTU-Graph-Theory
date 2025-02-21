@@ -3,6 +3,7 @@ using CTU_Graph_Theory.Models;
 using Microsoft.Msagl.Layout.LargeGraphLayout;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.Intrinsics;
@@ -22,6 +23,7 @@ namespace CTU_Graph_Theory.Models
         public GraphType _GraphType { get; private set; } = GraphType.UnDirected;
 
         public int VetexCount { get; private set; } = 0;
+        public ObservableCollection<Vertex> Vertices { get; private set; }
         public CustomGraph() { }
 
 
@@ -205,6 +207,7 @@ namespace CTU_Graph_Theory.Models
                 if (newEdge != null) newGraph.Edges.Add(newEdge);
             }
             newGraph.VetexCount = set.Count;
+            newGraph.Vertices = new ObservableCollection<Vertex>(set);
             return newGraph;
         }
     }

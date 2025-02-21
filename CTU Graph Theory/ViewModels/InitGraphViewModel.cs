@@ -26,8 +26,7 @@ namespace CTU_Graph_Theory.ViewModels
         private int _vertexCount = 0;
         private bool _isDirectedGraph = false;
         private string _graphData = string.Empty;
-
-        public BFS _bfs = new BFS();
+        
         
         public ReactiveCommand<RadioButton, Unit> ChangeGraphTypeCommand { get; private set; }
         public ReactiveCommand<Unit,Unit> RunBFSCommand { get; private set; }
@@ -93,7 +92,7 @@ namespace CTU_Graph_Theory.ViewModels
                  ChangeGraphType(radioButtonContent);
             });
 
-            RunBFSCommand = ReactiveCommand.Create<Unit>(_ => { _bfs.RunAlgorithms(MainGraph, (Vertex)(((ShowableEdge)MainGraph.Edges.First()).Tail)); });
+            RunBFSCommand = ReactiveCommand.Create<Unit>(_ => {  });
         }
 
         private CustomGraph.GraphType GetGraphType(bool isDirectedGraph)
