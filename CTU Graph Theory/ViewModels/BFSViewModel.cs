@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Avalonia.Xaml.Interactivity;
 using CTU_Graph_Theory.Algorithms;
 using CTU_Graph_Theory.Models;
 using ReactiveUI;
@@ -39,6 +40,7 @@ namespace CTU_Graph_Theory.ViewModels
         public BFSViewModel()
         {
             _bfs = new BFS();
+            this.Name = AlgorithmName;
         }
     }
 }

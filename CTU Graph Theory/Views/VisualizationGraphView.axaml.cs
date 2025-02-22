@@ -15,11 +15,11 @@ using System.Reactive.Disposables;
 
 namespace CTU_Graph_Theory.Views;
 
-public partial class InitGraphView : ReactiveUserControl<InitGraphViewModel>
+public partial class VisualizationGraphView : ReactiveUserControl<VisualizationGraphViewModel>
 {
 
 
-    public InitGraphView()
+    public VisualizationGraphView()
     {
         InitializeComponent();
 
@@ -35,7 +35,7 @@ public partial class InitGraphView : ReactiveUserControl<InitGraphViewModel>
     {
         if (sender is Connection edgeLine)
         {
-            ((InitGraphViewModel)this.DataContext)?.UpdateEdgeColor(edgeLine);
+            ((VisualizationGraphViewModel)this.DataContext)?.UpdateEdgeColor(edgeLine);
         }
     }
 

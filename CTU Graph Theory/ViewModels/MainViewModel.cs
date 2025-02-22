@@ -57,7 +57,7 @@ public class MainViewModel : ViewModelBase
     private void PagesViewModelInit()
     {
         PagesViewModel.Add(new InformationViewModel());
-        PagesViewModel.Add(new InitGraphViewModel());
+        PagesViewModel.Add(new VisualizationGraphViewModel());
     }
 
     private void ViewLocatorNodeInit()

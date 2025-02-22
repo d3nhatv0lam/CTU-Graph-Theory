@@ -20,16 +20,14 @@ using System.Threading.Tasks;
 
 namespace CTU_Graph_Theory.ViewModels
 {
-    public class InitGraphViewModel: ViewModelBase
+    public class VisualizationGraphViewModel: ViewModelBase
     {
         private CustomGraph _mainGraph = new CustomGraph();
         private int _vertexCount = 0;
         private bool _isDirectedGraph = false;
         private string _graphData = string.Empty;
-        
-        
-        public ReactiveCommand<RadioButton, Unit> ChangeGraphTypeCommand { get; private set; }
-        public ReactiveCommand<Unit,Unit> RunBFSCommand { get; private set; }
+        private List<ViewModelBase> _algorithmList;
+        private ViewModelBase _selectedAlgorithm;
 
         public CustomGraph MainGraph
         {
@@ -47,25 +45,47 @@ namespace CTU_Graph_Theory.ViewModels
             set => this.RaiseAndSetIfChanged(ref _graphData, value);
         }
 
-        GraphPanel al;
+        public List<ViewModelBase> AlgorithmList
+        {
+            get 
+            {
+                if (_algorithmList == null) _algorithmList = new();
+                return _algorithmList;
+            }   
+        }
 
-        public InitGraphViewModel()
+        public ViewModelBase SelectedAlgorithm
+        {
+            get => _selectedAlgorithm;
+            set => this.RaiseAndSetIfChanged(ref _selectedAlgorithm, value);
+        }
+     
+
+        public ReactiveCommand<RadioButton, Unit> ChangeGraphTypeCommand { get; private set; }
+
+        public VisualizationGraphViewModel()
         {
             //var v1 = new Vertex("1");
             //var v2 = new Vertex("2");
             //var v3 = new Vertex("3");
             //var v4 = new Vertex("4");
 
-            
+
             //MainGraph.Edges.Add(new ShowableEdge(v1, v1, "aaa",ShowableEdge.Visible.Show, Edge.Symbol.None, Edge.Symbol.None));
             //MainGraph.Edges.Add(new ShowableEdge(v1, v2, "asdafdass", ShowableEdge.Visible.Show, Edge.Symbol.None, Edge.Symbol.None));
             //MainGraph.Edges.Add(new ShowableEdge(v3, v4, "a", ShowableEdge.Visible.Show, Edge.Symbol.None, Edge.Symbol.None));
             //MainGraph.Edges.Add(new ShowableEdge(v1, v4, "", ShowableEdge.Visible.Show, Edge.Symbol.None, Edge.Symbol.None));
 
             //MainGraph.Edges.Add(new ShowableEdge(new Vertex("alo"), Vertex.EmptyVertex, "alo", ShowableEdge.Visible.NotShow));
-          
+            CreateAlgorithList();
             InitCommand();
             InitObservable();
+        }
+
+        private void CreateAlgorithList()
+        {
+            AlgorithmList.Add(new BFSViewModel());
+            AlgorithmList.Add(new DFSStackViewModel());
         }
 
         private void InitObservable()
@@ -92,13 +112,12 @@ namespace CTU_Graph_Theory.ViewModels
                  ChangeGraphType(radioButtonContent);
             });
 
-            RunBFSCommand = ReactiveCommand.Create<Unit>(_ => {  });
         }
 
-        private CustomGraph.GraphType GetGraphType(bool isDirectedGraph)
+        private CustomGraph.GraphDirectType GetGraphType(bool isDirectedGraph)
         {
-            if (isDirectedGraph) return CustomGraph.GraphType.Directed;
-            return CustomGraph.GraphType.UnDirected;
+            if (isDirectedGraph) return CustomGraph.GraphDirectType.Directed;
+            return CustomGraph.GraphDirectType.UnDirected;
         }
 
         public void UpdateEdgeColor(Connection edgeLine)
@@ -114,14 +133,14 @@ namespace CTU_Graph_Theory.ViewModels
                 // current graph is Directed
                 if (_isDirectedGraph) return;
                 // not Directed => change
-                MainGraph = CustomGraph.CreateNewGraphFromChangeGraphType(MainGraph,CustomGraph.GraphType.Directed);
+                MainGraph = CustomGraph.CreateNewGraphFromChangeGraphType(MainGraph,CustomGraph.GraphDirectType.Directed);
                 _isDirectedGraph = true;
             }
             // UnDirected
             else
             {
                 if (!_isDirectedGraph) return;
-                MainGraph = CustomGraph.CreateNewGraphFromChangeGraphType(MainGraph, CustomGraph.GraphType.UnDirected);
+                MainGraph = CustomGraph.CreateNewGraphFromChangeGraphType(MainGraph, CustomGraph.GraphDirectType.UnDirected);
                 _isDirectedGraph = false;
             }
 

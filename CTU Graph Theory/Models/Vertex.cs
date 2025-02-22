@@ -20,14 +20,13 @@ namespace CTU_Graph_Theory.Models
             NotShow,
             Show
         }
-        public string Title {  get; private set; }
-        public bool IsShowVertex { get; set; }
-
         // cần để duyệt đồ thị và update UI
+        public bool _isVisited;
+        public bool _isPending;
 
-        public bool _isVisited = false;
-        public bool _isPending = false;
-        public Vertex? ParentVertex { get; set; } = null;
+        public string Title {  get; }
+        public bool IsShowVertex { get; }
+        public Vertex? ParentVertex { get; set; }
         public bool IsVisited
         {
             get => _isVisited;
@@ -43,6 +42,8 @@ namespace CTU_Graph_Theory.Models
         {
             Title = title;
             IsShowVertex = GetVisibleState(isShowVertex);
+            ParentVertex = null;
+            IsVisited = IsPending = false;
         }
 
         private bool GetVisibleState(Visible isShowVertex)
@@ -56,6 +57,16 @@ namespace CTU_Graph_Theory.Models
                     break;
             }
             return isVisible;
+        }
+
+        public static Vertex CreateNewVertex(string Title)
+        {
+            return new Vertex(Title);
+        }
+
+        public static bool IsVertexEqual(Vertex v1, Vertex v2)
+        {
+            return v1.Title == v2.Title;
         }
 
         public override string ToString()

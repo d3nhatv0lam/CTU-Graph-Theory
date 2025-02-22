@@ -12,11 +12,12 @@ namespace CTU_Graph_Theory.Algorithms
     public class BFS : AlgorithmBase
     {
         // Algorithms
-        private readonly Queue<Vertex> queue = new();
+        private readonly Queue<Vertex> queue;
         public BFS()
         {
             AlgorithmName = "BFS - Duyệt theo chiều rộng";
             Pseudocodes = new List<StringPseudoCode>();
+            queue = new();
         }
 
         protected override void FillPseudoCode()

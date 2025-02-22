@@ -28,4 +28,10 @@
   <ItemGroup>
     <UpToDateCheckInput Remove="Views\BFSView.axaml" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Views\VisualizationGraphView.axaml.cs">
+      <DependentUpon>VisualizationGraphView.axaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
 </Project>

@@ -15,20 +15,59 @@ namespace CTU_Graph_Theory.Models
 {
     public class CustomGraph : Graph
     {
+        
         public enum GraphType
+        {
+            SimpleGraph,
+            MultiGraph,
+            PseudoGraph,
+        };
+
+        public enum GraphDirectType
         {
             UnDirected,
             Directed
         };
-        public GraphType _GraphType { get; private set; } = GraphType.UnDirected;
 
-        public int VetexCount { get; private set; } = 0;
+        public GraphType TypeOfGraph { get; private set; }
+        public GraphDirectType DirectTypeOfGraph { get; private set; }
+
         public ObservableCollection<Vertex> Vertices { get; private set; }
-        public CustomGraph() { }
+        public int VetexCount { get => Vertices.Count; }
+        public int EdgeCount
+        {
+            get => this.Edges.Count;
+        }
 
+        public CustomGraph() 
+        {
+            TypeOfGraph = GraphType.SimpleGraph;
+            DirectTypeOfGraph = GraphDirectType.UnDirected;
+            Vertices = new ObservableCollection<Vertex>();
+        }
+
+        public bool IsDirectedGraph() => DirectTypeOfGraph == GraphDirectType.Directed;
+        public bool IsUnDirectedGraph() => DirectTypeOfGraph == GraphDirectType.UnDirected;
+        public bool IsSimpleGraph() => TypeOfGraph == GraphType.SimpleGraph;
+        public bool IsMultiGraph() => TypeOfGraph == GraphType.MultiGraph;
+        public bool IsPseudoGraph() => TypeOfGraph == GraphType.PseudoGraph;
+       
+
+        public Vertex? GetVertex(string vertexTitle)
+        {
+            Vertex? u = null ;
+            foreach (ShowableEdge edge in this.Edges)
+            {
+                u = edge.Tail as Vertex;
+                if (u?.Title == vertexTitle) return u;
+                u = edge.Head as Vertex;
+                if (u?.Title == vertexTitle) return u;
+            }
+            return u;
+        }
 
         public Vertex GetOrCreateVertex(string vertexTitle)
-        {
+        { 
             Vertex? u;
             // find vertex in graph
             foreach (ShowableEdge edge in this.Edges)
@@ -43,27 +82,7 @@ namespace CTU_Graph_Theory.Models
             return u;
         }
 
-        public ShowableEdge? GetEdge(Vertex u, Vertex v)
-        {   
-            
-            foreach (ShowableEdge edge in this.Edges)
-            {
-                Vertex? v1 = edge.Tail as Vertex;
-                Vertex? v2 = edge.Head as Vertex;
-
-                 if (_GraphType == GraphType.Directed)
-                    {
-                     if (u.Title == v1?.Title && v.Title == v2?.Title) return edge;
-                    }
-                else
-                    if ((u.Title == v1?.Title && v.Title == v2?.Title) 
-                    || (u.Title == v2?.Title && v.Title == v1?.Title)) return edge;
-            }
-            // don't find
-            return null;
-        }
-
-        public bool Adjacent(Vertex u, Vertex v) 
+        public bool Adjacent(Vertex u, Vertex v)
         {
             if (GetEdge(u, v) == null) return false;
             return true;
@@ -74,22 +93,53 @@ namespace CTU_Graph_Theory.Models
             List<Vertex> neighboursVertex = new List<Vertex>();
             if (x == Vertex.EmptyVertex) return neighboursVertex;
 
-            foreach (ShowableEdge edge in this.Edges) 
+            foreach (ShowableEdge edge in this.Edges)
             {
-                Vertex  u = (Vertex)edge.Tail,
+                Vertex u = (Vertex)edge.Tail,
                         v = (Vertex)edge.Head;
                 if (v == Vertex.EmptyVertex) continue;
 
                 if (x == u) neighboursVertex.Add(v);
-                else 
-                if (_GraphType == GraphType.UnDirected && x == v) neighboursVertex.Add(u);
+                else
+                if (DirectTypeOfGraph == GraphDirectType.UnDirected && x == v) neighboursVertex.Add(u);
             }
             neighboursVertex.Sort((x, y) => x.Title.CompareTo(y.Title));
             return neighboursVertex;
         }
 
+        public ShowableEdge? GetEdge(Vertex u, Vertex v)
+        {   
+            
+            foreach (ShowableEdge edge in this.Edges)
+            {
+                Vertex? v1 = edge.Tail as Vertex;
+                Vertex? v2 = edge.Head as Vertex;
+                if (v1 == null || v2 == null) continue;
 
+                // both 2 Direct type accept u->v
+                if (Vertex.IsVertexEqual(u, v1) && Vertex.IsVertexEqual(v, v2)) return edge;
 
+                // don't has u->v
+                // is Undirected and has v->u
+                if (IsUnDirectedGraph() && Vertex.IsVertexEqual(u, v2) && Vertex.IsVertexEqual(v, v1)) return edge;
+                //    if (DirectTypeOfGraph == GraphDirectType.Directed)
+                //{
+                //     return edge;
+                //    //if (u.Title == v1?.Title && v.Title == v2?.Title) return edge;
+                //}
+                //else
+                //{
+                //    if (Vertex.IsVertexEqual(u, v1) && Vertex.IsVertexEqual(v, v2))
+                //    if ((u.Title == v1?.Title && v.Title == v2?.Title)
+                //    || (u.Title == v2?.Title && v.Title == v1?.Title)) return edge;
+                //}
+
+            }
+            // don't find
+            return null;
+        }
+
+       
         public void UnVisitAndClearParentAll()
         {
             Vertex u;
@@ -117,16 +167,17 @@ namespace CTU_Graph_Theory.Models
             }
         }
 
-        public static CustomGraph CreateNewGraphFromChangeGraphType(CustomGraph graph, GraphType newType)
+        public static CustomGraph CreateNewGraphFromChangeGraphType(CustomGraph graph, GraphDirectType newType)
         {
-            if (graph._GraphType == newType) return graph;
-
+            if (graph.DirectTypeOfGraph == newType) return graph;
+            // create new graph
             CustomGraph newGraph = new CustomGraph();
-            newGraph._GraphType = newType;
+            newGraph.DirectTypeOfGraph = newType;
+            // add edge for graph
             foreach (ShowableEdge edge in graph.Edges)
             {
                 ShowableEdge newEdge;
-                if (newType == GraphType.Directed)
+                if (newType == GraphDirectType.Directed)
                     newEdge = new ShowableEdge(edge.Tail, edge.Head, edge.VisibleState, edge.Label);
                 else
                     newEdge = new ShowableEdge(edge.Tail, edge.Head, edge.VisibleState, edge.Label, Edge.Symbol.None, Edge.Symbol.None);
@@ -135,18 +186,14 @@ namespace CTU_Graph_Theory.Models
             return newGraph;
         }
 
-        public static CustomGraph CreateNewGraphFromStringLineData(List<string> graphData,GraphType type)
+        public static CustomGraph CreateNewGraphFromStringLineData(List<string> graphData,GraphDirectType type)
         {
+            // create new graph
             CustomGraph newGraph = new CustomGraph();
-            newGraph._GraphType = type;
+            newGraph.DirectTypeOfGraph = type;
 
             // get symbol
-            Edge.Symbol DirectGraphSymbol;
-            if (type == GraphType.UnDirected)
-                DirectGraphSymbol = Edge.Symbol.None;
-            else
-                DirectGraphSymbol = Edge.Symbol.Arrow;
-
+            Edge.Symbol DirectGraphSymbol = newGraph.IsUnDirectedGraph() ? DirectGraphSymbol = Edge.Symbol.None: DirectGraphSymbol = Edge.Symbol.Arrow;
             HashSet<Vertex> set = new HashSet<Vertex>();
 
             foreach (var data in graphData)
@@ -162,7 +209,10 @@ namespace CTU_Graph_Theory.Models
                 {
                     case 1:
                         {
-                            u = newGraph.GetOrCreateVertex(nodeData[0]);
+                            u = newGraph.GetVertex(nodeData[0]);
+                            if (u != null) continue;
+
+                            u = Vertex.CreateNewVertex(nodeData[0]);
                             v = Vertex.EmptyVertex;
                             newEdge = new ShowableEdge(u, v, ShowableEdge.Visible.NotShow);
                             set.Add(u);
@@ -206,7 +256,6 @@ namespace CTU_Graph_Theory.Models
                 }
                 if (newEdge != null) newGraph.Edges.Add(newEdge);
             }
-            newGraph.VetexCount = set.Count;
             newGraph.Vertices = new ObservableCollection<Vertex>(set);
             return newGraph;
         }
