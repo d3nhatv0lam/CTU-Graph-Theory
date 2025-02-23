@@ -5,9 +5,12 @@
              mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="600"
 			 xmlns:vm="using:CTU_Graph_Theory.ViewModels"
 			 xmlns:model="using:CTU_Graph_Theory.Models"
+			 xmlns:converter ="using:CTU_Graph_Theory.Converters"
+			 xmlns:interface ="using:CTU_Graph_Theory.Interfaces"
 			 x:DataType="vm:VisualizationGraphViewModel"
 			 xmlns:paz="using:Avalonia.Controls.PanAndZoom"
 			 xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+			 xmlns:p1="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
 			 xmlns:System="clr-namespace:System;assembly=mscorlib"
 			 xmlns:AvaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
 			xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
@@ -19,18 +22,24 @@
 	<UserControl.DataContext>
 		<vm:VisualizationGraphViewModel/>
 	</UserControl.DataContext>
+	
+	<UserControl.Resources>
+		<converter:GraphTypeToStringConverter x:Key ="TypeToString"/>
+		<converter:GraphDirectTypeToStringConverter x:Key ="DirectToString"/>
+		<converter:BoolToStringState x:Key ="BoolToStringState"/>
+	</UserControl.Resources>
 
 	<Grid ColumnDefinitions="0.25* auto *">
 		<Border Grid.Column="0" CornerRadius="10" Padding="10" Background="Transparent">
 			<DockPanel>
-				<TextBlock DockPanel.Dock="Top" Text="Số lượng đỉnh:"/>
-				<TextBox DockPanel.Dock="Top"
+				<TextBlock Classes="Headline6" DockPanel.Dock="Top" Text="Nhập đồ thị:"/>
+				<!--<TextBox DockPanel.Dock="Top"
 						 UseFloatingWatermark="False"
 						 Classes="outline"
 						 Theme="{StaticResource OutlineTextBox}"
 						 IsReadOnly="True"
 						 Text="{Binding VertexCount}"
-						 Watermark="số lượng đỉnh" />
+						 Watermark="số lượng đỉnh" />-->
 				
 				<Separator DockPanel.Dock="Top" />
 
@@ -113,21 +122,19 @@
 			<Panel Background="Gray"/>
 		</Border>
 
-		<Grid Grid.Column="2" RowDefinitions="* 0.4*" ColumnDefinitions="* 0.8*">
-
+		<Grid Grid.Column="2" RowDefinitions="* 0.2*" ColumnDefinitions="* 0.8*">
 
 			<Border Grid.Row="0" Grid.Column="0" Padding="10">
-				<paz:ZoomBorder  Stretch="Uniform" ZoomSpeed="1.5"
+				<Grid RowDefinitions="* 0.1*">
+					<paz:ZoomBorder Grid.Row="0" 
+								Stretch="Uniform" ZoomSpeed="1.5"
 								MaxZoomX="2" MaxZoomY="2"
-								
 								 PanButton="Right"
 								 EnableConstrains="False"
 								 BorderThickness="1" BorderBrush="Black"
 								 Background="Transparent" ClipToBounds="True" Focusable="True"
 								 VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
 							>
-
-
 					<agc:GraphPanel x:Name="MainGraph" Graph="{Binding MainGraph}" LayoutMethod="SugiyamaScheme" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
 
 						<agc:GraphPanel.Transitions>
@@ -137,7 +144,6 @@
 						</agc:GraphPanel.Transitions>
 
 						<agc:GraphPanel.Styles>
-
 							<!--// Node Style Area //-->
 							<Style Selector="agc|TextSticker">
 								<Setter Property="Background" Value="Transparent"/>
@@ -175,41 +181,32 @@
 							</Style>
 
 							<!--// Connection //-->
-
 							<Style Selector="agc|Connection">
 								<Style Selector="^:pointerover">
 									<Setter Property="Brush" Value="Blue"/>
 								</Style>
-
-
 								<Setter Property="Transitions">
 									<Transitions>
 										<BrushTransition Property="Brush" Duration="0:0:0.3"/>
 									</Transitions>
 								</Setter>
 							</Style>
-
 							<Style Selector="agc|Connection.NotShow">
 								<Setter Property="Opacity" Value="0"/>
 							</Style>
-
 							<Style Selector="agc|Connection.Show">
 								<Setter Property="Opacity" Value="1"/>
 							</Style>
-
 							<Style Selector="agc|Connection.NotVisited">
 								<Setter Property="Brush" Value="Black"/>
 							</Style>
 							<Style Selector="agc|Connection.Visited">
 								<Setter Property="Brush" Value="Red"/>
 							</Style>
-
-
 						</agc:GraphPanel.Styles>
 
-
-
 						<agc:GraphPanel.DataTemplates>
+							<!--// node template //-->
 							<DataTemplate DataType="{x:Type model:Vertex}">
 								<agc:TextSticker Classes.Show="{Binding IsShowVertex}"
 												 Classes.NotShow ="{Binding !IsShowVertex}"
@@ -221,8 +218,7 @@
 												 Shape="Ellipse"
 													 />
 							</DataTemplate>
-
-
+							<!--// Edge template //-->
 							<DataTemplate DataType="{x:Type model:ShowableEdge}">
 								<agc:Connection Classes.NotShow="{Binding !IsShowEdge}"
 												Classes.Show="{Binding IsShowEdge}"
@@ -231,32 +227,106 @@
 												PropertyChanged="Connection_PropertyChanged"
 													/>
 							</DataTemplate>
-
+							<!--// weight template //-->
 							<DataTemplate DataType="{x:Type System:Int64}">
 								<TextBlock Text="{Binding}"/>
 							</DataTemplate>
-
-
-
 						</agc:GraphPanel.DataTemplates>
 					</agc:GraphPanel>
+					</paz:ZoomBorder>
+					<Grid Grid.Row="1"  ColumnDefinitions="* *">
 
-				</paz:ZoomBorder>
+						<StackPanel Grid.Column="0" Orientation="Horizontal">
+							<TextBlock Text="Tốc độ thuật toán: "
+									   VerticalAlignment="Center"
+										FontWeight="Bold"/>
+							<Slider Width="60"
+								IsSnapToTickEnabled="True" 
+								Classes="Discrete Accent" 
+								Value="{Binding MultiplierSpeed}"
+								TickFrequency="1" 
+								Minimum="1"
+								Maximum="5"
+								Margin="10 0 0 0"/>
+						</StackPanel>		
+						<Grid Grid.Column="1" ColumnDefinitions="* *">
+							<Button Grid.Column="0"
+									Theme="{StaticResource MaterialOutlineButton}" Classes="accent"
+									Height="40"
+									Content="Tạm dừng" HorizontalAlignment="Center"
+									Command="{Binding PauseAlgorithmCommand}"/>
+							<Button Grid.Column="1"
+									Theme="{StaticResource MaterialOutlineButton}" Classes="accent"
+									Height="40"
+									Content="Tiếp tục" 
+									Command="{Binding RunAlgorithmCommand}"/>
+						</Grid>
+					</Grid>
+				
+				</Grid>
 			</Border>
 
 			<Border Grid.Row="1" Grid.Column="0" Padding="10 0 10 10">
 				<Border BorderThickness="1" BorderBrush="Black">
-					
+					<Grid RowDefinitions="auto auto auto auto" >
+						<Grid.Styles>
+							<Style Selector="TextBlock">
+								<Setter Property="FontWeight" Value="Bold"/>
+							</Style>
+						</Grid.Styles>
+						<TextBlock  Grid.Row="0" 
+									Classes="Subtitle1"
+								    Text="--Thông tin đồ thị--"
+									HorizontalAlignment="Center"/>
+						<StackPanel Grid.Row="1"
+									Orientation="Horizontal"
+									HorizontalAlignment="Left"
+									Margin="10 0 0 0">
+							<TextBlock Text="Loại đồ thị:"/>
+							<TextBlock Text="{Binding GraphType ,Converter={StaticResource TypeToString}}"
+									   Margin="5 0 0 0"/>
+							<TextBlock Text="{Binding IsDirectedGraph,Converter={StaticResource DirectToString}}"
+									   Margin="3 0 0 0"/>
+						</StackPanel>
+						<Grid Grid.Row="2" Margin="10 0 0 0" ColumnDefinitions="* *">
+							<TextBlock  Grid.Column="0" Text="{Binding VertexCount,StringFormat=Số lượng đỉnh: {0}}"/>
+							<TextBlock  Grid.Column="1" Text="{Binding EdgeCount,StringFormat=Số lượng cung: {0}}"/>
+						</Grid>
+						
+						<StackPanel Margin="10 0 0 0" Grid.Row="3" Orientation="Horizontal">
+							<StackPanel.Styles>
+								<Style Selector="TextBlock.Running">
+									<Setter Property="Foreground" Value="Green"/>
+								</Style>
+								<Style Selector="TextBlock.Stopped">
+									<Setter Property="Foreground" Value="Brown"/>
+								</Style>
+							</StackPanel.Styles>
+							<TextBlock Text="Trạng thái duyệt đồ thị: "/>
+							<TextBlock Classes.Running="{Binding IsRunningAlgorithm}"
+									   Classes.Stopped ="{Binding !IsRunningAlgorithm}"
+										Text="{Binding IsRunningAlgorithm,Converter={StaticResource BoolToStringState}}"/>
+						</StackPanel>
+					</Grid>
 				</Border>
 			</Border>
 	
 			<!--// Right side //-->
-
-			<Grid Grid.Row="0"
+			<Border Grid.Row="0"
 				  Grid.RowSpan="2"
-				  Grid.Column="1"
-				  RowDefinitions="0.1* auto *"
+				  Grid.Column="1" 
+				Padding="0 0 10 0">
+				<Grid
+				  RowDefinitions="0.1* auto auto auto *"
 				  >
+					<Grid.Styles>
+						<Style Selector="ComboBoxItem">
+							<Setter Property="Background" Value="Transparent"/>
+							<Style Selector="^:pointerover">
+								<Setter Property="Background" Value="LightGray"/>
+							</Style>
+						</Style>
+					</Grid.Styles>
 				
 					<TextBlock Grid.Row="0"
 							   Classes ="Headline6"
@@ -265,33 +335,59 @@
 							   />	
 				
 					<ComboBox Grid.Row="1"
+							  Theme="{StaticResource MaterialOutlineComboBox}"
+							  p1:ComboBoxAssist.Label="Tên thuật toán"
 							  ItemsSource="{Binding AlgorithmList}" 
 							  SelectedItem="{Binding SelectedAlgorithm}"
-							  MaxDropDownHeight="300">
+							  MaxDropDownHeight="300" 
+							  >
 
-						<ComboBox.Styles>
-							<Style Selector="ComboBoxItem">
-								<Setter Property="Background" Value="Transparent"/>
-								<Style Selector="^:pointerover">
-									<Setter Property="Background" Value="LightGray"/>
-								</Style>
-							</Style>
-						</ComboBox.Styles>
+						
 						
 						<ComboBox.ItemTemplate>
-								<DataTemplate x:DataType="{x:Type vm:ViewModelBase}">
-									<TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
+								<DataTemplate x:DataType="{x:Type interface:IAlgorithms}">
+									<TextBlock Text="{Binding AlgorithmName}" VerticalAlignment="Center"/>
 								</DataTemplate>
 						</ComboBox.ItemTemplate>
 					</ComboBox>
-
-
-
-
-
-
+					
+					<Grid Grid.Row="2"
+						  ColumnDefinitions="auto * *"
+							>
+						<TextBlock Grid.Column="0"
+								   Text="Chọn đỉnh bắt đầu:"
+									VerticalAlignment="Center"
+									HorizontalAlignment="Center"
+									FontWeight="Bold"/>
+						
+						<ComboBox Grid.Column="1" 
+								  ItemsSource="{Binding Vertices}"
+								  SelectedItem="{Binding StartVertex}"
+								  MinWidth="70"
+								 HorizontalAlignment="Center"
+								  MaxDropDownHeight="200">
+		
+							<ComboBox.ItemTemplate>
+								<DataTemplate DataType="{x:Type model:Vertex}">
+									<TextBlock Text="{Binding Title}"
+											    VerticalAlignment="Center"
+												 HorizontalAlignment="Stretch"
+												FontWeight="Bold"
+												FontSize="18"/>
+								</DataTemplate>
+							</ComboBox.ItemTemplate>
+						</ComboBox>
+					
+						<Button Grid.Column="2" Classes="accent" Content="Duyệt"
+								Command="{Binding RunAlgorithmCommand}"/>
+					</Grid>
+					
+					<Separator Grid.Row="3"/>
+					
+					<TransitioningContentControl Grid.Row="4" Content="{Binding SelectedAlgorithm}"/>
 			</Grid>
-
+			</Border>
+			
 		</Grid>
 
 

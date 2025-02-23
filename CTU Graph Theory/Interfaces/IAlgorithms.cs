@@ -1,6 +1,7 @@
 ﻿using CTU_Graph_Theory.Models;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -12,16 +13,13 @@ namespace CTU_Graph_Theory.Interfaces
     {
         // cơ bản
         public string AlgorithmName { get; }
-        public  List<StringPseudoCode> Pseudocodes { get; }
-
-        public void RunAlgorithm(CustomGraph graph);
+        public bool IsSetCompletedAlgorithm { get; set; }
+        public ObservableCollection<StringPseudoCode> Pseudocodes { get; }
+        
+        public void TransferGraph(CustomGraph graph, Vertex vertex);
+        public void RunAlgorithm();
         public void PauseAlgorithm();
-
-        protected virtual void FillPseudoCode()
-        {
-
-        }
-
-
+        public void SetRunSpeed(int speedUp);
+        public void SetCompletedAlgorithm(EventHandler returnIsRunningState);
     }
 }

@@ -16,8 +16,9 @@ namespace CTU_Graph_Theory.Algorithms
         public BFS()
         {
             AlgorithmName = "BFS - Duyệt theo chiều rộng";
-            Pseudocodes = new List<StringPseudoCode>();
+            Pseudocodes = new System.Collections.ObjectModel.ObservableCollection<StringPseudoCode>();
             queue = new();
+            FillPseudoCode();
         }
 
         protected override void FillPseudoCode()
@@ -50,6 +51,11 @@ namespace CTU_Graph_Theory.Algorithms
             CleanBFS(graph);
         }
 
+        public override void PauseAlgorithm()
+        {
+            base.PauseAlgorithm();
+        }
+
         public override void RunAlgorithm(CustomGraph graph)
         {
             if (StartVertex == null)
@@ -57,9 +63,11 @@ namespace CTU_Graph_Theory.Algorithms
                 CleanBFS(graph);
                 return;
             }
-            if (queue.Count == 0)
+            if (queue.Count == 0 || IsStartVertexChanged == true)
             {
+                CleanBFS(graph);
                 queue.Enqueue(StartVertex);
+                IsStartVertexChanged = false;
             }
             // clone token để xóa biết đường tự hủy
             var token = cts.Token;
@@ -70,7 +78,6 @@ namespace CTU_Graph_Theory.Algorithms
         {
             while (queue.Count != 0)
             {
-
                 if (token.IsCancellationRequested)
                     return;
 
@@ -95,64 +102,16 @@ namespace CTU_Graph_Theory.Algorithms
                         queue.Enqueue(v);
                         if (v.ParentVertex == null) v.ParentVertex = u;
                         v.IsPending = true;
-                        await Task.Delay(1000,token);
+                        await Task.Delay(this.RunSpeed);
                     }
                 }
-                await Task.Delay(1000,token);
+                try
+                {
+                    await Task.Delay(this.RunSpeed, token);
+                }
+                catch { return; }
             }
+            OnCompletedAlgorithm();
         }
-
-        //public async void RunAlgorithm(CustomGraph graph,Vertex s)
-        //{
-        //   // Đổi lại cấu trúc, thì khi này thuật toán sẽ chạy tiếp tục kể cả khi pause/run
-        //   // nếu không có thì sẽ bị reset toàn bộ
-        //    if ( StartVertex == null  ||
-        //        ( StartVertex != null && StartVertex != s))
-        //    {
-        //        graph.UnVisitAndClearParentAll();
-        //        queue.Clear();
-        //        queue.Enqueue(s);
-        //        StartVertex = s;
-        //    }
-        //    // copy ra để stop không bị bug
-        //    var token = cts.Token;
-           
-        //    while (queue.Count != 0)
-        //    {
-
-        //        if (token.IsCancellationRequested)
-        //            return;
-
-        //        Vertex u = queue.Dequeue();
-        //        //visit vertex => update into UI
-        //        if (u.IsVisited == true) continue;
-
-        //        u.IsPending = false;
-        //        u.IsVisited = true;
-        //        // draw adjacent => update into UI
-        //        if (u.ParentVertex != null)
-        //        {
-        //            ShowableEdge? AdjacentEdge = graph.GetEdge(u.ParentVertex, u);
-        //            if (AdjacentEdge != null)
-        //                AdjacentEdge.IsVisited = true;
-        //        }
-               
-        //        foreach (var v in graph.NeighboursOfVertex(u)) 
-        //        {
-        //            if (v.IsVisited == false)
-        //            {
-        //                queue.Enqueue(v);
-        //                if (v.ParentVertex == null) v.ParentVertex = u;
-        //                v.IsPending = true;
-        //                await Task.Delay(1000);
-        //            }
-        //        }
-        //        await Task.Delay(1000);
-        //    }
-
-        //    if (queue.Count == 0) StartVertex = null;
-        //}
-
-
     }
 }

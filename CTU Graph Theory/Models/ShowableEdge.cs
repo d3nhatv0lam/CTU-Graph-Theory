@@ -34,7 +34,7 @@ namespace CTU_Graph_Theory.Models
                 this.RaisePropertyChanging(new PropertyChangingEventArgs(nameof(IsVisited)));
                 _isVisited = value;
                 this.RaisePropertyChanged(new PropertyChangedEventArgs(nameof(IsVisited)));
-                Debug.WriteLine(((Vertex)Tail).ToString() + ((Vertex)Head).ToString() + IsVisited + " " + _isVisited);
+                //Debug.WriteLine(((Vertex)Tail).ToString() + ((Vertex)Head).ToString() + IsVisited + " " + _isVisited);
             }
         }
 

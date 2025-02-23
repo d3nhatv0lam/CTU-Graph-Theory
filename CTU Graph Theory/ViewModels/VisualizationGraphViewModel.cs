@@ -1,7 +1,9 @@
 ﻿
 using Avalonia.Controls;
+using Avalonia.Controls.Templates;
 using AvaloniaGraphControl;
 using CTU_Graph_Theory.Algorithms;
+using CTU_Graph_Theory.Interfaces;
 using CTU_Graph_Theory.Models;
 using DynamicData;
 
@@ -15,6 +17,7 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -24,10 +27,16 @@ namespace CTU_Graph_Theory.ViewModels
     {
         private CustomGraph _mainGraph = new CustomGraph();
         private int _vertexCount = 0;
+        private int _edgeCount = 0;
+        private CustomGraph.GraphType _graphType;
         private bool _isDirectedGraph = false;
         private string _graphData = string.Empty;
-        private List<ViewModelBase> _algorithmList;
-        private ViewModelBase _selectedAlgorithm;
+        private List<IAlgorithms> _algorithmList;
+        private IAlgorithms? _selectedAlgorithm = null;
+        private ObservableCollection<Vertex> _vertices;
+        private Vertex? _startVertex = null;
+        public bool _isRunningAlgorithm = false;
+        private int _multiplierSpeed = 1;
 
         public CustomGraph MainGraph
         {
@@ -39,13 +48,27 @@ namespace CTU_Graph_Theory.ViewModels
             get => _vertexCount;
             set => this.RaiseAndSetIfChanged(ref _vertexCount, value);
         }
+        public int EdgeCount
+        {
+            get => _edgeCount;
+            set => this.RaiseAndSetIfChanged(ref _edgeCount, value);
+        }
+        public CustomGraph.GraphType GraphType
+        {
+            get => _graphType;
+            set => this.RaiseAndSetIfChanged(ref  this._graphType, value);
+        }
+        public bool IsDirectedGraph
+        {
+            get => _isDirectedGraph;
+            set => this.RaiseAndSetIfChanged(ref _isDirectedGraph, value);
+        }
         public string GraphData
         {
             get => _graphData;
             set => this.RaiseAndSetIfChanged(ref _graphData, value);
         }
-
-        public List<ViewModelBase> AlgorithmList
+        public List<IAlgorithms> AlgorithmList
         {
             get 
             {
@@ -53,16 +76,39 @@ namespace CTU_Graph_Theory.ViewModels
                 return _algorithmList;
             }   
         }
-
-        public ViewModelBase SelectedAlgorithm
+        public IAlgorithms? SelectedAlgorithm
         {
             get => _selectedAlgorithm;
             set => this.RaiseAndSetIfChanged(ref _selectedAlgorithm, value);
+            
+        }
+        public ObservableCollection<Vertex> Vertices
+        {
+            get => _vertices;
+            set => this.RaiseAndSetIfChanged(ref _vertices, value);
+        }
+        public Vertex? StartVertex
+        {
+            get => _startVertex;
+            set => this.RaiseAndSetIfChanged(ref _startVertex, value);
+        }
+        public bool IsRunningAlgorithm
+        {
+            get => _isRunningAlgorithm;
+            set => this.RaiseAndSetIfChanged(ref _isRunningAlgorithm, value);
+        }
+        public int MultiplierSpeed
+        {
+            get => _multiplierSpeed;
+            set => this.RaiseAndSetIfChanged(ref _multiplierSpeed, value);
         }
      
 
         public ReactiveCommand<RadioButton, Unit> ChangeGraphTypeCommand { get; private set; }
-
+        private IObservable<bool> CanRunAlgorithmCommand { get;  set; }
+        public ReactiveCommand<Unit,Unit> RunAlgorithmCommand { get; private set; }
+        private IObservable<bool> CanPauseAlgorithmCommand { get;  set; }
+        public ReactiveCommand<Unit,Unit> PauseAlgorithmCommand { get; private set; }
         public VisualizationGraphViewModel()
         {
             //var v1 = new Vertex("1");
@@ -78,8 +124,9 @@ namespace CTU_Graph_Theory.ViewModels
 
             //MainGraph.Edges.Add(new ShowableEdge(new Vertex("alo"), Vertex.EmptyVertex, "alo", ShowableEdge.Visible.NotShow));
             CreateAlgorithList();
-            InitCommand();
             InitObservable();
+            InitCommand();
+
         }
 
         private void CreateAlgorithList()
@@ -97,9 +144,24 @@ namespace CTU_Graph_Theory.ViewModels
                 Select(graphData => graphData.Trim().Split("\n").Select(line => line.Trim()).Where(line => line.Length != 0).ToList()).
                 Select(graphData => CustomGraph.CreateNewGraphFromStringLineData(graphData, GetGraphType(_isDirectedGraph))).
                 ObserveOn(RxApp.MainThreadScheduler).
-                Subscribe(newGraph => { MainGraph = newGraph; VertexCount = MainGraph.VetexCount; });
-
-            
+                Subscribe(newGraph => {
+                    MainGraph = newGraph; 
+                    VertexCount = MainGraph.VetexCount; 
+                    EdgeCount = MainGraph.EdgeCount; 
+                    GraphType = MainGraph.TypeOfGraph;
+                    IsDirectedGraph = MainGraph.IsDirectedGraph();
+                    Vertices = MainGraph.Vertices;
+                    StartVertex = null;
+                });
+            // change algorithm
+            this.WhenAnyValue(x => x.SelectedAlgorithm).Where(algorithm => algorithm?.IsSetCompletedAlgorithm == false).Subscribe(algorithm => algorithm?.SetCompletedAlgorithm(OnAlgorithmCompleted));
+            // update Algorithm graph && vertex
+            this.WhenAnyValue(x => x.SelectedAlgorithm, x => x.StartVertex).Subscribe(tuple => { tuple.Item1?.TransferGraph(MainGraph, tuple.Item2); tuple.Item1?.SetRunSpeed(MultiplierSpeed); });
+            // set run speed
+            this.WhenAnyValue(x => x.MultiplierSpeed).Subscribe(multiplierSpeed => SelectedAlgorithm?.SetRunSpeed(multiplierSpeed));
+            // command check can activate
+            CanRunAlgorithmCommand = this.WhenAnyValue(x => x.SelectedAlgorithm, x => x.StartVertex,x => x.IsRunningAlgorithm, (algorithm, startVertex,isRunningAlgorithm) => (algorithm != null) && (startVertex != null) && (isRunningAlgorithm == false));
+            CanPauseAlgorithmCommand = this.WhenAnyValue(x => x.IsRunningAlgorithm, isRunning => isRunning == true);
         }
 
         private void InitCommand()
@@ -111,7 +173,9 @@ namespace CTU_Graph_Theory.ViewModels
                 if (string.IsNullOrWhiteSpace(radioButtonContent)) return;
                  ChangeGraphType(radioButtonContent);
             });
-
+            
+            RunAlgorithmCommand = ReactiveCommand.Create(() => { SelectedAlgorithm?.RunAlgorithm(); IsRunningAlgorithm = true; },CanRunAlgorithmCommand);
+            PauseAlgorithmCommand = ReactiveCommand.Create(() => { SelectedAlgorithm?.PauseAlgorithm(); IsRunningAlgorithm = false; }, CanPauseAlgorithmCommand);
         }
 
         private CustomGraph.GraphDirectType GetGraphType(bool isDirectedGraph)
@@ -133,17 +197,21 @@ namespace CTU_Graph_Theory.ViewModels
                 // current graph is Directed
                 if (_isDirectedGraph) return;
                 // not Directed => change
-                MainGraph = CustomGraph.CreateNewGraphFromChangeGraphType(MainGraph,CustomGraph.GraphDirectType.Directed);
-                _isDirectedGraph = true;
+                MainGraph = CustomGraph.CreateNewGraphFromChangeGraphType(MainGraph, CustomGraph.GraphDirectType.Directed);
+                IsDirectedGraph = true;
             }
             // UnDirected
             else
             {
                 if (!_isDirectedGraph) return;
                 MainGraph = CustomGraph.CreateNewGraphFromChangeGraphType(MainGraph, CustomGraph.GraphDirectType.UnDirected);
-                _isDirectedGraph = false;
+                IsDirectedGraph = false;
             }
+        }
 
+        private void OnAlgorithmCompleted(object? sender, EventArgs e)
+        {
+            IsRunningAlgorithm = false;
         }
 
     }

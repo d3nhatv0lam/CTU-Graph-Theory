@@ -2,11 +2,36 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="600"
+             mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="400"
 			 xmlns:vm ="using:CTU_Graph_Theory.ViewModels"
 			 x:DataType="vm:BFSViewModel"
              x:Class="CTU_Graph_Theory.Views.BFSView">
-	<Grid>
-		<TextBlock Text="asdajdgj"/>
+
+	
+	<Grid RowDefinitions="auto *">
+		<TextBlock Grid.Row="0" 
+				   Classes="Subtitle1"
+				   Text="Mã giả:"/>
+		
+		<ItemsRepeater Grid.Row="1"
+						ItemsSource="{Binding Pseudocodes}"
+					   VerticalAlignment="Top"
+					   HorizontalAlignment="Center">
+			<ItemsRepeater.Styles>
+				<Style Selector="TextBlock.SelectedLine">
+					<Setter Property="Background" Value="LightBlue"/>
+				</Style>
+			</ItemsRepeater.Styles>
+			
+			<ItemsRepeater.ItemTemplate>
+				<DataTemplate>
+					<TextBlock Classes.SelectedLine="{Binding IsSelectionCode}" 
+							   Text="{Binding Code}"
+							   TextWrapping="Wrap"
+							   />
+				</DataTemplate>
+			</ItemsRepeater.ItemTemplate>
+		</ItemsRepeater>
+
 	</Grid>
 </UserControl>

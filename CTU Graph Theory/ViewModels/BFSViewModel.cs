@@ -1,21 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Avalonia.Xaml.Interactivity;
+using AvaloniaGraphControl;
 using CTU_Graph_Theory.Algorithms;
+using CTU_Graph_Theory.Interfaces;
 using CTU_Graph_Theory.Models;
 using ReactiveUI;
 
 namespace CTU_Graph_Theory.ViewModels
 {
-    public class BFSViewModel: ViewModelBase
+    public class BFSViewModel: ViewModelBase, IAlgorithms
     {
         private BFS _bfs;
-
-        private bool _isRunningAlgorithm = false;
-
+        private CustomGraph _graph;
         public string AlgorithmName
         {
             get => _bfs.AlgorithmName;
@@ -30,17 +31,41 @@ namespace CTU_Graph_Theory.ViewModels
                 _bfs.StartVertex = value;
             }
         }
-
-        public bool IsRunningAlgorithm
+        public ObservableCollection<StringPseudoCode> Pseudocodes
         {
-            get => _isRunningAlgorithm;
-            set => this.RaiseAndSetIfChanged(ref _isRunningAlgorithm, value);
+            get => _bfs.Pseudocodes;
         }
+        public bool IsSetCompletedAlgorithm { get; set; } = false;
 
         public BFSViewModel()
         {
             _bfs = new BFS();
-            this.Name = AlgorithmName;
+        }
+
+        public void TransferGraph(CustomGraph graph,Vertex? startVertex)
+        {
+            _graph = graph;
+            StartVertex = startVertex;
+        }
+
+        public void RunAlgorithm()
+        {
+            _bfs.RunAlgorithm(_graph);
+        }
+
+        public void PauseAlgorithm()
+        {
+            _bfs.PauseAlgorithm();
+        }
+
+        public void SetRunSpeed(int speedUp)
+        {
+            _bfs.SetRunSpeed(speedUp);
+        }
+        public void SetCompletedAlgorithm(EventHandler returnIsRunningState)
+        {
+            _bfs.CompletedAlgorithm += returnIsRunningState;
+            IsSetCompletedAlgorithm = true;
         }
     }
 }

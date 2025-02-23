@@ -15,7 +15,6 @@ namespace CTU_Graph_Theory.Models
 {
     public class CustomGraph : Graph
     {
-        
         public enum GraphType
         {
             SimpleGraph,
@@ -34,10 +33,7 @@ namespace CTU_Graph_Theory.Models
 
         public ObservableCollection<Vertex> Vertices { get; private set; }
         public int VetexCount { get => Vertices.Count; }
-        public int EdgeCount
-        {
-            get => this.Edges.Count;
-        }
+        public int EdgeCount { get; private set; }
 
         public CustomGraph() 
         {
@@ -55,7 +51,7 @@ namespace CTU_Graph_Theory.Models
 
         public Vertex? GetVertex(string vertexTitle)
         {
-            Vertex? u = null ;
+            Vertex? u = null;
             foreach (ShowableEdge edge in this.Edges)
             {
                 u = edge.Tail as Vertex;
@@ -63,7 +59,7 @@ namespace CTU_Graph_Theory.Models
                 u = edge.Head as Vertex;
                 if (u?.Title == vertexTitle) return u;
             }
-            return u;
+            return null;
         }
 
         public Vertex GetOrCreateVertex(string vertexTitle)
@@ -99,11 +95,11 @@ namespace CTU_Graph_Theory.Models
                         v = (Vertex)edge.Head;
                 if (v == Vertex.EmptyVertex) continue;
 
-                if (x == u) neighboursVertex.Add(v);
+                if (Vertex.IsVertexEqual(x,u)) neighboursVertex.Add(v);
                 else
-                if (DirectTypeOfGraph == GraphDirectType.UnDirected && x == v) neighboursVertex.Add(u);
+                if (DirectTypeOfGraph == GraphDirectType.UnDirected && Vertex.IsVertexEqual(x, v)) neighboursVertex.Add(u);
             }
-            neighboursVertex.Sort((x, y) => x.Title.CompareTo(y.Title));
+            neighboursVertex.Sort((x, y) => x.Compare(y));
             return neighboursVertex;
         }
 
@@ -190,15 +186,17 @@ namespace CTU_Graph_Theory.Models
         {
             // create new graph
             CustomGraph newGraph = new CustomGraph();
+            newGraph.TypeOfGraph = GraphType.SimpleGraph;
             newGraph.DirectTypeOfGraph = type;
 
             // get symbol
             Edge.Symbol DirectGraphSymbol = newGraph.IsUnDirectedGraph() ? DirectGraphSymbol = Edge.Symbol.None: DirectGraphSymbol = Edge.Symbol.Arrow;
             HashSet<Vertex> set = new HashSet<Vertex>();
+            int edgeCount = 0;
 
             foreach (var data in graphData)
             {
-                string[] nodeData = data.Split(' ').Select((x) => x.Trim()).ToArray();
+                string[] nodeData = data.Split(' ').Select((x) => x.Trim()).Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
                 
                 if (nodeData.Length == 0 || nodeData.Length > 3) continue;
                 // node1 - node2 - weight
@@ -209,7 +207,7 @@ namespace CTU_Graph_Theory.Models
                 {
                     case 1:
                         {
-                            u = newGraph.GetVertex(nodeData[0]);
+                           u = newGraph.GetVertex(nodeData[0]);
                             if (u != null) continue;
 
                             u = Vertex.CreateNewVertex(nodeData[0]);
@@ -222,10 +220,18 @@ namespace CTU_Graph_Theory.Models
                         {
                             u = newGraph.GetOrCreateVertex(nodeData[0]);
                             v = newGraph.GetOrCreateVertex(nodeData[1]);
+                            var emptyVertexEdge = newGraph.GetEdge(u, Vertex.EmptyVertex);
+                            if (emptyVertexEdge != null) newGraph.Edges.Remove(emptyVertexEdge);
+
+                            var hasEdge = newGraph.GetEdge(u, v);
+                            // chỉ kiểm tra đa hướng khi là simplegraph
+                            if (hasEdge != null && newGraph.IsSimpleGraph()) newGraph.TypeOfGraph = GraphType.MultiGraph;
+
                             if (u.Title == v.Title)
                             {
                                 newEdge = new ShowableEdge(u, u, ShowableEdge.Visible.Show, null, Edge.Symbol.None, DirectGraphSymbol);
                                 set.Add(u);
+                                if (!newGraph.IsPseudoGraph()) newGraph.TypeOfGraph = GraphType.PseudoGraph;
                             }
                             else
                             {
@@ -233,17 +239,26 @@ namespace CTU_Graph_Theory.Models
                                 set.Add(u);
                                 set.Add(v);
                             }
+                            edgeCount++;
                         }
                         break;
                     case 3:
                         {
                             u = newGraph.GetOrCreateVertex(nodeData[0]);
                             v = newGraph.GetOrCreateVertex(nodeData[1]);
+                            var emptyVertexEdge = newGraph.GetEdge(u, Vertex.EmptyVertex);
+                            if (emptyVertexEdge != null) newGraph.Edges.Remove(emptyVertexEdge);
+
+                            var hasEdge = newGraph.GetEdge(u, v);
+                            // chỉ kiểm tra đa hướng khi là simplegraph
+                            if (hasEdge != null && newGraph.IsSimpleGraph()) newGraph.TypeOfGraph = GraphType.MultiGraph;
+
                             if (Int64.TryParse(nodeData[2], out weight))
                                 if (u.Title == v.Title)
                                 {
                                     newEdge = new ShowableEdge(u, u, ShowableEdge.Visible.Show, weight, Edge.Symbol.None, DirectGraphSymbol);
                                     set.Add(u);
+                                    if (!newGraph.IsPseudoGraph()) newGraph.TypeOfGraph = GraphType.PseudoGraph;
                                 }
                                 else
                                 {
@@ -251,12 +266,19 @@ namespace CTU_Graph_Theory.Models
                                     set.Add(u);
                                     set.Add(v);
                                 }
+                            edgeCount++;
                         }   
                         break;
                 }
                 if (newEdge != null) newGraph.Edges.Add(newEdge);
             }
-            newGraph.Vertices = new ObservableCollection<Vertex>(set);
+            //sort Vertex List
+            var vertexList = set.ToList();
+            vertexList.Sort((x,y) => x.Compare(y));
+
+            newGraph.Vertices = new ObservableCollection<Vertex>(vertexList);
+            
+            newGraph.EdgeCount = edgeCount;
             return newGraph;
         }
     }
