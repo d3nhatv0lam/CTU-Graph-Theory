@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -58,6 +59,11 @@ namespace CTU_Graph_Theory.ViewModels
             _bfs.RunAlgorithm(_graph);
         }
 
+        public void RunAlgorithmWithAllVertex(ObservableCollection<Vertex> vertices)
+        {
+            _bfs.RunAlgorithmWithAllVertex(_Graph, vertices);
+        }
+
         public void PauseAlgorithm()
         {
             _bfs.PauseAlgorithm();
@@ -65,6 +71,11 @@ namespace CTU_Graph_Theory.ViewModels
         public void ContinueAlgorithm()
         {
             _bfs.ContinueAlgorithm(_Graph);
+        }
+
+        public void ContinueAlgorithmWithAllVertex()
+        {
+            _bfs.ContinueAlgorithmWithAllVertex(_Graph);
         }
 
         public void SetRunSpeed(int speedUp)
@@ -76,7 +87,5 @@ namespace CTU_Graph_Theory.ViewModels
             _bfs.CompletedAlgorithm += returnIsRunningState;
             IsSetCompletedAlgorithm = true;
         }
-
-
     }
 }

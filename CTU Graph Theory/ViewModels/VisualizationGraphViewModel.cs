@@ -158,7 +158,18 @@ namespace CTU_Graph_Theory.ViewModels
                     EdgeCount = MainGraph.EdgeCount; 
                     GraphType = MainGraph.TypeOfGraph;
                     IsDirectedGraph = MainGraph.IsDirectedGraph();
-                    Vertices = MainGraph.Vertices;
+                    // Add Select all
+                    if (MainGraph.Vertices.Count > 0)
+                    {
+                        Vertices = new ObservableCollection<Vertex>() { Vertex.EmptyVertex };
+                        foreach (Vertex vertex in MainGraph.Vertices)
+                        {
+                            Vertices.Add(vertex);
+                        }
+                    }
+                   
+                    //Vertices = new ObservableCollection<Vertex>(MainGraph.Vertices);
+                    
                     StartVertex = null;
                 });
             // change algorithm
@@ -184,9 +195,23 @@ namespace CTU_Graph_Theory.ViewModels
                 SelectedAlgorithm?.TransferGraph(MainGraph, StartVertex);
             });
             
-            RunAlgorithmCommand = ReactiveCommand.Create(() => { SelectedAlgorithm?.RunAlgorithm(); IsRunningAlgorithm = true;  IsPauseAlgorithm = false; },CanRunAlgorithmCommand);
+            RunAlgorithmCommand = ReactiveCommand.Create(() => {
+                if (Vertex.IsVertexEqual(StartVertex, Vertex.EmptyVertex))
+                    SelectedAlgorithm?.RunAlgorithmWithAllVertex(MainGraph.Vertices);
+                else SelectedAlgorithm?.RunAlgorithm(); 
+                    IsRunningAlgorithm = true;  
+                    IsPauseAlgorithm = false; 
+                },CanRunAlgorithmCommand);
             PauseAlgorithmCommand = ReactiveCommand.Create(() => { SelectedAlgorithm?.PauseAlgorithm(); IsPauseAlgorithm = true; IsRunningAlgorithm = false; }, CanPauseAlgorithmCommand);
-            ContinueAlgorithmCommand = ReactiveCommand.Create(() => { SelectedAlgorithm?.ContinueAlgorithm(); IsPauseAlgorithm = false; IsRunningAlgorithm = true; },CanContinueAlgorithmCommand);
+            ContinueAlgorithmCommand = ReactiveCommand.Create(() => 
+            {
+                if (Vertex.IsVertexEqual(StartVertex, Vertex.EmptyVertex))
+                    SelectedAlgorithm?.ContinueAlgorithmWithAllVertex();
+                else
+                    SelectedAlgorithm?.ContinueAlgorithm();
+                IsPauseAlgorithm = false; 
+                IsRunningAlgorithm = true; 
+            },CanContinueAlgorithmCommand);
         }
 
         private CustomGraph.GraphDirectType GetGraphType(bool isDirectedGraph)

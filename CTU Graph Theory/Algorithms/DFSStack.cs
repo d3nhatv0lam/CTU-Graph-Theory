@@ -75,7 +75,7 @@ namespace CTU_Graph_Theory.Algorithms
             RunDFSStackLoop(graph, token);
         }
 
-        public override void ContinueAlgorithm(CustomGraph graph)
+        public override async void ContinueAlgorithm(CustomGraph graph)
         {
             base.ContinueAlgorithm(graph);
             var token = cts.Token;

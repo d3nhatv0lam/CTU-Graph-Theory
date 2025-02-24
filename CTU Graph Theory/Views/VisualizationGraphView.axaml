@@ -27,6 +27,7 @@
 		<converter:GraphTypeToStringConverter x:Key ="TypeToString"/>
 		<converter:GraphDirectTypeToStringConverter x:Key ="DirectToString"/>
 		<converter:BoolToStringState x:Key ="BoolToStringState"/>
+		<converter:EmptyVertexToStringConverter x:Key ="SelectAllConvert"/>
 	</UserControl.Resources>
 
 	<Grid ColumnDefinitions="0.25* auto *">
@@ -152,7 +153,7 @@
 									</Style>
 									<Setter Property="Transitions">
 										<Transitions>
-											<BrushTransition Property="BorderForeground" Duration="0:0:0.3"/>
+											<BrushTransition Property="BorderForeground" Duration="0:0:0.2"/>
 										</Transitions>
 									</Setter>
 
@@ -187,7 +188,7 @@
 									</Style>
 									<Setter Property="Transitions">
 										<Transitions>
-											<BrushTransition Property="Brush" Duration="0:0:0.3"/>
+											<BrushTransition Property="Brush" Duration="0:0:0.2"/>
 										</Transitions>
 									</Setter>
 								</Style>
@@ -370,7 +371,7 @@
 
 							<ComboBox.ItemTemplate>
 								<DataTemplate DataType="{x:Type model:Vertex}">
-									<TextBlock Text="{Binding Title}"
+									<TextBlock Text="{Binding Title,Converter={StaticResource SelectAllConvert}}"
 											    VerticalAlignment="Center"
 												 HorizontalAlignment="Stretch"
 												FontWeight="Bold"
@@ -418,7 +419,7 @@
 					</Grid>
 					<Separator Grid.Row="5"/>
 					<!--// Result of Algorithm //-->
-					<TransitioningContentControl Grid.Row="6" Content="{Binding SelectedAlgorithm}"/>
+					<!--<TransitioningContentControl Grid.Row="6" Content="{Binding SelectedAlgorithm}"/>-->
 
 				</Grid>
 			</Border>

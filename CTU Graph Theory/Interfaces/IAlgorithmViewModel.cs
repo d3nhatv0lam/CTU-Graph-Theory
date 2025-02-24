@@ -18,8 +18,10 @@ namespace CTU_Graph_Theory.Interfaces
         public ObservableCollection<StringPseudoCode> Pseudocodes { get; }
         public void TransferGraph(CustomGraph graph, Vertex startVertex);
         public void RunAlgorithm();
+        public void RunAlgorithmWithAllVertex(ObservableCollection<Vertex> vertices);
         public void PauseAlgorithm();
         public void ContinueAlgorithm();
+        public void ContinueAlgorithmWithAllVertex();
         public void SetRunSpeed(int speedUp);
         public void SetCompletedAlgorithm(EventHandler returnIsRunningState);
     }

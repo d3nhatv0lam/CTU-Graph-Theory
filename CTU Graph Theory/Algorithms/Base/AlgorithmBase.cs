@@ -12,7 +12,7 @@ namespace CTU_Graph_Theory.Algorithms.Base
     public class AlgorithmBase
     {
         // base
-        private Vertex _startVetex = null;
+        private Vertex? _startVetex = null;
         private int _baseSpeed = 2100;
         private int _fastSpeedPerLevel = 400;
         // Animation
@@ -20,6 +20,7 @@ namespace CTU_Graph_Theory.Algorithms.Base
 
         public  string AlgorithmName { get; protected set; }
         public ObservableCollection<StringPseudoCode> Pseudocodes { get; protected set; }
+        public Queue<Vertex> QueueVertices { get; protected set; }
         public Vertex? StartVertex
         {
             get => _startVetex;
@@ -60,34 +61,54 @@ namespace CTU_Graph_Theory.Algorithms.Base
         public AlgorithmBase() 
         {
             Pseudocodes = new();
+            QueueVertices = new();
         }
 
 
         // need to override
-        protected virtual void StartVetexChanged(CustomGraph graph)
-        {
-            CleanAlgorithm(graph);
-        }
-        protected virtual void CleanAlgorithm(CustomGraph graph)
+        protected virtual void CleanGraphForAlgorithm(CustomGraph graph)
         {
             graph.UnVisitAndClearParentAll();
         }
+        protected virtual void StartVetexChanged(CustomGraph graph)
+        {
+            CleanGraphForAlgorithm(graph);
+        }
+
         protected virtual void FillPseudoCode() { }
         public virtual async void RunAlgorithm(CustomGraph graph) 
         {
             IsRunning = 1;
+            CleanGraphForAlgorithm(graph);
         }
-        public virtual async void ContinueAlgorithm(CustomGraph graph) 
+
+        public virtual async void RunAlgorithmWithAllVertex(CustomGraph graph, ObservableCollection<Vertex> vertices)
+        {
+            IsRunning = 1;
+            CleanGraphForAlgorithm(graph);
+            QueueVertices.Clear();
+            foreach (var vertex in vertices)
+                QueueVertices.Enqueue(vertex);
+            // run algorith
+        }
+
+        public virtual async void ContinueAlgorithmWithAllVertex(CustomGraph graph)
         {
             IsRunning = 1;
         }
-        //
+        public virtual async void ContinueAlgorithm(CustomGraph graph)
+        {
+            IsRunning = 1;
+        }
+
         public void PauseAlgorithm()
         {
-            IsRunning = 0;
             cts?.Cancel();
             cts = new CancellationTokenSource();
+            IsRunning = 0;
         }
+
+
 
 
         public void SetRunSpeed(int speedUp)

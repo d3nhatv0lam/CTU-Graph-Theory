@@ -73,6 +73,25 @@ namespace CTU_Graph_Theory.ViewModels
            
         }
 
+        public void RunAlgorithm(ObservableCollection<Vertex> vertices)
+        {
+            
+            foreach (Vertex vertex in vertices)
+            {
+                if (vertex.IsVisited == true) continue;
+                StartVertex = vertex;
+                _dfsStack.RunAlgorithm(_Graph);
+            }
+        }
 
+        public void RunAlgorithmWithAllVertex(ObservableCollection<Vertex> vertices)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ContinueAlgorithmWithAllVertex()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
