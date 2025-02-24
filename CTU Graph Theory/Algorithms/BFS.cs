@@ -1,4 +1,5 @@
-﻿using CTU_Graph_Theory.Interfaces;
+﻿using CTU_Graph_Theory.Algorithms.Base;
+using CTU_Graph_Theory.Interfaces;
 using CTU_Graph_Theory.Models;
 using System;
 using System.Collections.Generic;
@@ -42,51 +43,76 @@ namespace CTU_Graph_Theory.Algorithms
 
         private void CleanBFS(CustomGraph graph)
         {
-            graph.UnVisitAndClearParentAll();
             queue.Clear();
         }
 
         protected override void StartVetexChanged(CustomGraph graph)
         {
+            base.StartVetexChanged(graph);
             CleanBFS(graph);
         }
 
-        public override void PauseAlgorithm()
+
+        public override async void RunAlgorithm(CustomGraph graph)
         {
-            base.PauseAlgorithm();
+            base.RunAlgorithm(graph);
+            if (StartVertex == null) return;
+
+            graph.UnVisitAndClearParentAll();
+            CleanBFS(graph);
+            queue.Enqueue(StartVertex);
+            IsStartVertexChanged = false;
+
+            Pseudocodes[0].IsSelectionCode = true;
+            await Task.Delay(TimeDelayOfLineCode);
+            Pseudocodes[0].IsSelectionCode = false;
+
+            // clone token để xóa biết đường tự hủy
+            var token = cts.Token;
+            RunBFSLoop(graph,token);
         }
 
-        public override void RunAlgorithm(CustomGraph graph)
+        public override void ContinueAlgorithm(CustomGraph graph)
         {
-            if (StartVertex == null)
-            {
-                CleanBFS(graph);
-                return;
-            }
-            if (queue.Count == 0 || IsStartVertexChanged == true)
-            {
-                CleanBFS(graph);
-                queue.Enqueue(StartVertex);
-                IsStartVertexChanged = false;
-            }
-            // clone token để xóa biết đường tự hủy
+            base.ContinueAlgorithm(graph);
             var token = cts.Token;
             RunBFSLoop(graph,token);
         }
 
         private async void RunBFSLoop(CustomGraph graph,CancellationToken token)
         {
+            
             while (queue.Count != 0)
             {
+                Pseudocodes[1].IsSelectionCode = true;
+                await Task.Delay(this.TimeDelayOfLineCode);
+                Pseudocodes[1].IsSelectionCode = false;
+
                 if (token.IsCancellationRequested)
                     return;
 
+                Pseudocodes[2].IsSelectionCode = true;
                 Vertex u = queue.Dequeue();
+                await Task.Delay(this.TimeDelayOfLineCode);
+                Pseudocodes[2].IsSelectionCode = false;
                 //visit vertex => update into UI
-                if (u.IsVisited == true) continue;
+                Pseudocodes[3].IsSelectionCode = true;
+                await Task.Delay(this.TimeDelayOfLineCode);
+                if (u.IsVisited == true)
+                {
+                    Pseudocodes[3].IsSelectionCode = false;
+                    Pseudocodes[4].IsSelectionCode = true;
+                    await Task.Delay(this.TimeDelayOfLineCode);
+                    Pseudocodes[4].IsSelectionCode = false;
+                    continue;
+                }
+                Pseudocodes[3].IsSelectionCode = false;
 
+                Pseudocodes[5].IsSelectionCode = Pseudocodes[6].IsSelectionCode = true;
                 u.IsPending = false;
                 u.IsVisited = true;
+                await Task.Delay(this.TimeDelayOfLineCode);
+                Pseudocodes[5].IsSelectionCode = Pseudocodes[6].IsSelectionCode = false;
                 // draw adjacent => update into UI
                 if (u.ParentVertex != null)
                 {
@@ -94,23 +120,30 @@ namespace CTU_Graph_Theory.Algorithms
                     if (AdjacentEdge != null)
                         AdjacentEdge.IsVisited = true;
                 }
-
+                
                 foreach (var v in graph.NeighboursOfVertex(u))
                 {
+                    Pseudocodes[7].IsSelectionCode = true;
+                    await Task.Delay(TimeDelayOfLineCode);
+                    Pseudocodes[7].IsSelectionCode = false;
+                    Pseudocodes[8].IsSelectionCode = true;
+                    await Task.Delay(TimeDelayOfLineCode);
                     if (v.IsVisited == false)
                     {
+                        Pseudocodes[8].IsSelectionCode = false;
+
+                        Pseudocodes[9].IsSelectionCode = true;
+                        await Task.Delay(TimeDelayOfLineCode);
                         queue.Enqueue(v);
                         if (v.ParentVertex == null) v.ParentVertex = u;
+                        Pseudocodes[9].IsSelectionCode = false ;
                         v.IsPending = true;
-                        await Task.Delay(this.RunSpeed);
+                        await Task.Delay(TimeDelayOfLineCode);
                     }
+                    Pseudocodes[8].IsSelectionCode = false;
                 }
-                try
-                {
-                    await Task.Delay(this.RunSpeed, token);
-                }
-                catch { return; }
             }
+            Pseudocodes[1].IsSelectionCode = false;
             OnCompletedAlgorithm();
         }
     }

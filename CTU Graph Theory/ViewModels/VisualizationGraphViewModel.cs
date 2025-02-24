@@ -31,11 +31,12 @@ namespace CTU_Graph_Theory.ViewModels
         private CustomGraph.GraphType _graphType;
         private bool _isDirectedGraph = false;
         private string _graphData = string.Empty;
-        private List<IAlgorithms> _algorithmList;
-        private IAlgorithms? _selectedAlgorithm = null;
+        private List<IAlgorithmViewModel> _algorithmList;
+        private IAlgorithmViewModel? _selectedAlgorithm = null;
         private ObservableCollection<Vertex> _vertices;
         private Vertex? _startVertex = null;
-        public bool _isRunningAlgorithm = false;
+        private bool _isRunningAlgorithm = false;
+        private bool _isPauseAlgorithm = false; 
         private int _multiplierSpeed = 1;
 
         public CustomGraph MainGraph
@@ -68,7 +69,7 @@ namespace CTU_Graph_Theory.ViewModels
             get => _graphData;
             set => this.RaiseAndSetIfChanged(ref _graphData, value);
         }
-        public List<IAlgorithms> AlgorithmList
+        public List<IAlgorithmViewModel> AlgorithmList
         {
             get 
             {
@@ -76,7 +77,7 @@ namespace CTU_Graph_Theory.ViewModels
                 return _algorithmList;
             }   
         }
-        public IAlgorithms? SelectedAlgorithm
+        public IAlgorithmViewModel? SelectedAlgorithm
         {
             get => _selectedAlgorithm;
             set => this.RaiseAndSetIfChanged(ref _selectedAlgorithm, value);
@@ -97,6 +98,11 @@ namespace CTU_Graph_Theory.ViewModels
             get => _isRunningAlgorithm;
             set => this.RaiseAndSetIfChanged(ref _isRunningAlgorithm, value);
         }
+        public bool IsPauseAlgorithm
+        {
+            get => _isPauseAlgorithm;
+            set => this.RaiseAndSetIfChanged(ref _isPauseAlgorithm, value);
+        }
         public int MultiplierSpeed
         {
             get => _multiplierSpeed;
@@ -109,6 +115,8 @@ namespace CTU_Graph_Theory.ViewModels
         public ReactiveCommand<Unit,Unit> RunAlgorithmCommand { get; private set; }
         private IObservable<bool> CanPauseAlgorithmCommand { get;  set; }
         public ReactiveCommand<Unit,Unit> PauseAlgorithmCommand { get; private set; }
+        private IObservable<bool> CanContinueAlgorithmCommand { get; set; }
+        public ReactiveCommand<Unit,Unit> ContinueAlgorithmCommand { get; private set; }
         public VisualizationGraphViewModel()
         {
             //var v1 = new Vertex("1");
@@ -162,6 +170,7 @@ namespace CTU_Graph_Theory.ViewModels
             // command check can activate
             CanRunAlgorithmCommand = this.WhenAnyValue(x => x.SelectedAlgorithm, x => x.StartVertex,x => x.IsRunningAlgorithm, (algorithm, startVertex,isRunningAlgorithm) => (algorithm != null) && (startVertex != null) && (isRunningAlgorithm == false));
             CanPauseAlgorithmCommand = this.WhenAnyValue(x => x.IsRunningAlgorithm, isRunning => isRunning == true);
+            CanContinueAlgorithmCommand = this.WhenAnyValue(x => x.IsPauseAlgorithm, isPaused => isPaused == true);
         }
 
         private void InitCommand()
@@ -172,10 +181,12 @@ namespace CTU_Graph_Theory.ViewModels
                 string radioButtonContent = radioButon.Tag as string;
                 if (string.IsNullOrWhiteSpace(radioButtonContent)) return;
                  ChangeGraphType(radioButtonContent);
+                SelectedAlgorithm?.TransferGraph(MainGraph, StartVertex);
             });
             
-            RunAlgorithmCommand = ReactiveCommand.Create(() => { SelectedAlgorithm?.RunAlgorithm(); IsRunningAlgorithm = true; },CanRunAlgorithmCommand);
-            PauseAlgorithmCommand = ReactiveCommand.Create(() => { SelectedAlgorithm?.PauseAlgorithm(); IsRunningAlgorithm = false; }, CanPauseAlgorithmCommand);
+            RunAlgorithmCommand = ReactiveCommand.Create(() => { SelectedAlgorithm?.RunAlgorithm(); IsRunningAlgorithm = true;  IsPauseAlgorithm = false; },CanRunAlgorithmCommand);
+            PauseAlgorithmCommand = ReactiveCommand.Create(() => { SelectedAlgorithm?.PauseAlgorithm(); IsPauseAlgorithm = true; IsRunningAlgorithm = false; }, CanPauseAlgorithmCommand);
+            ContinueAlgorithmCommand = ReactiveCommand.Create(() => { SelectedAlgorithm?.ContinueAlgorithm(); IsPauseAlgorithm = false; IsRunningAlgorithm = true; },CanContinueAlgorithmCommand);
         }
 
         private CustomGraph.GraphDirectType GetGraphType(bool isDirectedGraph)

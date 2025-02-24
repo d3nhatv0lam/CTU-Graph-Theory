@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace CTU_Graph_Theory.ViewModels
 {
-    class DFSStackViewModel: ViewModelBase, IAlgorithms
+    class DFSStackViewModel: ViewModelBase, IAlgorithmViewModel
     {
         public string AlgorithmName
         {
@@ -18,6 +18,8 @@ namespace CTU_Graph_Theory.ViewModels
         public bool IsSetCompletedAlgorithm { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public ObservableCollection<StringPseudoCode> Pseudocodes => throw new NotImplementedException();
+
+        public CustomGraph _Graph { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public DFSStackViewModel()
         {
@@ -45,6 +47,11 @@ namespace CTU_Graph_Theory.ViewModels
         }
 
         public void SetCompletedAlgorithm(EventHandler returnIsRunningState)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ContinueAlgorithm()
         {
             throw new NotImplementedException();
         }

@@ -88,7 +88,7 @@
 						</Style>
 					</Grid.Styles>
 
-					<RadioButton x:Name="UnDirectGraphSelect"
+					<RadioButton x:Name="UnDirectGraphSelect" IsEnabled="{Binding !IsRunningAlgorithm}"
 								 Grid.Row="1"
 								 Grid.Column="0"
 								 Content="Vô hướng"
@@ -96,7 +96,7 @@
 								 Command="{Binding ChangeGraphTypeCommand}"
 								 CommandParameter="{Binding $self}"
 								 Tag="UnDirected"/>
-					<RadioButton x:Name="DirectGraphSelect" Grid.Row="1"
+					<RadioButton x:Name="DirectGraphSelect" Grid.Row="1" IsEnabled="{Binding !IsRunningAlgorithm}"
 								 Grid.Column="1"
 								 Content="Có hướng"
 								 Command="{Binding ChangeGraphTypeCommand}"
@@ -109,7 +109,7 @@
 				<TextBlock DockPanel.Dock="Top" Text="Danh Sách Cung"/>
 				<AvaloniaEdit:TextEditor
 										Padding="0 10 0 0"
-											
+										IsReadOnly="{Binding IsRunningAlgorithm}"
 										ShowLineNumbers="True">
 					<i:Interaction.Behaviors>
 						<behaviors:DocumentTextBindingBehavior Text="{Binding GraphData, Mode=TwoWay}"/>
@@ -259,7 +259,7 @@
 									Theme="{StaticResource MaterialOutlineButton}" Classes="accent"
 									Height="40"
 									Content="Tiếp tục" 
-									Command="{Binding RunAlgorithmCommand}"/>
+									Command="{Binding ContinueAlgorithmCommand}"/>
 						</Grid>
 					</Grid>
 				
@@ -335,6 +335,7 @@
 							   />	
 				
 					<ComboBox Grid.Row="1"
+							  IsEnabled="{Binding !IsRunningAlgorithm}"
 							  Theme="{StaticResource MaterialOutlineComboBox}"
 							  p1:ComboBoxAssist.Label="Tên thuật toán"
 							  ItemsSource="{Binding AlgorithmList}" 
@@ -345,7 +346,7 @@
 						
 						
 						<ComboBox.ItemTemplate>
-								<DataTemplate x:DataType="{x:Type interface:IAlgorithms}">
+								<DataTemplate x:DataType="{x:Type interface:IAlgorithmViewModel}">
 									<TextBlock Text="{Binding AlgorithmName}" VerticalAlignment="Center"/>
 								</DataTemplate>
 						</ComboBox.ItemTemplate>
@@ -361,6 +362,7 @@
 									FontWeight="Bold"/>
 						
 						<ComboBox Grid.Column="1" 
+								  IsEnabled="{Binding !IsRunningAlgorithm}"
 								  ItemsSource="{Binding Vertices}"
 								  SelectedItem="{Binding StartVertex}"
 								  MinWidth="70"

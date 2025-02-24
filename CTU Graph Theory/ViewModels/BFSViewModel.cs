@@ -13,10 +13,15 @@ using ReactiveUI;
 
 namespace CTU_Graph_Theory.ViewModels
 {
-    public class BFSViewModel: ViewModelBase, IAlgorithms
+    public class BFSViewModel: ViewModelBase, IAlgorithmViewModel
     {
         private BFS _bfs;
         private CustomGraph _graph;
+        public CustomGraph _Graph
+        {
+            get => _graph;
+            set => _graph = value;
+        }
         public string AlgorithmName
         {
             get => _bfs.AlgorithmName;
@@ -57,6 +62,10 @@ namespace CTU_Graph_Theory.ViewModels
         {
             _bfs.PauseAlgorithm();
         }
+        public void ContinueAlgorithm()
+        {
+            _bfs.ContinueAlgorithm(_Graph);
+        }
 
         public void SetRunSpeed(int speedUp)
         {
@@ -67,5 +76,7 @@ namespace CTU_Graph_Theory.ViewModels
             _bfs.CompletedAlgorithm += returnIsRunningState;
             IsSetCompletedAlgorithm = true;
         }
+
+
     }
 }
