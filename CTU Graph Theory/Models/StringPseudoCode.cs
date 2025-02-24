@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace CTU_Graph_Theory.Models
@@ -27,6 +28,7 @@ namespace CTU_Graph_Theory.Models
 
         private string _code;
         private bool _isSelectionCode;
+        private string _codeWithSelectedVertex;
 
         public string Code
         {
@@ -39,10 +41,17 @@ namespace CTU_Graph_Theory.Models
             set => this.RaiseAndSetIfChanged(ref _isSelectionCode, value);
         }
 
+        public string CodeWithSlectedVertex
+        {
+            get => _codeWithSelectedVertex;
+            set => this.RaiseAndSetIfChanged(ref _codeWithSelectedVertex, value);
+        }
+
         public StringPseudoCode()
         {
             //AlignmentCount = 0;
             Code = string.Empty;
+            CodeWithSlectedVertex = string.Empty;
             IsSelectionCode = false;
         } 
 
@@ -50,7 +59,15 @@ namespace CTU_Graph_Theory.Models
         {
             //AlignmentCount = 0;
             Code = code;
+            CodeWithSlectedVertex = code;
             IsSelectionCode = false;
+        }
+
+        public void FillVertextIntoCode(Vertex vertex)
+        {
+            Regex regex = new Regex(@"\b[u|v]\b|\((u|v)\)");
+            CodeWithSlectedVertex = regex.Replace(Code, vertex.Title);
+
         }
     }
 }

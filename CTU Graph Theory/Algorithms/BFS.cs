@@ -27,7 +27,7 @@ namespace CTU_Graph_Theory.Algorithms
     protected override void FillPseudoCode()
         {
              List<string> code_lines = [
-            "Đưa 1 đỉnh bất kỳ vào Hàng đợi",
+            "Đưa đỉnh bất kỳ vào Hàng đợi",
             "while Hàng đợi chưa rỗng {",
             "    u = lấy đỉnh ở đầu hàng đợi ra",
             "    if (u đã duyệt)",
@@ -65,9 +65,7 @@ namespace CTU_Graph_Theory.Algorithms
             queue.Enqueue(StartVertex);
             IsStartVertexChanged = false;
 
-            Pseudocodes[0].IsSelectionCode = true;
-            await Task.Delay(TimeDelayOfLineCode);
-            Pseudocodes[0].IsSelectionCode = false;
+            await ChooseStartVertex();
 
             // clone token để xóa biết đường tự hủy
             var token = cts.Token;
@@ -83,38 +81,22 @@ namespace CTU_Graph_Theory.Algorithms
 
         private async void RunBFSLoop(CustomGraph graph,CancellationToken token)
         {
-            
             while (queue.Count != 0)
             {
-                Pseudocodes[1].IsSelectionCode = true;
-                await Task.Delay(this.TimeDelayOfLineCode);
-                Pseudocodes[1].IsSelectionCode = false;
+                await WhileState();
 
                 if (token.IsCancellationRequested)
                     return;
 
-                Pseudocodes[2].IsSelectionCode = true;
-                Vertex u = queue.Dequeue();
-                await Task.Delay(this.TimeDelayOfLineCode);
-                Pseudocodes[2].IsSelectionCode = false;
-                //visit vertex => update into UI
-                Pseudocodes[3].IsSelectionCode = true;
-                await Task.Delay(this.TimeDelayOfLineCode);
-                if (u.IsVisited == true)
-                {
-                    Pseudocodes[3].IsSelectionCode = false;
-                    Pseudocodes[4].IsSelectionCode = true;
-                    await Task.Delay(this.TimeDelayOfLineCode);
-                    Pseudocodes[4].IsSelectionCode = false;
-                    continue;
-                }
-                Pseudocodes[3].IsSelectionCode = false;
+                Vertex u = await ChooseVertexUState();
 
-                Pseudocodes[5].IsSelectionCode = Pseudocodes[6].IsSelectionCode = true;
-                u.IsPending = false;
-                u.IsVisited = true;
-                await Task.Delay(this.TimeDelayOfLineCode);
-                Pseudocodes[5].IsSelectionCode = Pseudocodes[6].IsSelectionCode = false;
+                //visit vertex => update into UI
+                bool isMarked = await IsVertexMarkedState(u);
+                if (isMarked) continue;
+
+                await MarkVertexState(u);
+
+                
                 // draw adjacent => update into UI
                 if (u.ParentVertex != null)
                 {
@@ -123,30 +105,101 @@ namespace CTU_Graph_Theory.Algorithms
                         AdjacentEdge.IsVisited = true;
                 }
                 
+
                 foreach (var v in graph.NeighboursOfVertex(u))
                 {
-                    Pseudocodes[7].IsSelectionCode = true;
-                    await Task.Delay(TimeDelayOfLineCode);
-                    Pseudocodes[7].IsSelectionCode = false;
-                    Pseudocodes[8].IsSelectionCode = true;
-                    await Task.Delay(TimeDelayOfLineCode);
+                    await ForLoopVState();
+
+                    await IfVisitedState(v);
                     if (v.IsVisited == false)
                     {
-                        Pseudocodes[8].IsSelectionCode = false;
-
-                        Pseudocodes[9].IsSelectionCode = true;
-                        await Task.Delay(TimeDelayOfLineCode);
-                        queue.Enqueue(v);
-                        if (v.ParentVertex == null) v.ParentVertex = u;
-                        Pseudocodes[9].IsSelectionCode = false ;
-                        v.IsPending = true;
-                        await Task.Delay(TimeDelayOfLineCode);
+                        await AddVertexIntoQueueState(v,u);  
                     }
-                    Pseudocodes[8].IsSelectionCode = false;
                 }
             }
             Pseudocodes[1].IsSelectionCode = false;
             OnCompletedAlgorithm();
+        }
+
+        private async Task ChooseStartVertex()
+        {
+            Pseudocodes[0].IsSelectionCode = true;
+            Pseudocodes[0].FillVertextIntoCode(StartVertex);
+            await Task.Delay(TimeDelayOfLineCode);
+            Pseudocodes[0].IsSelectionCode = false;
+        }
+
+        private async Task WhileState()
+        {
+            Pseudocodes[1].IsSelectionCode = true;
+            await Task.Delay(this.TimeDelayOfLineCode);
+            Pseudocodes[1].IsSelectionCode = false;
+        }
+
+        private async Task<Vertex> ChooseVertexUState()
+        {
+            Pseudocodes[2].IsSelectionCode = true;
+            Vertex u = queue.Dequeue();
+            Pseudocodes[2].FillVertextIntoCode(u);
+            await Task.Delay(this.TimeDelayOfLineCode);
+            Pseudocodes[2].IsSelectionCode = false;
+            return u;
+        }
+      
+        private async Task<bool> IsVertexMarkedState(Vertex u)
+        {
+            bool isContinue = false;
+            Pseudocodes[3].IsSelectionCode = true;
+            Pseudocodes[3].FillVertextIntoCode(u);
+            await Task.Delay(this.TimeDelayOfLineCode);
+            if (u.IsVisited == true)
+            {
+                Pseudocodes[3].IsSelectionCode = false;
+                Pseudocodes[4].IsSelectionCode = true;
+                await Task.Delay(this.TimeDelayOfLineCode);
+                Pseudocodes[4].IsSelectionCode = false;
+                isContinue = true;
+            }
+            Pseudocodes[3].IsSelectionCode = false;
+            return isContinue;
+        }
+
+        private async Task MarkVertexState(Vertex u)
+        {
+            Pseudocodes[5].FillVertextIntoCode(u);
+            Pseudocodes[6].FillVertextIntoCode(u);
+            Pseudocodes[5].IsSelectionCode = Pseudocodes[6].IsSelectionCode = true;
+            u.IsPending = false;
+            u.IsVisited = true;
+            await Task.Delay(this.TimeDelayOfLineCode);
+            Pseudocodes[5].IsSelectionCode = Pseudocodes[6].IsSelectionCode = false;
+        }
+
+        private async Task ForLoopVState()
+        {
+            Pseudocodes[7].IsSelectionCode = true;
+            await Task.Delay(TimeDelayOfLineCode);
+            Pseudocodes[7].IsSelectionCode = false;
+        }
+
+        private async Task IfVisitedState(Vertex v)
+        {
+            Pseudocodes[8].IsSelectionCode = true;
+            Pseudocodes[8].FillVertextIntoCode(v);
+            Pseudocodes[9].FillVertextIntoCode(v);
+            await Task.Delay(TimeDelayOfLineCode);
+            Pseudocodes[8].IsSelectionCode = false;
+        }
+
+        private async Task AddVertexIntoQueueState(Vertex v, Vertex u)
+        {
+            Pseudocodes[9].IsSelectionCode = true;
+            await Task.Delay(TimeDelayOfLineCode);
+            queue.Enqueue(v);
+            if (v.ParentVertex == null) v.ParentVertex = u;
+            Pseudocodes[9].IsSelectionCode = false;
+            v.IsPending = true;
+            await Task.Delay(TimeDelayOfLineCode);
         }
     }
 }

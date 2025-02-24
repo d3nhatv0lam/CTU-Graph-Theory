@@ -408,7 +408,7 @@
 									<TextBlock Classes.SelectedLine="{Binding IsSelectionCode}"
 												FontWeight="SemiBold"
 												FontFamily="Arial"
-												Text="{Binding Code}"
+												Text="{Binding CodeWithSlectedVertex}"
 												TextWrapping="Wrap"
 											/>
 								</DataTemplate>
