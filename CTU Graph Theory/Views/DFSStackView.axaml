@@ -2,19 +2,19 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="400"
-			 xmlns:vm ="using:CTU_Graph_Theory.ViewModels"
-			 x:DataType="vm:BFSViewModel"
-             x:Class="CTU_Graph_Theory.Views.BFSView">
-
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+			 xmlns:vm="using:CTU_Graph_Theory.ViewModels"
+			 x:DataType="vm:DFSStackViewModel"
+             x:Class="CTU_Graph_Theory.Views.DFSStackView">
+	
 	
 	<Grid RowDefinitions="0.1* *">
-		<TextBlock Grid.Row="0" VerticalAlignment="Center" 
+		<TextBlock Grid.Row="0" VerticalAlignment="Center"
 				   Classes="Headline6"
 				   Text="Mã giả:"/>
-		
+
 		<ItemsRepeater Grid.Row="1" Margin="10 10 0 0"
-					   ItemsSource="{Binding Pseudocodes}"
+						ItemsSource="{Binding Pseudocodes}"
 					   VerticalAlignment="Top"
 					   HorizontalAlignment="Center">
 			<ItemsRepeater.Styles>
@@ -22,17 +22,17 @@
 					<Setter Property="Background" Value="LightBlue"/>
 				</Style>
 			</ItemsRepeater.Styles>
-			
+
 			<ItemsRepeater.ItemTemplate>
 				<DataTemplate>
 					<TextBlock Classes.SelectedLine="{Binding IsSelectionCode}"
 							   FontWeight="SemiBold"
-							   FontFamily="Arial"
 							   Text="{Binding Code}"
 							   TextWrapping="Wrap"
 							   />
 				</DataTemplate>
 			</ItemsRepeater.ItemTemplate>
 		</ItemsRepeater>
+
 	</Grid>
 </UserControl>

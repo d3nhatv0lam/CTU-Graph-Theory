@@ -17,12 +17,12 @@
              xmlns:behaviors="using:CTU_Graph_Theory.Behaviors"
 			 
 			 xmlns:agc="clr-namespace:AvaloniaGraphControl;assembly=AvaloniaGraphControl"
-				x:Class="CTU_Graph_Theory.Views.VisualizationGraphView">
+			 x:Class="CTU_Graph_Theory.Views.VisualizationGraphView">
 
 	<UserControl.DataContext>
 		<vm:VisualizationGraphViewModel/>
 	</UserControl.DataContext>
-	
+
 	<UserControl.Resources>
 		<converter:GraphTypeToStringConverter x:Key ="TypeToString"/>
 		<converter:GraphDirectTypeToStringConverter x:Key ="DirectToString"/>
@@ -40,7 +40,7 @@
 						 IsReadOnly="True"
 						 Text="{Binding VertexCount}"
 						 Watermark="số lượng đỉnh" />-->
-				
+
 				<Separator DockPanel.Dock="Top" />
 
 				<Grid DockPanel.Dock="Top" RowDefinitions="auto *" ColumnDefinitions="* *">
@@ -126,7 +126,7 @@
 
 			<Border Grid.Row="0" Grid.Column="0" Padding="10">
 				<Grid RowDefinitions="* 0.1*">
-					<paz:ZoomBorder Grid.Row="0" 
+					<paz:ZoomBorder Grid.Row="0"
 								Stretch="Uniform" ZoomSpeed="1.5"
 								MaxZoomX="2" MaxZoomY="2"
 								 PanButton="Right"
@@ -135,104 +135,104 @@
 								 Background="Transparent" ClipToBounds="True" Focusable="True"
 								 VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
 							>
-					<agc:GraphPanel x:Name="MainGraph" Graph="{Binding MainGraph}" LayoutMethod="SugiyamaScheme" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+						<agc:GraphPanel x:Name="MainGraph" Graph="{Binding MainGraph}" LayoutMethod="SugiyamaScheme" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
 
-						<agc:GraphPanel.Transitions>
-							<Transitions>
-								<TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.1"  Easing="LinearEasing"/>
-							</Transitions>
-						</agc:GraphPanel.Transitions>
+							<agc:GraphPanel.Transitions>
+								<Transitions>
+									<TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.1"  Easing="LinearEasing"/>
+								</Transitions>
+							</agc:GraphPanel.Transitions>
 
-						<agc:GraphPanel.Styles>
-							<!--// Node Style Area //-->
-							<Style Selector="agc|TextSticker">
-								<Setter Property="Background" Value="Transparent"/>
-								<Style Selector="^:pointerover">
-									<Setter Property="Background" Value="Red"/>
+							<agc:GraphPanel.Styles>
+								<!--// Node Style Area //-->
+								<Style Selector="agc|TextSticker">
+									<Setter Property="Background" Value="Transparent"/>
+									<Style Selector="^:pointerover">
+										<Setter Property="Background" Value="Red"/>
+									</Style>
+									<Setter Property="Transitions">
+										<Transitions>
+											<BrushTransition Property="BorderForeground" Duration="0:0:0.3"/>
+										</Transitions>
+									</Setter>
+
 								</Style>
-								<Setter Property="Transitions">
-									<Transitions>
-										<BrushTransition Property="BorderForeground" Duration="0:0:0.3"/>
-									</Transitions>
-								</Setter>
 
-							</Style>
+								<Style Selector="agc|TextSticker.NotShow">
+									<Setter Property="Opacity" Value="0"/>
 
-							<Style Selector="agc|TextSticker.NotShow">
-								<Setter Property="Opacity" Value="0"/>
-
-							</Style>
-
-							<Style Selector="agc|TextSticker.Show">
-								<Setter Property="Opacity" Value="1"/>
-							</Style>
-
-							<Style Selector="agc|TextSticker.NotVisited">
-								<Setter Property="BorderForeground" Value="Black"/>
-
-							</Style>
-
-							<Style Selector="agc|TextSticker.Visited">
-								<Setter Property="BorderForeground" Value="Red"/>
-							</Style>
-
-							<Style Selector="agc|TextSticker.Pending">
-								<Setter Property="BorderForeground" Value="#FFCC00"/>
-							</Style>
-
-							<!--// Connection //-->
-							<Style Selector="agc|Connection">
-								<Style Selector="^:pointerover">
-									<Setter Property="Brush" Value="Blue"/>
 								</Style>
-								<Setter Property="Transitions">
-									<Transitions>
-										<BrushTransition Property="Brush" Duration="0:0:0.3"/>
-									</Transitions>
-								</Setter>
-							</Style>
-							<Style Selector="agc|Connection.NotShow">
-								<Setter Property="Opacity" Value="0"/>
-							</Style>
-							<Style Selector="agc|Connection.Show">
-								<Setter Property="Opacity" Value="1"/>
-							</Style>
-							<Style Selector="agc|Connection.NotVisited">
-								<Setter Property="Brush" Value="Black"/>
-							</Style>
-							<Style Selector="agc|Connection.Visited">
-								<Setter Property="Brush" Value="Red"/>
-							</Style>
-						</agc:GraphPanel.Styles>
 
-						<agc:GraphPanel.DataTemplates>
-							<!--// node template //-->
-							<DataTemplate DataType="{x:Type model:Vertex}">
-								<agc:TextSticker Classes.Show="{Binding IsShowVertex}"
-												 Classes.NotShow ="{Binding !IsShowVertex}"
-												 Classes.NotVisited ="{Binding !IsVisited}"
-												 Classes.Visited ="{Binding IsVisited}"
-												 Classes.Pending ="{Binding IsPending}"
-												 BorderThickness="1"
-												 Text="{Binding Title}"
-												 Shape="Ellipse"
+								<Style Selector="agc|TextSticker.Show">
+									<Setter Property="Opacity" Value="1"/>
+								</Style>
+
+								<Style Selector="agc|TextSticker.NotVisited">
+									<Setter Property="BorderForeground" Value="Black"/>
+
+								</Style>
+
+								<Style Selector="agc|TextSticker.Visited">
+									<Setter Property="BorderForeground" Value="Red"/>
+								</Style>
+
+								<Style Selector="agc|TextSticker.Pending">
+									<Setter Property="BorderForeground" Value="#FFCC00"/>
+								</Style>
+
+								<!--// Connection //-->
+								<Style Selector="agc|Connection">
+									<Style Selector="^:pointerover">
+										<Setter Property="Brush" Value="Blue"/>
+									</Style>
+									<Setter Property="Transitions">
+										<Transitions>
+											<BrushTransition Property="Brush" Duration="0:0:0.3"/>
+										</Transitions>
+									</Setter>
+								</Style>
+								<Style Selector="agc|Connection.NotShow">
+									<Setter Property="Opacity" Value="0"/>
+								</Style>
+								<Style Selector="agc|Connection.Show">
+									<Setter Property="Opacity" Value="1"/>
+								</Style>
+								<Style Selector="agc|Connection.NotVisited">
+									<Setter Property="Brush" Value="Black"/>
+								</Style>
+								<Style Selector="agc|Connection.Visited">
+									<Setter Property="Brush" Value="Red"/>
+								</Style>
+							</agc:GraphPanel.Styles>
+
+							<agc:GraphPanel.DataTemplates>
+								<!--// node template //-->
+								<DataTemplate DataType="{x:Type model:Vertex}">
+									<agc:TextSticker Classes.Show="{Binding IsShowVertex}"
+													 Classes.NotShow ="{Binding !IsShowVertex}"
+													 Classes.NotVisited ="{Binding !IsVisited}"
+													 Classes.Visited ="{Binding IsVisited}"
+													 Classes.Pending ="{Binding IsPending}"
+													 BorderThickness="1"
+													 Text="{Binding Title}"
+													 Shape="Ellipse"
 													 />
-							</DataTemplate>
-							<!--// Edge template //-->
-							<DataTemplate DataType="{x:Type model:ShowableEdge}">
-								<agc:Connection Classes.NotShow="{Binding !IsShowEdge}"
-												Classes.Show="{Binding IsShowEdge}"
-												Classes.Visited="{Binding IsVisited}"
-												Classes.NotVisited ="{Binding !IsVisited}"
-												PropertyChanged="Connection_PropertyChanged"
+								</DataTemplate>
+								<!--// Edge template //-->
+								<DataTemplate DataType="{x:Type model:ShowableEdge}">
+									<agc:Connection Classes.NotShow="{Binding !IsShowEdge}"
+													Classes.Show="{Binding IsShowEdge}"
+													Classes.Visited="{Binding IsVisited}"
+													Classes.NotVisited ="{Binding !IsVisited}"
+													PropertyChanged="Connection_PropertyChanged"
 													/>
-							</DataTemplate>
-							<!--// weight template //-->
-							<DataTemplate DataType="{x:Type System:Int64}">
-								<TextBlock Text="{Binding}"/>
-							</DataTemplate>
-						</agc:GraphPanel.DataTemplates>
-					</agc:GraphPanel>
+								</DataTemplate>
+								<!--// weight template //-->
+								<DataTemplate DataType="{x:Type System:Int64}">
+									<TextBlock Text="{Binding}"/>
+								</DataTemplate>
+							</agc:GraphPanel.DataTemplates>
+						</agc:GraphPanel>
 					</paz:ZoomBorder>
 					<Grid Grid.Row="1"  ColumnDefinitions="* *">
 
@@ -241,14 +241,14 @@
 									   VerticalAlignment="Center"
 										FontWeight="Bold"/>
 							<Slider Width="60"
-								IsSnapToTickEnabled="True" 
-								Classes="Discrete Accent" 
+								IsSnapToTickEnabled="True"
+								Classes="Discrete Accent"
 								Value="{Binding MultiplierSpeed}"
-								TickFrequency="1" 
+								TickFrequency="1"
 								Minimum="1"
 								Maximum="5"
 								Margin="10 0 0 0"/>
-						</StackPanel>		
+						</StackPanel>
 						<Grid Grid.Column="1" ColumnDefinitions="* *">
 							<Button Grid.Column="0"
 									Theme="{StaticResource MaterialOutlineButton}" Classes="accent"
@@ -258,13 +258,15 @@
 							<Button Grid.Column="1"
 									Theme="{StaticResource MaterialOutlineButton}" Classes="accent"
 									Height="40"
-									Content="Tiếp tục" 
+									Content="Tiếp tục"
 									Command="{Binding ContinueAlgorithmCommand}"/>
 						</Grid>
 					</Grid>
-				
+
 				</Grid>
 			</Border>
+
+			<!--// graph infomation //-->
 
 			<Border Grid.Row="1" Grid.Column="0" Padding="10 0 10 10">
 				<Border BorderThickness="1" BorderBrush="Black">
@@ -274,7 +276,7 @@
 								<Setter Property="FontWeight" Value="Bold"/>
 							</Style>
 						</Grid.Styles>
-						<TextBlock  Grid.Row="0" 
+						<TextBlock  Grid.Row="0"
 									Classes="Subtitle1"
 								    Text="--Thông tin đồ thị--"
 									HorizontalAlignment="Center"/>
@@ -292,7 +294,7 @@
 							<TextBlock  Grid.Column="0" Text="{Binding VertexCount,StringFormat=Số lượng đỉnh: {0}}"/>
 							<TextBlock  Grid.Column="1" Text="{Binding EdgeCount,StringFormat=Số lượng cung: {0}}"/>
 						</Grid>
-						
+
 						<StackPanel Margin="10 0 0 0" Grid.Row="3" Orientation="Horizontal">
 							<StackPanel.Styles>
 								<Style Selector="TextBlock.Running">
@@ -310,14 +312,14 @@
 					</Grid>
 				</Border>
 			</Border>
-	
+
 			<!--// Right side //-->
 			<Border Grid.Row="0"
 				  Grid.RowSpan="2"
-				  Grid.Column="1" 
+				  Grid.Column="1"
 				Padding="0 0 10 0">
 				<Grid
-				  RowDefinitions="0.1* auto auto auto *"
+				  RowDefinitions="0.25* auto auto auto 1.5* auto *"
 				  >
 					<Grid.Styles>
 						<Style Selector="ComboBoxItem">
@@ -327,31 +329,28 @@
 							</Style>
 						</Style>
 					</Grid.Styles>
-				
+
 					<TextBlock Grid.Row="0"
 							   Classes ="Headline6"
 							   Text="Thuật toán"
 							   VerticalAlignment="Center"
-							   />	
-				
+							   />
+
 					<ComboBox Grid.Row="1"
 							  IsEnabled="{Binding !IsRunningAlgorithm}"
 							  Theme="{StaticResource MaterialOutlineComboBox}"
 							  p1:ComboBoxAssist.Label="Tên thuật toán"
-							  ItemsSource="{Binding AlgorithmList}" 
+							  ItemsSource="{Binding AlgorithmList}"
 							  SelectedItem="{Binding SelectedAlgorithm}"
-							  MaxDropDownHeight="300" 
+							  MaxDropDownHeight="300"
 							  >
-
-						
-						
 						<ComboBox.ItemTemplate>
-								<DataTemplate x:DataType="{x:Type interface:IAlgorithmViewModel}">
-									<TextBlock Text="{Binding AlgorithmName}" VerticalAlignment="Center"/>
-								</DataTemplate>
+							<DataTemplate x:DataType="{x:Type interface:IAlgorithmViewModel}">
+								<TextBlock Text="{Binding AlgorithmName}" VerticalAlignment="Center"/>
+							</DataTemplate>
 						</ComboBox.ItemTemplate>
 					</ComboBox>
-					
+
 					<Grid Grid.Row="2"
 						  ColumnDefinitions="auto * *"
 							>
@@ -360,15 +359,15 @@
 									VerticalAlignment="Center"
 									HorizontalAlignment="Center"
 									FontWeight="Bold"/>
-						
-						<ComboBox Grid.Column="1" 
+
+						<ComboBox Grid.Column="1"
 								  IsEnabled="{Binding !IsRunningAlgorithm}"
 								  ItemsSource="{Binding Vertices}"
 								  SelectedItem="{Binding StartVertex}"
 								  MinWidth="70"
 								 HorizontalAlignment="Center"
 								  MaxDropDownHeight="200">
-		
+
 							<ComboBox.ItemTemplate>
 								<DataTemplate DataType="{x:Type model:Vertex}">
 									<TextBlock Text="{Binding Title}"
@@ -379,17 +378,51 @@
 								</DataTemplate>
 							</ComboBox.ItemTemplate>
 						</ComboBox>
-					
+
 						<Button Grid.Column="2" Classes="accent" Content="Duyệt"
 								Command="{Binding RunAlgorithmCommand}"/>
 					</Grid>
-					
+
 					<Separator Grid.Row="3"/>
-					
-					<TransitioningContentControl Grid.Row="4" Content="{Binding SelectedAlgorithm}"/>
-			</Grid>
+
+					<!--// mã giả //-->
+					<Grid Grid.Row="4" RowDefinitions="0.1* *">
+						<TextBlock Grid.Row="0" VerticalAlignment="Center"
+								   Classes="Headline6"
+								   Text="Mã giả:"/>
+						
+						<ItemsRepeater  Margin="10 10 0 0" Grid.Row="1"
+									ItemsSource="{Binding SelectedAlgorithm.Pseudocodes}"
+									VerticalAlignment="Top"
+									HorizontalAlignment="Left"
+									ScrollViewer.VerticalScrollBarVisibility="Auto"
+									ScrollViewer.HorizontalScrollBarVisibility="Auto">
+							<ItemsRepeater.Styles>
+								<Style Selector="TextBlock.SelectedLine">
+									<Setter Property="Background" Value="LightBlue"/>
+								</Style>
+							</ItemsRepeater.Styles>
+
+							<ItemsRepeater.ItemTemplate>
+								<DataTemplate>
+									<TextBlock Classes.SelectedLine="{Binding IsSelectionCode}"
+												FontWeight="SemiBold"
+												FontFamily="Arial"
+												Text="{Binding Code}"
+												TextWrapping="Wrap"
+											/>
+								</DataTemplate>
+							</ItemsRepeater.ItemTemplate>
+						</ItemsRepeater>
+
+					</Grid>
+					<Separator Grid.Row="5"/>
+					<!--// Result of Algorithm //-->
+					<TransitioningContentControl Grid.Row="6" Content="{Binding SelectedAlgorithm}"/>
+
+				</Grid>
 			</Border>
-			
+
 		</Grid>
 
 

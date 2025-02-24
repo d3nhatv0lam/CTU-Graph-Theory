@@ -57,20 +57,27 @@ namespace CTU_Graph_Theory.Algorithms.Base
             }
         }
 
-        public AlgorithmBase() { }
+        public AlgorithmBase() 
+        {
+            Pseudocodes = new();
+        }
 
 
         // need to override
         protected virtual void StartVetexChanged(CustomGraph graph)
         {
+            CleanAlgorithm(graph);
+        }
+        protected virtual void CleanAlgorithm(CustomGraph graph)
+        {
             graph.UnVisitAndClearParentAll();
         }
         protected virtual void FillPseudoCode() { }
-        public virtual void RunAlgorithm(CustomGraph graph) 
+        public virtual async void RunAlgorithm(CustomGraph graph) 
         {
             IsRunning = 1;
         }
-        public virtual void ContinueAlgorithm(CustomGraph graph) 
+        public virtual async void ContinueAlgorithm(CustomGraph graph) 
         {
             IsRunning = 1;
         }

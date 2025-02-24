@@ -6,54 +6,73 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CTU_Graph_Theory.Algorithms;
 
 namespace CTU_Graph_Theory.ViewModels
 {
     class DFSStackViewModel: ViewModelBase, IAlgorithmViewModel
     {
+        private DFSStack _dfsStack;
+        public CustomGraph _Graph { get; set; }
         public string AlgorithmName
         {
-            get => "BFS";
+            get => _dfsStack.AlgorithmName;
         }
-        public bool IsSetCompletedAlgorithm { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public Vertex? StartVertex
+        {
+            get => _dfsStack.StartVertex;
+            set
+            {
+                if (_dfsStack.StartVertex == value) return;
+                _dfsStack.StartVertex = value;
+            }
+        }
+        public bool IsSetCompletedAlgorithm { get; set; }
 
-        public ObservableCollection<StringPseudoCode> Pseudocodes => throw new NotImplementedException();
-
-        public CustomGraph _Graph { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public ObservableCollection<StringPseudoCode> Pseudocodes 
+        { 
+            get => _dfsStack.Pseudocodes; 
+        }
 
         public DFSStackViewModel()
         {
-
+            _dfsStack = new DFSStack();
+            IsSetCompletedAlgorithm = false;
         }
 
         public void TransferGraph(CustomGraph graph, Vertex vertex)
         {
-            return;
+            _Graph = graph;
+            StartVertex = vertex;
         }
 
         public void RunAlgorithm()
         {
-
+            _dfsStack.RunAlgorithm(_Graph);
         }
 
         public void PauseAlgorithm()
         {
-            throw new NotImplementedException();
+            _dfsStack.PauseAlgorithm();
         }
 
-        public void SetRunSpeed(int speed)
+        public void SetRunSpeed(int speedUp)
         {
-            throw new NotImplementedException();
+            _dfsStack.SetRunSpeed(speedUp);
+        }
+        public void ContinueAlgorithm()
+        {
+            _dfsStack.ContinueAlgorithm(_Graph);
         }
 
         public void SetCompletedAlgorithm(EventHandler returnIsRunningState)
         {
-            throw new NotImplementedException();
+            if (IsSetCompletedAlgorithm) return;
+      
+               _dfsStack.CompletedAlgorithm += returnIsRunningState;
+           
         }
 
-        public void ContinueAlgorithm()
-        {
-            throw new NotImplementedException();
-        }
+
     }
 }
