@@ -180,6 +180,10 @@
 								<Style Selector="agc|TextSticker.Pending">
 									<Setter Property="BorderForeground" Value="#FFCC00"/>
 								</Style>
+								
+								<Style Selector="agc|TextSticker.PointedTo">
+									<Setter Property="BorderForeground" Value="#0000FF"/>
+								</Style>
 
 								<!--// Connection //-->
 								<Style Selector="agc|Connection">
@@ -214,6 +218,7 @@
 													 Classes.NotVisited ="{Binding !IsVisited}"
 													 Classes.Visited ="{Binding IsVisited}"
 													 Classes.Pending ="{Binding IsPending}"
+													 Classes.PointedTo ="{Binding IsPointedTo}"
 													 BorderThickness="1"
 													 Text="{Binding Title}"
 													 Shape="Ellipse"
@@ -254,7 +259,7 @@
 							<Button Grid.Column="0"
 									Theme="{StaticResource MaterialOutlineButton}" Classes="accent"
 									Height="40"
-									Content="Tạm dừng" HorizontalAlignment="Center"
+									Content="Tạm dừng" HorizontalAlignment="Stretch"
 									Command="{Binding PauseAlgorithmCommand}"/>
 							<Button Grid.Column="1"
 									Theme="{StaticResource MaterialOutlineButton}" Classes="accent"
@@ -380,8 +385,19 @@
 							</ComboBox.ItemTemplate>
 						</ComboBox>
 
-						<Button Grid.Column="2" Classes="accent" Content="Duyệt"
-								Command="{Binding RunAlgorithmCommand}"/>
+						<Button Grid.Column="2" Classes="accent" Classes.IsRunningAlgorithm ="{Binding IsRunningAlgorithm}"
+								Command="{Binding RunAlgorithmCommand}">
+							<Button.Styles>
+								<Style Selector="Button">
+									<Setter Property="Content" Value="Duyệt"/>
+								</Style>
+								<Style Selector="Button.IsRunningAlgorithm">
+									<Setter Property="Content" Value="Dừng"/>
+									<Setter Property="Background" Value="Red"/>
+								</Style>
+							</Button.Styles>
+						
+						</Button>
 					</Grid>
 
 					<Separator Grid.Row="3"/>
@@ -392,29 +408,33 @@
 								   Classes="Headline6"
 								   Text="Mã giả:"/>
 						
-						<ItemsRepeater  Margin="10 10 0 0" Grid.Row="1"
+						<ScrollViewer Grid.Row="1" BringIntoViewOnFocusChange="True">
+							<ItemsRepeater  Margin="10 10 0 0"
 									ItemsSource="{Binding SelectedAlgorithm.Pseudocodes}"
 									VerticalAlignment="Top"
 									HorizontalAlignment="Left"
-									ScrollViewer.VerticalScrollBarVisibility="Auto"
-									ScrollViewer.HorizontalScrollBarVisibility="Auto">
-							<ItemsRepeater.Styles>
-								<Style Selector="TextBlock.SelectedLine">
-									<Setter Property="Background" Value="LightBlue"/>
-								</Style>
-							</ItemsRepeater.Styles>
+									 
+									  
+									>
+								<ItemsRepeater.Styles>
+									<Style Selector="TextBlock.SelectedLine">
+										<Setter Property="Background" Value="LightBlue"/>
+									</Style>
+								</ItemsRepeater.Styles>
 
-							<ItemsRepeater.ItemTemplate>
-								<DataTemplate>
-									<TextBlock Classes.SelectedLine="{Binding IsSelectionCode}"
-												FontWeight="SemiBold"
-												FontFamily="Arial"
-												Text="{Binding CodeWithSlectedVertex}"
-												TextWrapping="Wrap"
+								<ItemsRepeater.ItemTemplate>
+									<DataTemplate>
+										<TextBlock  Classes.SelectedLine="{Binding IsSelectionCode}"
+													FontWeight="SemiBold"
+													FontFamily="Arial"
+													Text="{Binding CodeWithSlectedVertex}"
+													TextWrapping="Wrap"
+													PropertyChanged="TextBlock_PropertyChanged"
 											/>
-								</DataTemplate>
-							</ItemsRepeater.ItemTemplate>
-						</ItemsRepeater>
+									</DataTemplate>
+								</ItemsRepeater.ItemTemplate>
+							</ItemsRepeater>
+						</ScrollViewer>
 
 					</Grid>
 					<Separator Grid.Row="5"/>

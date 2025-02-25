@@ -22,8 +22,10 @@ namespace CTU_Graph_Theory.Models
             Show
         }
         // cần để duyệt đồ thị và update UI
-        public bool _isVisited;
-        public bool _isPending;
+        private bool _isVisited;
+        private bool _isPending;
+        private bool _isPointedTo;
+
 
         public string Title {  get; }
         public bool IsShowVertex { get; }
@@ -38,13 +40,18 @@ namespace CTU_Graph_Theory.Models
             get => _isPending;
             set => this.RaiseAndSetIfChanged(ref _isPending, value);
         }
+        public bool IsPointedTo
+        {
+            get => _isPointedTo;
+            set => this.RaiseAndSetIfChanged(ref _isPointedTo, value);
+        }
 
         public Vertex(string title, Visible isShowVertex = Visible.Show)
         {
             Title = title;
             IsShowVertex = GetVisibleState(isShowVertex);
             ParentVertex = null;
-            IsVisited = IsPending = false;
+            IsVisited = IsPending = IsPointedTo = false;
         }
 
         private bool GetVisibleState(Visible isShowVertex)
@@ -58,6 +65,45 @@ namespace CTU_Graph_Theory.Models
                     break;
             }
             return isVisible;
+        }
+
+        public void UnSetAll()
+        {
+            UnSetAllState();
+            ParentVertex = null;
+        }
+
+        public void UnSetAllState()
+        {
+            IsVisited = false;
+            IsPending = false;
+            IsPointedTo = false;
+        }
+        public void SetVitsited()
+        {
+            IsPending = false;
+            IsVisited = true;
+        }
+        public void UnSetVisited()
+        {
+            IsVisited = false;
+        }
+
+        public void SetPending()
+        {
+            IsPending = true;
+        }
+        public void UnSetPending()
+        {
+            IsPending = false;
+        }
+        public void SetPointTo()
+        {
+            IsPointedTo = true;
+        }
+        public void UnSetPointedTo()
+        {
+            IsPointedTo = false;
         }
 
         public int Compare(Vertex v)

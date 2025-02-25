@@ -24,8 +24,6 @@ namespace CTU_Graph_Theory.Algorithms
             FillPseudoCode();
         }
 
-
-
     protected override void FillPseudoCode()
         {
              List<string> code_lines = [
@@ -50,21 +48,15 @@ namespace CTU_Graph_Theory.Algorithms
             queue.Clear();
         }
 
-        protected override void StartVetexChanged(CustomGraph graph)
-        {
-            base.StartVetexChanged(graph);
-            CleanBFS(graph);
-        }
-
         public override async void RunAlgorithmWithAllVertex(CustomGraph graph, ObservableCollection<Vertex> vertices)
         {
             base.RunAlgorithmWithAllVertex(graph, vertices);
             var token = cts.Token;
             while (QueueVertices.Count > 0)
             {
-                if (token.IsCancellationRequested) return;
-                await PrepareBFS(graph);
-                await ChooseStartVertex();
+                if (token.IsCancellationRequested) break;
+                await PrepareBFSState(graph);
+                await ChooseStartVertexState();
 
                 StartVertex = QueueVertices.Dequeue();
                 if (StartVertex.IsVisited == true) continue;
@@ -72,6 +64,7 @@ namespace CTU_Graph_Theory.Algorithms
                 queue.Enqueue(StartVertex);
                 await RunBFSLoop(graph, token);
             }
+            if (IsStopAlgorithm) base.CleanGraphForAlgorithm(graph);
             if (QueueVertices.Count == 0 && queue.Count == 0) OnCompletedAlgorithm();
         }
 
@@ -80,11 +73,13 @@ namespace CTU_Graph_Theory.Algorithms
             var token = cts.Token;
             base.RunAlgorithm(graph);
 
-            await PrepareBFS(graph);
+            await PrepareBFSState(graph);
             queue.Enqueue(StartVertex);
-            await ChooseStartVertex();
+            await ChooseStartVertexState();
             // clone token để xóa biết đường tự hủy
             await RunBFSLoop(graph,token);
+
+            if (IsStopAlgorithm) base.CleanGraphForAlgorithm(graph);
             if (queue.Count == 0) OnCompletedAlgorithm();
         }
 
@@ -93,7 +88,8 @@ namespace CTU_Graph_Theory.Algorithms
             base.ContinueAlgorithm(graph);
             var token = cts.Token;
             await RunBFSLoop(graph,token);
-            if(queue.Count == 0) OnCompletedAlgorithm();
+            if (IsStopAlgorithm) base.CleanGraphForAlgorithm(graph);
+            if (queue.Count == 0) OnCompletedAlgorithm();
         }
 
         public override async void ContinueAlgorithmWithAllVertex(CustomGraph graph)
@@ -113,16 +109,17 @@ namespace CTU_Graph_Theory.Algorithms
                 await RunBFSLoop(graph, token);
                 //if (token.IsCancellationRequested) return;
             }
+            if (IsStopAlgorithm) base.CleanGraphForAlgorithm(graph);
             if (QueueVertices.Count == 0 && queue.Count == 0) OnCompletedAlgorithm();
         }
 
-        private async Task PrepareBFS(CustomGraph graph)
+        private async Task PrepareBFSState(CustomGraph graph)
         {
             if (StartVertex == null) return;
             CleanBFS(graph);
         }
 
-        private async Task ChooseStartVertex()
+        private async Task ChooseStartVertexState()
         {
             Pseudocodes[0].IsSelectionCode = true;
             Pseudocodes[0].FillVertextIntoCode(StartVertex);
@@ -143,14 +140,14 @@ namespace CTU_Graph_Theory.Algorithms
                 }
 
                 Vertex u = await ChooseVertexUState();
-
+                u.SetPointTo();
                 //visit vertex => update into UI
                 bool isMarked = await IsVertexMarkedState(u);
+                u.UnSetPointedTo();
                 if (isMarked) continue;
 
                 await MarkVertexState(u);
 
-                
                 // draw adjacent => update into UI
                 if (u.ParentVertex != null)
                 {
@@ -162,13 +159,14 @@ namespace CTU_Graph_Theory.Algorithms
 
                 foreach (var v in graph.NeighboursOfVertex(u))
                 {
+                    v.SetPointTo();
                     await ForLoopVState();
 
                     await IfVisitedState(v);
                     if (v.IsVisited == false)
-                    {
                         await AddVertexIntoQueueState(v,u);  
-                    }
+                    else
+                        v.UnSetPointedTo();
                 }
             }
             Pseudocodes[1].IsSelectionCode = false;
@@ -214,8 +212,7 @@ namespace CTU_Graph_Theory.Algorithms
             Pseudocodes[5].FillVertextIntoCode(u);
             Pseudocodes[6].FillVertextIntoCode(u);
             Pseudocodes[5].IsSelectionCode = Pseudocodes[6].IsSelectionCode = true;
-            u.IsPending = false;
-            u.IsVisited = true;
+            u.SetVitsited();
             await Task.Delay(this.TimeDelayOfLineCode);
             Pseudocodes[5].IsSelectionCode = Pseudocodes[6].IsSelectionCode = false;
         }
@@ -243,7 +240,8 @@ namespace CTU_Graph_Theory.Algorithms
             queue.Enqueue(v);
             if (v.ParentVertex == null) v.ParentVertex = u;
             Pseudocodes[9].IsSelectionCode = false;
-            v.IsPending = true;
+            v.UnSetPointedTo();
+            v.SetPending();
             await Task.Delay(TimeDelayOfLineCode);
         }
     }

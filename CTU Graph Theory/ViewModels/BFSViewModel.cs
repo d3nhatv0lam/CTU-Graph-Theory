@@ -78,6 +78,10 @@ namespace CTU_Graph_Theory.ViewModels
             _bfs.ContinueAlgorithmWithAllVertex(_Graph);
         }
 
+        public void StopAlgorithm()
+        {
+            _bfs.StopAlgorithm(_Graph);
+        }
         public void SetRunSpeed(int speedUp)
         {
             _bfs.SetRunSpeed(speedUp);

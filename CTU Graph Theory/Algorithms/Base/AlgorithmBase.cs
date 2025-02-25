@@ -12,13 +12,14 @@ namespace CTU_Graph_Theory.Algorithms.Base
     public class AlgorithmBase
     {
         // base
+        private bool _isStopAlgorithm;
         private Vertex? _startVetex = null;
+        // Animation
         private int _baseSpeed = 2100;
         private int _fastSpeedPerLevel = 400;
-        // Animation
         protected CancellationTokenSource? cts = new();
 
-        public  string AlgorithmName { get; protected set; }
+        public string AlgorithmName { get; protected set; }
         public ObservableCollection<StringPseudoCode> Pseudocodes { get; protected set; }
         public Queue<Vertex> QueueVertices { get; protected set; }
         public Vertex? StartVertex
@@ -29,12 +30,14 @@ namespace CTU_Graph_Theory.Algorithms.Base
                 if (_startVetex != value)
                 {
                     _startVetex = value;
-                    IsStartVertexChanged = true;
                 }
             }
         }
-        public bool IsStartVertexChanged { get; protected set; } = false;
-
+        public bool IsStopAlgorithm
+        {
+            get => _isStopAlgorithm;
+            set => _isStopAlgorithm = value;
+        }
 
         // giây
         protected int RunSpeed { get; set; } = 2000;
@@ -58,7 +61,7 @@ namespace CTU_Graph_Theory.Algorithms.Base
             }
         }
 
-        public AlgorithmBase() 
+        public AlgorithmBase()
         {
             Pseudocodes = new();
             QueueVertices = new();
@@ -70,20 +73,18 @@ namespace CTU_Graph_Theory.Algorithms.Base
         {
             graph.UnVisitAndClearParentAll();
         }
-        protected virtual void StartVetexChanged(CustomGraph graph)
-        {
-            CleanGraphForAlgorithm(graph);
-        }
 
         protected virtual void FillPseudoCode() { }
-        public virtual async void RunAlgorithm(CustomGraph graph) 
+        public virtual async void RunAlgorithm(CustomGraph graph)
         {
+            IsStopAlgorithm = false;
             IsRunning = 1;
             CleanGraphForAlgorithm(graph);
         }
 
         public virtual async void RunAlgorithmWithAllVertex(CustomGraph graph, ObservableCollection<Vertex> vertices)
         {
+            IsStopAlgorithm = false;
             IsRunning = 1;
             CleanGraphForAlgorithm(graph);
             QueueVertices.Clear();
@@ -108,7 +109,12 @@ namespace CTU_Graph_Theory.Algorithms.Base
             IsRunning = 0;
         }
 
-
+        public void StopAlgorithm(CustomGraph graph)
+        {
+            IsStopAlgorithm = true;
+            PauseAlgorithm();
+            CleanGraphForAlgorithm(graph);
+        }
 
 
         public void SetRunSpeed(int speedUp)

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.Intrinsics;
 using System.Text;
@@ -147,17 +148,13 @@ namespace CTU_Graph_Theory.Models
                 if (edge.Tail != null)
                 {
                     u = (Vertex)edge.Tail;
-                    u.IsVisited = false;
-                    u.IsPending = false;
-                    u.ParentVertex = null;
+                    u.UnSetAll();
                 }
                 if (edge.Head != null)
                 {
                     u = (Vertex)edge.Head;
                     if (u == Vertex.EmptyVertex) continue;
-                    u.IsVisited = false;
-                    u.IsPending = false;
-                    u.ParentVertex = null;
+                    u.UnSetAll();
                 }
 
             }
@@ -169,6 +166,9 @@ namespace CTU_Graph_Theory.Models
             // create new graph
             CustomGraph newGraph = new CustomGraph();
             newGraph.DirectTypeOfGraph = newType;
+            newGraph.TypeOfGraph = graph.TypeOfGraph;
+            newGraph.Vertices = new ObservableCollection<Vertex>(graph.Vertices.Select(vertex => vertex));
+            newGraph.EdgeCount = graph.EdgeCount;
             // add edge for graph
             foreach (ShowableEdge edge in graph.Edges)
             {

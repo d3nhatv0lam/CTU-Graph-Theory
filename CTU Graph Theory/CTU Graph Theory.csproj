@@ -26,9 +26,9 @@
     <PackageReference Include="Material.Icons.Avalonia" Version="2.2.0" />
   </ItemGroup>
 
-  <ItemGroup>
+  <!--<ItemGroup>
     <UpToDateCheckInput Remove="Views\BFSView.axaml" />
-  </ItemGroup>
+  </ItemGroup>-->
 
   <ItemGroup>
     <Compile Update="Views\VisualizationGraphView.axaml.cs">

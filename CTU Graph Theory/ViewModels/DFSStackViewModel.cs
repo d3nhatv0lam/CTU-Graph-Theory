@@ -64,6 +64,10 @@ namespace CTU_Graph_Theory.ViewModels
         {
             _dfsStack.ContinueAlgorithm(_Graph);
         }
+        public void StopAlgorithm()
+        {
+            _dfsStack.StopAlgorithm(_Graph);
+        }
 
         public void SetCompletedAlgorithm(EventHandler returnIsRunningState)
         {
@@ -73,25 +77,15 @@ namespace CTU_Graph_Theory.ViewModels
            
         }
 
-        public void RunAlgorithm(ObservableCollection<Vertex> vertices)
-        {
-            
-            foreach (Vertex vertex in vertices)
-            {
-                if (vertex.IsVisited == true) continue;
-                StartVertex = vertex;
-                _dfsStack.RunAlgorithm(_Graph);
-            }
-        }
 
         public void RunAlgorithmWithAllVertex(ObservableCollection<Vertex> vertices)
         {
-            throw new NotImplementedException();
+            _dfsStack.RunAlgorithmWithAllVertex(_Graph,vertices);
         }
 
         public void ContinueAlgorithmWithAllVertex()
         {
-            throw new NotImplementedException();
+            _dfsStack.ContinueAlgorithmWithAllVertex(_Graph);
         }
     }
 }

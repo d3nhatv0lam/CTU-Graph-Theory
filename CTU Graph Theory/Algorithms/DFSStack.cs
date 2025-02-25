@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -24,7 +25,7 @@ namespace CTU_Graph_Theory.Algorithms
 
         protected override void FillPseudoCode()
         {
-            List<string> code_lines = new List<string>() {
+            string[] code_lines = {
                 "Thêm đỉnh bất kỳ vào ngăn xếp",
                 "while ngăn xếp chưa rỗng {",
                 "    u = Lấy đỉnh ở đỉnh ngăn xếp ra",
@@ -49,73 +50,106 @@ namespace CTU_Graph_Theory.Algorithms
             stack.Clear();
         }
 
-        protected override void StartVetexChanged(CustomGraph graph)
-        {
-            base.StartVetexChanged(graph);
-            CleanBFS(graph);
-        }
-
         public override async void RunAlgorithm(CustomGraph graph)
         {
+            var token = cts.Token;
             base.RunAlgorithm(graph);
-
-            if (StartVertex == null) return;
-
-            graph.UnVisitAndClearParentAll();
-            CleanBFS(graph);
+            await PrepareDFSStackState(graph);
+           
             stack.Push(StartVertex);
-            IsStartVertexChanged = false;
 
-            Pseudocodes[0].IsSelectionCode = true;
-            await Task.Delay(TimeDelayOfLineCode);
-            Pseudocodes[0].IsSelectionCode = false;
+            await ChooseStartVertexState();
 
             // clone token để xóa biết đường tự hủy
-            var token = cts.Token;
-            RunDFSStackLoop(graph, token);
+            
+            await RunDFSStackLoop(graph, token);
+
+
+            if (IsStopAlgorithm) base.CleanGraphForAlgorithm(graph);
+            if (stack.Count == 0) OnCompletedAlgorithm();
         }
 
         public override async void ContinueAlgorithm(CustomGraph graph)
         {
             base.ContinueAlgorithm(graph);
             var token = cts.Token;
-            RunDFSStackLoop(graph, token);
+            await RunDFSStackLoop(graph, token);
+            if (IsStopAlgorithm) base.CleanGraphForAlgorithm(graph);
+            if (stack.Count == 0) OnCompletedAlgorithm();
         }
 
-        private async void RunDFSStackLoop(CustomGraph graph, CancellationToken token)
+        public override async void RunAlgorithmWithAllVertex(CustomGraph graph, ObservableCollection<Vertex> vertices)
+        {
+            base.RunAlgorithmWithAllVertex(graph, vertices);
+            var token = cts.Token;
+            while (QueueVertices.Count > 0)
+            {
+                if (token.IsCancellationRequested) break;
+                await PrepareDFSStackState(graph);
+                await ChooseStartVertexState();
+
+                StartVertex = QueueVertices.Dequeue();
+                if (StartVertex.IsVisited == true) continue;
+
+                stack.Push(StartVertex);
+                await RunDFSStackLoop(graph, token);
+            }
+            if (IsStopAlgorithm) base.CleanGraphForAlgorithm(graph);
+            if (QueueVertices.Count == 0 && stack.Count == 0) OnCompletedAlgorithm();
+        }
+        public override async void ContinueAlgorithmWithAllVertex(CustomGraph graph)
+        {
+            var token = cts.Token;
+            base.ContinueAlgorithmWithAllVertex(graph);
+            await RunDFSStackLoop(graph, token);
+            while (QueueVertices.Count > 0)
+            {
+                if (token.IsCancellationRequested) break;
+                StartVertex = QueueVertices.Dequeue();
+                if (StartVertex.IsVisited == true) continue;
+
+                stack.Push(StartVertex);
+
+                await RunDFSStackLoop(graph, token);
+            }
+            if (IsStopAlgorithm) base.CleanGraphForAlgorithm(graph);
+            if (QueueVertices.Count == 0 && stack.Count == 0) OnCompletedAlgorithm();
+        }
+
+        private async Task PrepareDFSStackState(CustomGraph graph)
+        {
+            if (StartVertex == null) return;
+            CleanBFS(graph);
+        }
+
+        private async Task ChooseStartVertexState()
+        {
+            Pseudocodes[0].IsSelectionCode = true;
+            await Task.Delay(TimeDelayOfLineCode);
+            Pseudocodes[0].IsSelectionCode = false;
+        }
+
+        private async Task RunDFSStackLoop(CustomGraph graph, CancellationToken token)
         {
             while (stack.Count != 0)
             {
-                Pseudocodes[1].IsSelectionCode = true;
-                await Task.Delay(this.TimeDelayOfLineCode);
-                Pseudocodes[1].IsSelectionCode = false;
-
+                await WhileState();
 
                 if (token.IsCancellationRequested)
-                    return;
-
-                Pseudocodes[2].IsSelectionCode = true;
-                Vertex u = stack.Pop();
-                await Task.Delay(this.TimeDelayOfLineCode);
-                Pseudocodes[2].IsSelectionCode = false;
-                //visit vertex => update into UI
-                Pseudocodes[3].IsSelectionCode = true;
-                await Task.Delay(this.TimeDelayOfLineCode);
-                if (u.IsVisited == true)
                 {
-                    Pseudocodes[3].IsSelectionCode = false;
-                    Pseudocodes[4].IsSelectionCode = true;
-                    await Task.Delay(this.TimeDelayOfLineCode);
-                    Pseudocodes[4].IsSelectionCode = false;
-                    continue;
+                    await Task.Delay(100);
+                    return;
                 }
-                Pseudocodes[3].IsSelectionCode = false;
 
-                Pseudocodes[5].IsSelectionCode = Pseudocodes[6].IsSelectionCode = true;
-                u.IsPending = false;
-                u.IsVisited = true;
-                await Task.Delay(this.TimeDelayOfLineCode);
-                Pseudocodes[5].IsSelectionCode = Pseudocodes[6].IsSelectionCode = false;
+                Vertex u = await ChooseVertexUState();
+                u.SetPointTo();
+                //visit vertex => update into UI
+                bool isContinue = await IsContinueState(u);
+                u.UnSetPointedTo();
+                if (isContinue) continue;
+
+                await MarkVertexState(u);
+               
                 // draw adjacent => update into UI
                 if (u.ParentVertex != null)
                 {
@@ -124,30 +158,85 @@ namespace CTU_Graph_Theory.Algorithms
                         AdjacentEdge.IsVisited = true;
                 }
 
+
                 foreach (var v in graph.NeighboursOfVertex(u))
                 {
-                    Pseudocodes[7].IsSelectionCode = true;
-                    await Task.Delay(TimeDelayOfLineCode);
-                    Pseudocodes[7].IsSelectionCode = false;
-                    Pseudocodes[8].IsSelectionCode = true;
-                    await Task.Delay(TimeDelayOfLineCode);
+                    v.SetPointTo();
+                    await ForLoopState();
+
+                    await IfVisitedState();
                     if (v.IsVisited == false)
                     {
-                        Pseudocodes[8].IsSelectionCode = false;
-
-                        Pseudocodes[9].IsSelectionCode = true;
-                        await Task.Delay(TimeDelayOfLineCode);
-                        stack.Push(v);
-                        if (v.ParentVertex == null) v.ParentVertex = u;
-                        Pseudocodes[9].IsSelectionCode = false;
-                        v.IsPending = true;
-                        await Task.Delay(TimeDelayOfLineCode);
+                        await AddVertexIntoStackState(v, u);
                     }
-                    Pseudocodes[8].IsSelectionCode = false;
+                    else v.UnSetPointedTo();
+                    
                 }
             }
+        }
+
+        private async Task WhileState()
+        {
+            Pseudocodes[1].IsSelectionCode = true;
+            await Task.Delay(this.TimeDelayOfLineCode);
             Pseudocodes[1].IsSelectionCode = false;
-            OnCompletedAlgorithm();
+        }
+
+        private async Task<Vertex> ChooseVertexUState()
+        {
+            Pseudocodes[2].IsSelectionCode = true;
+            Vertex u = stack.Pop();
+            await Task.Delay(this.TimeDelayOfLineCode);
+            Pseudocodes[2].IsSelectionCode = false;
+            return u;
+        }
+
+        private async Task<bool> IsContinueState(Vertex u)
+        {
+            bool isContinue = false;
+            Pseudocodes[3].IsSelectionCode = true;
+            await Task.Delay(this.TimeDelayOfLineCode);
+            Pseudocodes[3].IsSelectionCode = false;
+            if (u.IsVisited == true)
+            {
+                Pseudocodes[4].IsSelectionCode = true;
+                await Task.Delay(this.TimeDelayOfLineCode);
+                Pseudocodes[4].IsSelectionCode = false;
+                isContinue = true;
+            }
+            return isContinue;
+        }
+
+        private async Task MarkVertexState(Vertex u)
+        {
+            Pseudocodes[5].IsSelectionCode = Pseudocodes[6].IsSelectionCode = true;
+            u.SetVitsited();
+            await Task.Delay(this.TimeDelayOfLineCode);
+            Pseudocodes[5].IsSelectionCode = Pseudocodes[6].IsSelectionCode = false;
+        }
+        private async Task ForLoopState()
+        {
+            Pseudocodes[7].IsSelectionCode = true;
+            await Task.Delay(TimeDelayOfLineCode);
+            Pseudocodes[7].IsSelectionCode = false;
+        }
+        private async Task IfVisitedState()
+        {
+            Pseudocodes[8].IsSelectionCode = true;
+            await Task.Delay(TimeDelayOfLineCode);
+            Pseudocodes[8].IsSelectionCode = false;
+        }
+
+        private async Task AddVertexIntoStackState(Vertex v, Vertex u)
+        {
+            Pseudocodes[9].IsSelectionCode = true;
+            await Task.Delay(TimeDelayOfLineCode);
+            stack.Push(v);
+            if (v.ParentVertex == null) v.ParentVertex = u;
+            Pseudocodes[9].IsSelectionCode = false;
+            v.UnSetPointedTo();
+            v.SetPending();
+            await Task.Delay(TimeDelayOfLineCode);
         }
     }
 }

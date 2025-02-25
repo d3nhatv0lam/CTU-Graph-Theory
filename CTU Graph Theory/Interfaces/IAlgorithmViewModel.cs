@@ -14,6 +14,7 @@ namespace CTU_Graph_Theory.Interfaces
         // cơ bản
         public CustomGraph _Graph { get; set; }
         public string AlgorithmName { get; }
+        public Vertex? StartVertex { get; set; }
         public bool IsSetCompletedAlgorithm { get; set; }
         public ObservableCollection<StringPseudoCode> Pseudocodes { get; }
         public void TransferGraph(CustomGraph graph, Vertex startVertex);
@@ -22,6 +23,7 @@ namespace CTU_Graph_Theory.Interfaces
         public void PauseAlgorithm();
         public void ContinueAlgorithm();
         public void ContinueAlgorithmWithAllVertex();
+        public void StopAlgorithm();
         public void SetRunSpeed(int speedUp);
         public void SetCompletedAlgorithm(EventHandler returnIsRunningState);
     }
