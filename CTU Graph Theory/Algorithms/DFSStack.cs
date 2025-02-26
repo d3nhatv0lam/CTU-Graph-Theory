@@ -18,7 +18,7 @@ namespace CTU_Graph_Theory.Algorithms
         private Stack<Vertex> stack;
         public DFSStack() : base()
         {
-            this.AlgorithmName = "BFS - Duyệt theo chiều sâu bằng Stack";
+            this.AlgorithmName = "DFS - Duyệt theo chiều sâu bằng Stack";
             stack = new Stack<Vertex>();
             FillPseudoCode();
         }

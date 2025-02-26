@@ -305,15 +305,22 @@
 							<StackPanel.Styles>
 								<Style Selector="TextBlock.Running">
 									<Setter Property="Foreground" Value="Green"/>
+									<Setter Property="Text" Value="Đang Duyệt"/>
 								</Style>
 								<Style Selector="TextBlock.Stopped">
 									<Setter Property="Foreground" Value="Brown"/>
+									<Setter Property="Text" Value="Không"/>
+								</Style>
+								<Style Selector="TextBlock.Pause">
+									<Setter Property="Text" Value="Tạm dừng"/>
+									<Setter Property="Foreground" Value="#FFC107"/>
 								</Style>
 							</StackPanel.Styles>
 							<TextBlock Text="Trạng thái duyệt đồ thị: "/>
 							<TextBlock Classes.Running="{Binding IsRunningAlgorithm}"
 									   Classes.Stopped ="{Binding !IsRunningAlgorithm}"
-										Text="{Binding IsRunningAlgorithm,Converter={StaticResource BoolToStringState}}"/>
+									   Classes.Pause ="{Binding IsPauseAlgorithm}"
+										/>
 						</StackPanel>
 					</Grid>
 				</Border>
@@ -393,7 +400,7 @@
 								</Style>
 								<Style Selector="Button.IsRunningAlgorithm">
 									<Setter Property="Content" Value="Dừng"/>
-									<Setter Property="Background" Value="Red"/>
+									<Setter Property="Background" Value="#D31A38"/>
 								</Style>
 							</Button.Styles>
 						
