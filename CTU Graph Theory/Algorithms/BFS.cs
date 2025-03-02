@@ -43,7 +43,7 @@ namespace CTU_Graph_Theory.Algorithms
             
         }
 
-        private void CleanBFS(CustomGraph graph)
+        private void CleanBFS()
         {
             queue.Clear();
         }
@@ -99,8 +99,7 @@ namespace CTU_Graph_Theory.Algorithms
             await RunBFSLoop(graph, token);
             while (QueueVertices.Count > 0)
             {
-
-                if (token.IsCancellationRequested) return;
+                if (token.IsCancellationRequested) break;
                 StartVertex = QueueVertices.Dequeue();
                 if (StartVertex.IsVisited == true) continue;
                 
@@ -116,7 +115,7 @@ namespace CTU_Graph_Theory.Algorithms
         private async Task PrepareBFSState(CustomGraph graph)
         {
             if (StartVertex == null) return;
-            CleanBFS(graph);
+            CleanBFS();
         }
 
         private async Task ChooseStartVertexState()

@@ -12,18 +12,19 @@ namespace CTU_Graph_Theory.Algorithms.Base
     public abstract class AbstractAlgorithm
     {
         // field area
-        private int _baseSpeed = 2100;
-        private int _fastSpeedPerLevel = 400;
+        private const int BASE_SPEED = 2100;
+        private const int SPEED_FER_LEVEL = 400;
         private int _runSpeed;
 
         // property area
         protected int TimeDelayOfLineCode
         {
-            get => _runSpeed / 2 * Convert.ToInt32(!IsStopAlgorithm);
+            get => _runSpeed / 2 * Convert.ToInt32(!IsStopAlgorithm && !IsPauseAlgorithm) ;
         }
 
         protected CancellationTokenSource? cts;
         protected bool IsStopAlgorithm { get; set; }
+        protected bool IsPauseAlgorithm {  get; set; } 
         public Vertex? StartVertex { get; set; }
         public abstract string AlgorithmName { get; }
         public ObservableCollection<StringPseudoCode> Pseudocodes { get; }
@@ -45,7 +46,7 @@ namespace CTU_Graph_Theory.Algorithms.Base
 
         public void SetRunSpeed(int speedUp)
         {
-            _runSpeed = _baseSpeed - speedUp * _fastSpeedPerLevel;
+            _runSpeed = BASE_SPEED - speedUp * SPEED_FER_LEVEL;
             _runSpeed = int.Max(_runSpeed, 0);
         }
 
@@ -53,15 +54,16 @@ namespace CTU_Graph_Theory.Algorithms.Base
         {
             cts?.Cancel();
             cts = new CancellationTokenSource();
-            IsStopAlgorithm = true;
+            IsPauseAlgorithm = true;
         }
         public virtual void StopAlgorithm(CustomGraph graph)
         {
             IsStopAlgorithm = true;
             PauseAlgorithm();
+            CleanGraphForAlgorithm(graph);
         }
 
-        public virtual void CleanGraphAfterStopAndPause(CustomGraph graph)
+        public virtual void CleanGraphAfterStop(CustomGraph graph)
         {
             if (IsStopAlgorithm) CleanGraphForAlgorithm(graph);
         }
@@ -71,6 +73,7 @@ namespace CTU_Graph_Theory.Algorithms.Base
         protected void BaseRunAlgorithm(CustomGraph graph)
         {
             IsStopAlgorithm = false;
+            IsPauseAlgorithm = false;
             CleanGraphForAlgorithm(graph);
         }
 
@@ -86,6 +89,7 @@ namespace CTU_Graph_Theory.Algorithms.Base
         protected void BaseContinueAlgorithm(CustomGraph graph)
         {
             IsStopAlgorithm = false;
+            IsPauseAlgorithm = false;
         }
 
         protected void BaseContinueAlgorithmWithAllVertex(CustomGraph graph)
@@ -115,7 +119,8 @@ namespace CTU_Graph_Theory.Algorithms.Base
             QueueVertices = new Queue<Vertex>();
             cts = new CancellationTokenSource();
             IsStopAlgorithm = false;
-            _runSpeed = _baseSpeed;
+            IsPauseAlgorithm = false;
+            _runSpeed = BASE_SPEED;
 
         }
     }
