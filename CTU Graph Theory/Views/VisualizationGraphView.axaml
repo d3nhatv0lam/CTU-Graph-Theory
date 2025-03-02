@@ -26,7 +26,6 @@
 	<UserControl.Resources>
 		<converter:GraphTypeToStringConverter x:Key ="TypeToString"/>
 		<converter:GraphDirectTypeToStringConverter x:Key ="DirectToString"/>
-		<converter:BoolToStringState x:Key ="BoolToStringState"/>
 		<converter:EmptyVertexToStringConverter x:Key ="SelectAllConvert"/>
 	</UserControl.Resources>
 

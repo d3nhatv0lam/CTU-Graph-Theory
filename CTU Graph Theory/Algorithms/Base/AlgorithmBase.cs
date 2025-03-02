@@ -17,7 +17,7 @@ namespace CTU_Graph_Theory.Algorithms.Base
         // Animation
         private int _baseSpeed = 2100;
         private int _fastSpeedPerLevel = 400;
-        protected CancellationTokenSource? cts = new();
+        protected CancellationTokenSource cts = new();
 
         public string AlgorithmName { get; protected set; }
         public ObservableCollection<StringPseudoCode> Pseudocodes { get; protected set; }
@@ -104,7 +104,7 @@ namespace CTU_Graph_Theory.Algorithms.Base
 
         public void PauseAlgorithm()
         {
-            cts?.Cancel();
+            cts.Cancel();
             cts = new CancellationTokenSource();
             IsRunning = 0;
         }

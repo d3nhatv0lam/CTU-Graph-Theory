@@ -133,7 +133,7 @@ namespace CTU_Graph_Theory.ViewModels
             CreateAlgorithList();
             InitObservable();
             InitCommand();
-
+            GraphData = "1 2 1\r\n2 3 5\r\n3 1 2\r\n1 5 2\r\n2 4 3\r\n4 6 6";
         }
 
         private void CreateAlgorithList()
@@ -141,6 +141,7 @@ namespace CTU_Graph_Theory.ViewModels
             AlgorithmList.Add(new BFSViewModel());
             AlgorithmList.Add(new DFSStackViewModel());
             AlgorithmList.Add(new DFSRecursiveViewModel());
+            AlgorithmList.Add(new CircledCheckViewModel());
         }
 
         private void InitObservable()

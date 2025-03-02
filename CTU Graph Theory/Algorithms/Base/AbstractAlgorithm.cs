@@ -15,6 +15,7 @@ namespace CTU_Graph_Theory.Algorithms.Base
         private const int BASE_SPEED = 2100;
         private const int SPEED_FER_LEVEL = 400;
         private int _runSpeed;
+        protected CancellationTokenSource cts;
 
         // property area
         protected int TimeDelayOfLineCode
@@ -22,11 +23,11 @@ namespace CTU_Graph_Theory.Algorithms.Base
             get => _runSpeed / 2 * Convert.ToInt32(!IsStopAlgorithm && !IsPauseAlgorithm) ;
         }
 
-        protected CancellationTokenSource? cts;
+        
         protected bool IsStopAlgorithm { get; set; }
         protected bool IsPauseAlgorithm {  get; set; } 
         public Vertex? StartVertex { get; set; }
-        public abstract string AlgorithmName { get; }
+        public string AlgorithmName { get; protected set; }
         public ObservableCollection<StringPseudoCode> Pseudocodes { get; }
         public Queue<Vertex> QueueVertices { get; }
 
@@ -52,7 +53,7 @@ namespace CTU_Graph_Theory.Algorithms.Base
 
         public virtual void PauseAlgorithm()
         {
-            cts?.Cancel();
+            cts.Cancel();
             cts = new CancellationTokenSource();
             IsPauseAlgorithm = true;
         }

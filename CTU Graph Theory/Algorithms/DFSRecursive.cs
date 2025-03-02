@@ -13,7 +13,6 @@ namespace CTU_Graph_Theory.Algorithms
 {
     public class DFSRecursive : AbstractAlgorithm
     {
-        public override string AlgorithmName { get; }
         private Stack<Vertex> FuntionStack;
         public DFSRecursive() : base()
         {
