@@ -119,24 +119,44 @@ namespace CTU_Graph_Theory.Models
                 // don't has u->v
                 // is Undirected and has v->u
                 if (IsUnDirectedGraph() && Vertex.IsVertexEqual(u, v2) && Vertex.IsVertexEqual(v, v1)) return edge;
-                //    if (DirectTypeOfGraph == GraphDirectType.Directed)
-                //{
-                //     return edge;
-                //    //if (u.Title == v1?.Title && v.Title == v2?.Title) return edge;
-                //}
-                //else
-                //{
-                //    if (Vertex.IsVertexEqual(u, v1) && Vertex.IsVertexEqual(v, v2))
-                //    if ((u.Title == v1?.Title && v.Title == v2?.Title)
-                //    || (u.Title == v2?.Title && v.Title == v1?.Title)) return edge;
-                //}
-
             }
             // don't find
             return null;
         }
 
-       
+        public List<ShowableEdge> GetAllEdges(Vertex u,Vertex v)
+        {
+            List<ShowableEdge> edges = new List<ShowableEdge>();
+            foreach (ShowableEdge edge in this.Edges)
+            {
+                Vertex? v1 = edge.Tail as Vertex;
+                Vertex? v2 = edge.Head as Vertex;
+                if (v1 == null || v2 == null) continue;
+
+                // both 2 Direct type accept u->v
+                if (Vertex.IsVertexEqual(u, v1) && Vertex.IsVertexEqual(v, v2)) edges.Add(edge);
+
+                // don't has u->v
+                // is Undirected and has v->u
+                if (IsUnDirectedGraph() && Vertex.IsVertexEqual(u, v2) && Vertex.IsVertexEqual(v, v1)) edges.Add(edge);
+            }
+            return edges;
+        }
+
+        public void ColoredAllEdgeOfVertices(List<Vertex> vertices)
+        {
+            HashSet<Vertex> vertexSet = new(vertices);
+
+            foreach (ShowableEdge edge in this.Edges)
+            {
+                if (vertexSet.Contains(edge.Head) && vertexSet.Contains(edge.Tail))
+                {
+                    edge.IsVisited = true;
+                }
+            }
+        }
+
+
         public void UnVisitAndClearParentAll()
         {
             Vertex u;

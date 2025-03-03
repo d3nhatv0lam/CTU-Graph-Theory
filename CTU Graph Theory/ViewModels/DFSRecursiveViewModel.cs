@@ -29,7 +29,6 @@ namespace CTU_Graph_Theory.ViewModels
             get => _dfsRecursive.StartVertex; 
             set => _dfsRecursive.StartVertex = value;
         }
-
         public DFSRecursiveViewModel()
         {
             _dfsRecursive = new DFSRecursive();

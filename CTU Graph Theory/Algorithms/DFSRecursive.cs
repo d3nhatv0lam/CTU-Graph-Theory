@@ -14,6 +14,7 @@ namespace CTU_Graph_Theory.Algorithms
     public class DFSRecursive : AbstractAlgorithm
     {
         private Stack<Vertex> FuntionStack;
+
         public DFSRecursive() : base()
         {
             AlgorithmName = "DFS - Duyệt theo chiều sâu (đệ quy)";

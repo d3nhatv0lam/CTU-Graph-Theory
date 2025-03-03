@@ -13,7 +13,6 @@ namespace CTU_Graph_Theory.Models
 {
     public class ShowableEdge : Edge , IReactiveObject
     {
-        public double Weight { get; set; }
         public bool IsShowEdge { get; private set; }
         public Visible VisibleState { get; }
         public enum Visible
@@ -30,15 +29,11 @@ namespace CTU_Graph_Theory.Models
             get => _isVisited;
             set 
             {
-                
                 this.RaisePropertyChanging(new PropertyChangingEventArgs(nameof(IsVisited)));
                 _isVisited = value;
                 this.RaisePropertyChanged(new PropertyChangedEventArgs(nameof(IsVisited)));
-                //Debug.WriteLine(((Vertex)Tail).ToString() + ((Vertex)Head).ToString() + IsVisited + " " + _isVisited);
             }
         }
-
-
 
         public ShowableEdge(object tail, object head,Visible isShowEdge = Visible.Show, object? lable = null, Edge.Symbol tailSymbol = Symbol.None, Edge.Symbol headSymbol = Symbol.Arrow)
             : base(tail, head, lable, tailSymbol, headSymbol)
@@ -56,7 +51,7 @@ namespace CTU_Graph_Theory.Models
             return null;
         }
 
-        private bool GetEdgeState(Visible isShowEdge)
+        private static bool GetEdgeState(Visible isShowEdge)
         {
             bool isVisible = true;
             switch (isShowEdge)

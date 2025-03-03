@@ -43,6 +43,8 @@ namespace CTU_Graph_Theory.ViewModels
         }
         public bool IsSetCompletedAlgorithm { get; set; } = false;
 
+        public ObservableCollection<RequestOfAlgorithm> Requirements => throw new NotImplementedException();
+
         public BFSViewModel()
         {
             _bfs = new BFS();

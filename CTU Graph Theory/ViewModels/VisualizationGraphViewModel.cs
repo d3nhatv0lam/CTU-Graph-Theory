@@ -34,6 +34,7 @@ namespace CTU_Graph_Theory.ViewModels
         private IAlgorithmViewModel? _selectedAlgorithm = null;
         private ObservableCollection<Vertex> _vertices;
         private Vertex? _startVertex = null;
+        private bool _isAllowRunAlgorithm = false;
         private bool _isRunningAlgorithm = false;
         private bool _isPauseAlgorithm = false; 
         private int _multiplierSpeed = 1;
@@ -92,6 +93,11 @@ namespace CTU_Graph_Theory.ViewModels
             get => _startVertex;
             set => this.RaiseAndSetIfChanged(ref _startVertex, value);
         }
+        public bool IsAllowRunAlgorithm
+        {
+            get => _isAllowRunAlgorithm;
+            set => this.RaiseAndSetIfChanged(ref _isAllowRunAlgorithm, value);
+        }
         public bool IsRunningAlgorithm
         {
             get => _isRunningAlgorithm;
@@ -142,6 +148,7 @@ namespace CTU_Graph_Theory.ViewModels
             AlgorithmList.Add(new DFSStackViewModel());
             AlgorithmList.Add(new DFSRecursiveViewModel());
             AlgorithmList.Add(new CircledCheckViewModel());
+            AlgorithmList.Add(new TarjanSCCViewModel());
         }
 
         private void InitObservable()
@@ -171,14 +178,15 @@ namespace CTU_Graph_Theory.ViewModels
                     StartVertex = null;
                 });
 
-            // change algorithm
+            this.WhenAnyValue(x => x.MainGraph, x => x.SelectedAlgorithm).Where((tuple) => tuple.Item2 != null).Subscribe(tuple => { if (tuple.Item2 is IAlgorithmRequirementViewModel algorithm) IsAllowRunAlgorithm = algorithm.CheckRequirements(tuple.Item1); else IsAllowRunAlgorithm = true; });
+            // change algorithm & first choose this algorithm
             this.WhenAnyValue(x => x.SelectedAlgorithm).Where(algorithm => algorithm?.IsSetCompletedAlgorithm == false).Subscribe(algorithm => algorithm?.SetCompletedAlgorithm(OnAlgorithmCompleted) );
             // update Algorithm graph && vertex
             this.WhenAnyValue(x => x.SelectedAlgorithm, x => x.StartVertex, (selectedAlgorithm, startVertex) => (selectedAlgorithm, startVertex)).Subscribe((tuple) => {tuple.selectedAlgorithm?.TransferGraph(MainGraph, tuple.startVertex); tuple.selectedAlgorithm?.SetRunSpeed(MultiplierSpeed);} ); 
             // set run speed
             this.WhenAnyValue(x => x.MultiplierSpeed).Subscribe(multiplierSpeed => SelectedAlgorithm?.SetRunSpeed(multiplierSpeed));
             // command check can activate
-            CanRunAlgorithmCommand = this.WhenAnyValue(x => x.SelectedAlgorithm, x => x.StartVertex, (algorithm, startVertex) => (algorithm != null) && (startVertex != null));
+            CanRunAlgorithmCommand = this.WhenAnyValue(x => x.SelectedAlgorithm, x => x.StartVertex,x => x.IsAllowRunAlgorithm, (algorithm, startVertex,isAllowRun) => (algorithm != null) && (startVertex != null) && (isAllowRun == true));
             CanPauseAlgorithmCommand = this.WhenAnyValue(x => x.IsRunningAlgorithm, x => x.IsPauseAlgorithm , (isRunning,isPause) => isRunning == true && isPause == false);
             CanContinueAlgorithmCommand = this.WhenAnyValue(x => x.IsPauseAlgorithm, isPaused => isPaused == true);
         }

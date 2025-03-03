@@ -1,4 +1,4 @@
-﻿using CTU_Graph_Theory.Algorithms.Base;
+﻿using CTU_Graph_Theory.Algorithms;
 using CTU_Graph_Theory.Interfaces;
 using CTU_Graph_Theory.Models;
 using System;
@@ -7,74 +7,82 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CTU_Graph_Theory.Algorithms;
 
 namespace CTU_Graph_Theory.ViewModels
 {
-    public class CircledCheckViewModel : IAlgorithmViewModel
+    public class TarjanSCCViewModel : ViewModelBase, IAlgorithmViewModel, IAlgorithmRequirementViewModel
     {
-        private AbstractAlgorithm _circledCheckAlgorithm;
+        private TarjanSCC _scc;
         public CustomGraph _Graph { get; set; }
 
         public string AlgorithmName
         {
-            get => _circledCheckAlgorithm.AlgorithmName;
+            get => _scc.AlgorithmName;
         }
 
-        public Vertex? StartVertex {
-            get => _circledCheckAlgorithm.StartVertex;
-            set => _circledCheckAlgorithm.StartVertex = value;
-        }
+        public Vertex? StartVertex { get => _scc.StartVertex; set => _scc.StartVertex = value; }
         public bool IsSetCompletedAlgorithm { get; set; }
 
         public ObservableCollection<StringPseudoCode> Pseudocodes
         {
-            get => _circledCheckAlgorithm.Pseudocodes;
+            get => _scc.Pseudocodes;
         }
-        public CircledCheckViewModel()
+
+        public ObservableCollection<RequestOfAlgorithm> Requirements
         {
-            _circledCheckAlgorithm = new CircledCheck();
+            get => _scc.Requirements;
+        }
+
+        public TarjanSCCViewModel()
+        {
+            _scc = new TarjanSCC();
             IsSetCompletedAlgorithm = false;
+        }
+
+        public bool CheckRequirements(CustomGraph graph)
+        {
+            return _scc.CheckRequirements(graph);
         }
 
         public void ContinueAlgorithm()
         {
-            _circledCheckAlgorithm.ContinueAlgorithm(_Graph);
+            _scc.ContinueAlgorithm(_Graph);
         }
 
         public void ContinueAlgorithmWithAllVertex()
         {
-            _circledCheckAlgorithm.ContinueAlgorithmWithAllVertex(_Graph);
+            _scc.ContinueAlgorithmWithAllVertex(_Graph);
         }
 
         public void PauseAlgorithm()
         {
-            _circledCheckAlgorithm.PauseAlgorithm();
+            _scc.PauseAlgorithm();
         }
 
         public void RunAlgorithm()
         {
-            _circledCheckAlgorithm.RunAlgorithm(_Graph);
+            _scc.RunAlgorithm(_Graph);
         }
 
         public void RunAlgorithmWithAllVertex(ObservableCollection<Vertex> vertices)
         {
-            _circledCheckAlgorithm.RunAlgorithmWithAllVertex(_Graph,vertices);
+            _scc.RunAlgorithmWithAllVertex(_Graph, vertices);
         }
 
         public void SetCompletedAlgorithm(EventHandler returnIsRunningState)
         {
-            _circledCheckAlgorithm.CompletedAlgorithm += returnIsRunningState;
+            if (IsSetCompletedAlgorithm) return;
+            _scc.CompletedAlgorithm += returnIsRunningState;
         }
 
         public void SetRunSpeed(int speedUp)
         {
-            _circledCheckAlgorithm.SetRunSpeed(speedUp);
+            _scc.SetRunSpeed(speedUp);
         }
 
         public void StopAlgorithm()
         {
-            _circledCheckAlgorithm.StopAlgorithm(_Graph);
+            _scc.StopAlgorithm(_Graph);
         }
 
         public void TransferGraph(CustomGraph graph, Vertex startVertex)
@@ -82,6 +90,5 @@ namespace CTU_Graph_Theory.ViewModels
             _Graph = graph;
             StartVertex = startVertex;
         }
-
     }
 }

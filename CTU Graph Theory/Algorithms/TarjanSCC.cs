@@ -1,0 +1,328 @@
+﻿using CTU_Graph_Theory.Algorithms.Base;
+using CTU_Graph_Theory.Interfaces;
+using CTU_Graph_Theory.Models;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace CTU_Graph_Theory.Algorithms
+{
+    public class TarjanSCC : AbstractAlgorithm, IAlgorithmRequirement
+    {
+        public ObservableCollection<RequestOfAlgorithm> Requirements { get; }
+
+        private enum RecursiveState
+        {
+            Entry,
+            Exit,
+        }
+        private readonly Stack<(Vertex vertex, int selectedNeighbourIndex, RecursiveState state)> funtionStack;
+        private readonly Dictionary<Vertex, int> num, min_num;
+        private readonly Dictionary<Vertex, List<Vertex>> Neighbours;
+        private readonly Stack<Vertex> SCCStack;
+        private int k;
+
+        public TarjanSCC()
+        {
+            AlgorithmName = "SCC - Bộ phận liên thông mạnh";
+            Requirements = new();
+            num = new();
+            min_num = new();
+            funtionStack = new();
+            Neighbours = new();
+            SCCStack = new();
+            k = 0;
+            FillPseudoCode();
+            FillIAlgorithmRequirement();
+        }
+        protected override void FillPseudoCode()
+        {
+            string[] line_codes = new string[]
+            {
+                "SCC(u) {",
+                "    num[u] = min_num[u] = k; k++;",
+                "    thêm u vào stack",
+                "    for (v là các đỉnh kề của u)",
+                "        if (v chưa duyệt) {",
+                "            SCC(v);",
+                "            min_num[u] = min(min_num[u], min_num[v]);",
+                "        } else if (v còn trên stack)",
+                "            min_num[u] = min(min_num[u], num[v]);",
+                "   if (num[u] == min_num[u]) {",
+                "       Tìm thấy một bộ phận liên thông mạnh!",
+                "       Rút các đỉnh ra khỏi stack đến khi gặp u",
+                "   }",
+                "}"
+            };
+            foreach (string line in line_codes)
+            {
+                Pseudocodes.Add(new StringPseudoCode(line));
+            }
+        }
+
+        public void FillIAlgorithmRequirement()
+        {
+            if (Requirements.Count != 0) return;
+            Requirements.Add(new RequestOfAlgorithm("Đồ thị có hướng"));
+        }
+
+        public bool CheckRequirements(CustomGraph graph)
+        {
+            Requirements[0].IsDoneRequest = graph.IsDirectedGraph();
+
+            return Requirements.All(request => request.IsDoneRequest == true);
+        }
+
+        private void CleanAlgorithm()
+        {
+            num.Clear();
+            min_num.Clear();
+            funtionStack.Clear();
+            Neighbours.Clear();
+            SCCStack.Clear();
+            k = 0;
+        }
+
+        public override async void ContinueAlgorithm(CustomGraph graph)
+        {
+            base.BaseContinueAlgorithm(graph);
+            var token = cts.Token;
+            await RunLoop(graph, token);
+            EndAlgorithmState(graph);
+        }
+
+        public override async void ContinueAlgorithmWithAllVertex(CustomGraph graph)
+        {
+            base.BaseContinueAlgorithmWithAllVertex(graph);
+            var token = cts.Token;
+            await RunLoop(graph, token);
+            while (QueueVertices.Count > 0)
+            {
+                if (token.IsCancellationRequested) break;
+                StartVertex = QueueVertices.Dequeue();
+
+                if (StartVertex.IsVisited == true) continue;
+
+                if (StartVertex != null)
+                    funtionStack.Push((StartVertex, 0, RecursiveState.Entry));
+                await RunLoop(graph, token);
+            }
+            EndAlgorithmState(graph);
+        }
+
+        public override async void RunAlgorithm(CustomGraph graph)
+        {
+            var token = cts.Token;
+            base.BaseRunAlgorithm(graph);
+            await PrepareState();
+
+            if (StartVertex != null)
+                funtionStack.Push((StartVertex, 0,RecursiveState.Entry));
+
+            await RunLoop(graph, token);
+            EndAlgorithmState(graph);
+        }
+
+        public override async void RunAlgorithmWithAllVertex(CustomGraph graph, ObservableCollection<Vertex> vertices)
+        {
+            base.BaseRunAlgorithmWithAllVertex(graph,vertices);
+            var token = cts.Token;
+            await PrepareState();
+            while (QueueVertices.Count > 0)
+            {
+                if (token.IsCancellationRequested) break;
+                StartVertex = QueueVertices.Dequeue();
+
+                if (StartVertex.IsVisited == true) continue;
+
+                if (StartVertex != null)
+                    funtionStack.Push((StartVertex, 0, RecursiveState.Entry));
+                await RunLoop(graph, token);
+            }
+            EndAlgorithmState(graph);
+        }
+
+        private Task PrepareState()
+        {
+            CleanAlgorithm();
+            return Task.FromResult(0);
+        }
+
+        private void EndAlgorithmState(CustomGraph graph)
+        {
+            if (IsStopAlgorithm) base.CleanGraphForAlgorithm(graph);
+            if (QueueVertices.Count == 0 && funtionStack.Count == 0) OnCompletedAlgorithm();
+        }
+
+        private async Task RunLoop(CustomGraph graph, CancellationToken token)
+        {
+            while(funtionStack.Count > 0)
+            {
+                if (token.IsCancellationRequested)
+                {
+                    await Task.Delay(TimeDelayOfLineCode);
+                    return;
+                }
+
+                var (u, neighBourIndex, state) = funtionStack.Pop();
+                u.SetPointTo();
+                if (state ==RecursiveState.Entry)
+                {
+                    await JoinFuntionState();
+
+                    if (!u.IsVisited)
+                    {
+                        await SetNum_MinNumState();
+
+                        if (!num.ContainsKey(u))
+                            num.Add(u, k);
+                        else num[u] = k;
+                        if (!min_num.ContainsKey(u))
+                            min_num.Add(u, k);
+                        else min_num[u] = k;
+                        k++;
+                        u.SetVitsited();
+                        SCCStack.Push(u);
+                        u.SetPending();
+                    }
+
+                    if (!Neighbours.ContainsKey(u))
+                        Neighbours.Add(u, graph.NeighboursOfVertex(u));
+                    u.UnSetPointedTo();
+                    if (neighBourIndex < Neighbours[u].Count)
+                    {
+                        await ForLoopState();
+                        funtionStack.Push((u, neighBourIndex + 1, RecursiveState.Entry));
+
+                        Vertex v = Neighbours[u][neighBourIndex];
+                        v.SetPointTo();
+                        await IfNotVisitedState();
+                        if (!v.IsVisited)
+                        {
+                            await JoinNewFuntionState();
+                            funtionStack.Push((v, 0, RecursiveState.Entry));
+                        }
+                        else
+                        {
+                            await IfRemainingOnStackState();
+                            if (v.IsPending)
+                            {
+                                await SetMinnumByOnStackState();
+                                // nhìn lên trái phải
+                                min_num[u] = Math.Min(min_num[u], num[v]);
+                            }
+                        }
+                        v.UnSetPointedTo();
+                    }
+                    else
+                    {
+                        funtionStack.Push((u, neighBourIndex, RecursiveState.Exit));
+                    }
+                }
+                else if (state == RecursiveState.Exit)
+                {
+                    if (funtionStack.Count > 0 && Neighbours[u].Count > 0)
+                    {
+                        var (parent_u, _, _) = funtionStack.Peek();
+                        if (parent_u != null)
+                        {
+                            await SetMinnumBySCCState();
+                            min_num[parent_u] = Math.Min(min_num[parent_u], min_num[u]);
+                        }
+                    }
+                    await IfMinnumEqualNumState();
+                    if (min_num[u] == num[u])
+                    {
+                        await SCCFoundState();
+                        List<Vertex> SCCVertex = new List<Vertex>();
+                        Vertex v;
+                        do
+                        {
+                            v = SCCStack.Pop();
+                            v.UnSetPending();
+                            SCCVertex.Add(v);
+                        } while (v != u);
+                        graph.ColoredAllEdgeOfVertices(SCCVertex);
+                    }
+                }
+                u.UnSetPointedTo();
+            }
+        }
+
+        private async Task JoinFuntionState()
+        {
+            Pseudocodes[0].IsSelectionCode = true;
+            await Task.Delay(TimeDelayOfLineCode);
+            Pseudocodes[0].IsSelectionCode = false;
+        }
+
+        private async Task SetNum_MinNumState()
+        {
+            Pseudocodes[1].IsSelectionCode = true;
+            Pseudocodes[2].IsSelectionCode = true;
+            await Task.Delay(TimeDelayOfLineCode);
+            Pseudocodes[1].IsSelectionCode = false;
+            Pseudocodes[2].IsSelectionCode = false;
+        }
+
+        private async Task ForLoopState()
+        {
+            Pseudocodes[3].IsSelectionCode = true;
+            await Task.Delay(TimeDelayOfLineCode);
+            Pseudocodes[3].IsSelectionCode = false;
+        }
+        private async Task IfNotVisitedState()
+        {
+            Pseudocodes[4].IsSelectionCode = true;
+            await Task.Delay(TimeDelayOfLineCode);
+            Pseudocodes[4].IsSelectionCode = false;
+        }
+        private async Task JoinNewFuntionState()
+        {
+            Pseudocodes[5].IsSelectionCode = true;
+            await Task.Delay(TimeDelayOfLineCode);
+            Pseudocodes[5].IsSelectionCode = false;
+        }
+        private async Task IfRemainingOnStackState()
+        {
+            Pseudocodes[7].IsSelectionCode = true;
+            await Task.Delay(TimeDelayOfLineCode);
+            Pseudocodes[7].IsSelectionCode = false;
+        }
+        private async Task SetMinnumByOnStackState() 
+        {
+            Pseudocodes[8].IsSelectionCode = true;
+            await Task.Delay(TimeDelayOfLineCode);
+            Pseudocodes[8].IsSelectionCode = false;
+        }
+        
+        private async Task SetMinnumBySCCState()
+        {
+            Pseudocodes[6].IsSelectionCode = true;
+            await Task.Delay(TimeDelayOfLineCode);
+            Pseudocodes[6].IsSelectionCode = false;
+        }
+
+       private async Task IfMinnumEqualNumState()
+        {
+            Pseudocodes[9].IsSelectionCode = true;
+            await Task.Delay(TimeDelayOfLineCode);
+            Pseudocodes[9].IsSelectionCode = false;
+        }
+
+        private async Task SCCFoundState()
+        {
+            Pseudocodes[10].IsSelectionCode = true;
+            Pseudocodes[11].IsSelectionCode = true;
+            await Task.Delay(TimeDelayOfLineCode);
+            Pseudocodes[10].IsSelectionCode = false;
+            Pseudocodes[11].IsSelectionCode = false;
+        }
+
+    }
+}

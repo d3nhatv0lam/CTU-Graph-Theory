@@ -22,15 +22,13 @@ namespace CTU_Graph_Theory.Algorithms.Base
         {
             get => _runSpeed / 2 * Convert.ToInt32(!IsStopAlgorithm && !IsPauseAlgorithm) ;
         }
-
-        
+   
         protected bool IsStopAlgorithm { get; set; }
         protected bool IsPauseAlgorithm {  get; set; } 
         public Vertex? StartVertex { get; set; }
         public string AlgorithmName { get; protected set; }
         public ObservableCollection<StringPseudoCode> Pseudocodes { get; }
         public Queue<Vertex> QueueVertices { get; }
-
 
         // Abstract funtion area
         protected abstract void FillPseudoCode();

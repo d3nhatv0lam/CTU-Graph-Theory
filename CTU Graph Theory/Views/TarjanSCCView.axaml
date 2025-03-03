@@ -1,0 +1,32 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="250" d:DesignHeight="250"
+			 xmlns:vm="using:CTU_Graph_Theory.ViewModels"
+			 x:DataType="vm:TarjanSCCViewModel"
+             x:Class="CTU_Graph_Theory.Views.TarjanSCCView">
+	<Grid>
+		<ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+			<ItemsRepeater ItemsSource="{Binding Requirements}">
+				<ItemsRepeater.Styles>
+					<Style Selector="TextBlock.DoneRequest">
+						<Setter Property="Foreground" Value="Green"/>
+					</Style>
+				</ItemsRepeater.Styles>
+				<ItemsRepeater.ItemTemplate>
+						<DataTemplate>
+							<TextBlock Classes.DoneRequest ="{Binding IsDoneRequest}"
+									   Classes ="Subtitle1"
+										FontWeight="SemiBold"
+										FontFamily="Arial"
+										Text="{Binding RequestString, StringFormat=+ {0}}"
+										TextWrapping="Wrap"
+										Margin="10 0 0 0"
+								/>
+						</DataTemplate>
+					</ItemsRepeater.ItemTemplate>
+			</ItemsRepeater>
+		</ScrollViewer>
+	</Grid>
+</UserControl>

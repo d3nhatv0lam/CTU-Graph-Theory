@@ -419,8 +419,7 @@
 									ItemsSource="{Binding SelectedAlgorithm.Pseudocodes}"
 									VerticalAlignment="Top"
 									HorizontalAlignment="Left"
-									 
-									  
+																		  
 									>
 								<ItemsRepeater.Styles>
 									<Style Selector="TextBlock.SelectedLine">
@@ -445,8 +444,11 @@
 					</Grid>
 					<Separator Grid.Row="5"/>
 					<!--// Result of Algorithm //-->
-					<!--<TransitioningContentControl Grid.Row="6" Content="{Binding SelectedAlgorithm}"/>-->
-
+					<DockPanel Grid.Row="6">
+						<TextBlock DockPanel.Dock="Top" Text="Yêu cầu thuật toán" Classes="Headline6"/>
+						<TransitioningContentControl DockPanel.Dock="Top" Content="{Binding SelectedAlgorithm}"/>
+					</DockPanel>
+					
 				</Grid>
 			</Border>
 

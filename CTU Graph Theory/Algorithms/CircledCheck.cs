@@ -13,6 +13,7 @@ namespace CTU_Graph_Theory.Algorithms
     public class CircledCheck: AbstractAlgorithm
     {
         private Stack<Vertex> FuntionStack;
+
         public CircledCheck(): base()
         {
             AlgorithmName = "CircledCheck - Kiểm tra đồ thị chứa chu trình";
@@ -449,5 +450,7 @@ namespace CTU_Graph_Theory.Algorithms
             await Task.Delay(TimeDelayOfLineCode);
             Pseudocodes[23].IsSelectionCode = false;
         }
+
+      
     }
 }
