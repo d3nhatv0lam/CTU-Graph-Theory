@@ -13,75 +13,75 @@ namespace CTU_Graph_Theory.ViewModels
 {
     public class CircledCheckViewModel : IAlgorithmViewModel
     {
-        private AbstractAlgorithm _circledCheckAlgorithm;
-        public CustomGraph _Graph { get; set; }
-
+        private AbstractAlgorithm _scc;
         public string AlgorithmName
         {
-            get => _circledCheckAlgorithm.AlgorithmName;
+            get => _scc.AlgorithmName;
         }
 
-        public Vertex? StartVertex {
-            get => _circledCheckAlgorithm.StartVertex;
-            set => _circledCheckAlgorithm.StartVertex = value;
+        public Vertex? StartVertex
+        {
+            get => _scc.StartVertex;
+            set
+            {
+                if (_scc.StartVertex == value) return;
+                _scc.StartVertex = value;
+            }
         }
-        public bool IsSetCompletedAlgorithm { get; set; }
-
         public ObservableCollection<StringPseudoCode> Pseudocodes
         {
-            get => _circledCheckAlgorithm.Pseudocodes;
+            get => _scc.Pseudocodes;
         }
+        public bool IsSetCompletedAlgorithm { get; set; } = false;
+
+        public ObservableCollection<RequestOfAlgorithm> Requirements => throw new NotImplementedException();
+
         public CircledCheckViewModel()
         {
-            _circledCheckAlgorithm = new CircledCheck();
-            IsSetCompletedAlgorithm = false;
+            _scc = new CircledCheck();
         }
 
-        public void ContinueAlgorithm()
+        public void TransferStartVertex(Vertex? startVertex)
         {
-            _circledCheckAlgorithm.ContinueAlgorithm(_Graph);
+            StartVertex = startVertex;
         }
 
-        public void ContinueAlgorithmWithAllVertex()
+        public void RunAlgorithm(CustomGraph graph)
         {
-            _circledCheckAlgorithm.ContinueAlgorithmWithAllVertex(_Graph);
+            _scc.RunAlgorithm(graph);
+        }
+
+        public void RunAlgorithmWithAllVertex(CustomGraph graph, ObservableCollection<Vertex> vertices)
+        {
+            _scc.RunAlgorithmWithAllVertex(graph, vertices);
         }
 
         public void PauseAlgorithm()
         {
-            _circledCheckAlgorithm.PauseAlgorithm();
+            _scc.PauseAlgorithm();
         }
-
-        public void RunAlgorithm()
+        public void ContinueAlgorithm(CustomGraph graph)
         {
-            _circledCheckAlgorithm.RunAlgorithm(_Graph);
+            _scc.ContinueAlgorithm(graph);
         }
 
-        public void RunAlgorithmWithAllVertex(ObservableCollection<Vertex> vertices)
+        public void ContinueAlgorithmWithAllVertex(CustomGraph graph)
         {
-            _circledCheckAlgorithm.RunAlgorithmWithAllVertex(_Graph,vertices);
+            _scc.ContinueAlgorithmWithAllVertex(graph);
         }
 
-        public void SetCompletedAlgorithm(EventHandler returnIsRunningState)
+        public void StopAlgorithm(CustomGraph graph)
         {
-            _circledCheckAlgorithm.CompletedAlgorithm += returnIsRunningState;
+            _scc.StopAlgorithm(graph);
         }
-
         public void SetRunSpeed(int speedUp)
         {
-            _circledCheckAlgorithm.SetRunSpeed(speedUp);
+            _scc.SetRunSpeed(speedUp);
         }
-
-        public void StopAlgorithm()
+        public void SetCompletedAlgorithm(EventHandler returnIsRunningState)
         {
-            _circledCheckAlgorithm.StopAlgorithm(_Graph);
+            _scc.CompletedAlgorithm += returnIsRunningState;
+            IsSetCompletedAlgorithm = true;
         }
-
-        public void TransferGraph(CustomGraph graph, Vertex startVertex)
-        {
-            _Graph = graph;
-            StartVertex = startVertex;
-        }
-
     }
 }

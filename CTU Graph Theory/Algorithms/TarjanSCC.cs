@@ -81,10 +81,15 @@ namespace CTU_Graph_Theory.Algorithms
         private void CleanAlgorithm()
         {
             num.Clear();
+            num.TrimExcess();
             min_num.Clear();
+            min_num.TrimExcess();
             funtionStack.Clear();
+            funtionStack.TrimExcess();
             Neighbours.Clear();
+            Neighbours.TrimExcess();
             SCCStack.Clear();
+            SCCStack.TrimExcess();
             k = 0;
         }
 

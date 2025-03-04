@@ -126,11 +126,11 @@
 
 			<Border Grid.Row="0" Grid.Column="0" Padding="10">
 				<Grid RowDefinitions="* 0.1*">
-					<paz:ZoomBorder Grid.Row="0"
-								Stretch="Uniform" ZoomSpeed="1.5"
-								MaxZoomX="2" MaxZoomY="2"
-								 PanButton="Right"
-								 EnableConstrains="False"
+					<paz:ZoomBorder Grid.Row="0" 
+								Stretch="Uniform" ZoomSpeed="1.5" 
+								 MaxZoomX="2" MaxZoomY="2"
+								 PanButton="Left"  VirtualizingStackPanel.VerticalSnapPointsChanged=""
+								 EnableConstrains="true"
 								 BorderThickness="1" BorderBrush="Black"
 								 Background="Transparent" ClipToBounds="True" Focusable="True"
 								 VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
@@ -414,13 +414,15 @@
 								   Classes="Headline6"
 								   Text="Mã giả:"/>
 						
-						<ScrollViewer Grid.Row="1" BringIntoViewOnFocusChange="True">
+						<ScrollViewer Grid.Row="1">
 							<ItemsRepeater  Margin="10 10 0 0"
 									ItemsSource="{Binding SelectedAlgorithm.Pseudocodes}"
 									VerticalAlignment="Top"
-									HorizontalAlignment="Left"
-																		  
+									HorizontalAlignment="Left"							  
 									>
+								<ItemsRepeater.Layout>
+									<StackLayout Spacing="5"/>
+								</ItemsRepeater.Layout>
 								<ItemsRepeater.Styles>
 									<Style Selector="TextBlock.SelectedLine">
 										<Setter Property="Background" Value="LightBlue"/>
@@ -431,7 +433,6 @@
 									<DataTemplate>
 										<TextBlock  Classes.SelectedLine="{Binding IsSelectionCode}"
 													FontWeight="SemiBold"
-													FontFamily="Arial"
 													Text="{Binding CodeWithSlectedVertex}"
 													TextWrapping="Wrap"
 													PropertyChanged="TextBlock_PropertyChanged"

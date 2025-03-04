@@ -16,30 +16,24 @@ namespace CTU_Graph_Theory.ViewModels
 {
     public class BFSViewModel: ViewModelBase, IAlgorithmViewModel
     {
-        private BFS _bfs;
-        private CustomGraph _graph;
-        public CustomGraph _Graph
-        {
-            get => _graph;
-            set => _graph = value;
-        }
+        private BFS _scc;
         public string AlgorithmName
         {
-            get => _bfs.AlgorithmName;
+            get => _scc.AlgorithmName;
         }
 
         public Vertex? StartVertex
         {
-            get => _bfs.StartVertex;
+            get => _scc.StartVertex;
             set 
             {
-                if (_bfs.StartVertex == value) return;
-                _bfs.StartVertex = value;
+                if (_scc.StartVertex == value) return;
+                _scc.StartVertex = value;
             }
         }
         public ObservableCollection<StringPseudoCode> Pseudocodes
         {
-            get => _bfs.Pseudocodes;
+            get => _scc.Pseudocodes;
         }
         public bool IsSetCompletedAlgorithm { get; set; } = false;
 
@@ -47,50 +41,49 @@ namespace CTU_Graph_Theory.ViewModels
 
         public BFSViewModel()
         {
-            _bfs = new BFS();
+            _scc = new BFS();
         }
 
-        public void TransferGraph(CustomGraph graph,Vertex? startVertex)
+        public void TransferStartVertex(Vertex? startVertex)
         {
-            _graph = graph;
             StartVertex = startVertex;
         }
 
-        public void RunAlgorithm()
+        public void RunAlgorithm(CustomGraph graph)
         {
-            _bfs.RunAlgorithm(_graph);
+            _scc.RunAlgorithm(graph);
         }
 
-        public void RunAlgorithmWithAllVertex(ObservableCollection<Vertex> vertices)
+        public void RunAlgorithmWithAllVertex(CustomGraph graph,ObservableCollection<Vertex> vertices)
         {
-            _bfs.RunAlgorithmWithAllVertex(_Graph, vertices);
+            _scc.RunAlgorithmWithAllVertex(graph, vertices);
         }
 
         public void PauseAlgorithm()
         {
-            _bfs.PauseAlgorithm();
+            _scc.PauseAlgorithm();
         }
-        public void ContinueAlgorithm()
+        public void ContinueAlgorithm(CustomGraph graph)
         {
-            _bfs.ContinueAlgorithm(_Graph);
-        }
-
-        public void ContinueAlgorithmWithAllVertex()
-        {
-            _bfs.ContinueAlgorithmWithAllVertex(_Graph);
+            _scc.ContinueAlgorithm(graph);
         }
 
-        public void StopAlgorithm()
+        public void ContinueAlgorithmWithAllVertex(CustomGraph graph)
         {
-            _bfs.StopAlgorithm(_Graph);
+            _scc.ContinueAlgorithmWithAllVertex(graph);
+        }
+
+        public void StopAlgorithm(CustomGraph graph)
+        {
+            _scc.StopAlgorithm(graph);
         }
         public void SetRunSpeed(int speedUp)
         {
-            _bfs.SetRunSpeed(speedUp);
+            _scc.SetRunSpeed(speedUp);
         }
         public void SetCompletedAlgorithm(EventHandler returnIsRunningState)
         {
-            _bfs.CompletedAlgorithm += returnIsRunningState;
+            _scc.CompletedAlgorithm += returnIsRunningState;
             IsSetCompletedAlgorithm = true;
         }
     }

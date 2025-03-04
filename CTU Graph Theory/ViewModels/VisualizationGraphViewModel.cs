@@ -160,16 +160,18 @@ namespace CTU_Graph_Theory.ViewModels
                 Select(graphData => graphData.Trim().Split("\n").Select(line => line.Trim()).Where(line => line.Length != 0).ToList()).
                 Select(graphData => CustomGraph.CreateNewGraphFromStringLineData(graphData, GetGraphType(_isDirectedGraph))).
                 ObserveOn(RxApp.MainThreadScheduler).
-                Subscribe(newGraph => {
+                Subscribe(newGraph => 
+                {
                     MainGraph = newGraph; 
                     VertexCount = MainGraph.VetexCount; 
                     EdgeCount = MainGraph.EdgeCount; 
                     GraphType = MainGraph.TypeOfGraph;
                     IsDirectedGraph = MainGraph.IsDirectedGraph();
                     // Add Select all
+                    Vertices = new ObservableCollection<Vertex>();
                     if (MainGraph.Vertices.Count > 0)
                     {
-                        Vertices = new ObservableCollection<Vertex>() { Vertex.EmptyVertex };
+                        Vertices.Add(Vertex.EmptyVertex);
                         foreach (Vertex vertex in MainGraph.Vertices)
                         {
                             Vertices.Add(vertex);
@@ -178,11 +180,12 @@ namespace CTU_Graph_Theory.ViewModels
                     StartVertex = null;
                 });
 
+            // Algorithm Requirement
             this.WhenAnyValue(x => x.MainGraph, x => x.SelectedAlgorithm).Where((tuple) => tuple.Item2 != null).Subscribe(tuple => { if (tuple.Item2 is IAlgorithmRequirementViewModel algorithm) IsAllowRunAlgorithm = algorithm.CheckRequirements(tuple.Item1); else IsAllowRunAlgorithm = true; });
-            // change algorithm & first choose this algorithm
+            // change algorithm - first choose this algorithm
             this.WhenAnyValue(x => x.SelectedAlgorithm).Where(algorithm => algorithm?.IsSetCompletedAlgorithm == false).Subscribe(algorithm => algorithm?.SetCompletedAlgorithm(OnAlgorithmCompleted) );
-            // update Algorithm graph && vertex
-            this.WhenAnyValue(x => x.SelectedAlgorithm, x => x.StartVertex, (selectedAlgorithm, startVertex) => (selectedAlgorithm, startVertex)).Subscribe((tuple) => {tuple.selectedAlgorithm?.TransferGraph(MainGraph, tuple.startVertex); tuple.selectedAlgorithm?.SetRunSpeed(MultiplierSpeed);} ); 
+            // change Algorithm || vertex
+            this.WhenAnyValue(x => x.SelectedAlgorithm, x => x.StartVertex, (selectedAlgorithm, startVertex) => (selectedAlgorithm, startVertex)).Subscribe((tuple) => {tuple.selectedAlgorithm?.TransferStartVertex(tuple.startVertex); tuple.selectedAlgorithm?.SetRunSpeed(MultiplierSpeed);} ); 
             // set run speed
             this.WhenAnyValue(x => x.MultiplierSpeed).Subscribe(multiplierSpeed => SelectedAlgorithm?.SetRunSpeed(multiplierSpeed));
             // command check can activate
@@ -200,7 +203,7 @@ namespace CTU_Graph_Theory.ViewModels
                 if (string.IsNullOrWhiteSpace(radioButtonContent)) return;
                  ChangeGraphType(radioButtonContent);
                 // Change Direct of Graph => Update Algorithm graph
-                SelectedAlgorithm?.TransferGraph(MainGraph, StartVertex);
+                SelectedAlgorithm?.TransferStartVertex(StartVertex);
                 MainGraph.UnVisitAndClearParentAll();
             });
             
@@ -210,23 +213,23 @@ namespace CTU_Graph_Theory.ViewModels
                 {
                     IsRunningAlgorithm = false;
                     IsPauseAlgorithm = false;
-                    SelectedAlgorithm?.StopAlgorithm();
+                    SelectedAlgorithm?.StopAlgorithm(MainGraph);
                     return;
                 }
                 IsRunningAlgorithm = true;
                 IsPauseAlgorithm = false;
                 if (Vertex.IsVertexEqual(StartVertex, Vertex.EmptyVertex))
-                    SelectedAlgorithm?.RunAlgorithmWithAllVertex(MainGraph.Vertices);
-                else SelectedAlgorithm?.RunAlgorithm();     
+                    SelectedAlgorithm?.RunAlgorithmWithAllVertex(MainGraph,MainGraph.Vertices);
+                else SelectedAlgorithm?.RunAlgorithm(MainGraph);     
                 },CanRunAlgorithmCommand);
             PauseAlgorithmCommand = ReactiveCommand.Create(() => { SelectedAlgorithm?.PauseAlgorithm(); IsPauseAlgorithm = true;}, CanPauseAlgorithmCommand);
 
             ContinueAlgorithmCommand = ReactiveCommand.Create(() => 
             {
                 if (Vertex.IsVertexEqual(StartVertex, Vertex.EmptyVertex))
-                    SelectedAlgorithm?.ContinueAlgorithmWithAllVertex();
+                    SelectedAlgorithm?.ContinueAlgorithmWithAllVertex(MainGraph);
                 else
-                    SelectedAlgorithm?.ContinueAlgorithm();
+                    SelectedAlgorithm?.ContinueAlgorithm(MainGraph);
                 IsPauseAlgorithm = false; 
             },CanContinueAlgorithmCommand);
         }

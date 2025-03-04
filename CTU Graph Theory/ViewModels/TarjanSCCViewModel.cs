@@ -13,20 +13,25 @@ namespace CTU_Graph_Theory.ViewModels
     public class TarjanSCCViewModel : ViewModelBase, IAlgorithmViewModel, IAlgorithmRequirementViewModel
     {
         private TarjanSCC _scc;
-        public CustomGraph _Graph { get; set; }
-
         public string AlgorithmName
         {
             get => _scc.AlgorithmName;
         }
 
-        public Vertex? StartVertex { get => _scc.StartVertex; set => _scc.StartVertex = value; }
-        public bool IsSetCompletedAlgorithm { get; set; }
-
+        public Vertex? StartVertex
+        {
+            get => _scc.StartVertex;
+            set
+            {
+                if (_scc.StartVertex == value) return;
+                _scc.StartVertex = value;
+            }
+        }
         public ObservableCollection<StringPseudoCode> Pseudocodes
         {
             get => _scc.Pseudocodes;
         }
+        public bool IsSetCompletedAlgorithm { get; set; } = false;
 
         public ObservableCollection<RequestOfAlgorithm> Requirements
         {
@@ -36,59 +41,54 @@ namespace CTU_Graph_Theory.ViewModels
         public TarjanSCCViewModel()
         {
             _scc = new TarjanSCC();
-            IsSetCompletedAlgorithm = false;
         }
 
-        public bool CheckRequirements(CustomGraph graph)
+        public void TransferStartVertex(Vertex? startVertex)
         {
-            return _scc.CheckRequirements(graph);
+            StartVertex = startVertex;
         }
 
-        public void ContinueAlgorithm()
+        public void RunAlgorithm(CustomGraph graph)
         {
-            _scc.ContinueAlgorithm(_Graph);
+            _scc.RunAlgorithm(graph);
         }
 
-        public void ContinueAlgorithmWithAllVertex()
+        public void RunAlgorithmWithAllVertex(CustomGraph graph, ObservableCollection<Vertex> vertices)
         {
-            _scc.ContinueAlgorithmWithAllVertex(_Graph);
+            _scc.RunAlgorithmWithAllVertex(graph, vertices);
         }
 
         public void PauseAlgorithm()
         {
             _scc.PauseAlgorithm();
         }
-
-        public void RunAlgorithm()
+        public void ContinueAlgorithm(CustomGraph graph)
         {
-            _scc.RunAlgorithm(_Graph);
+            _scc.ContinueAlgorithm(graph);
         }
 
-        public void RunAlgorithmWithAllVertex(ObservableCollection<Vertex> vertices)
+        public void ContinueAlgorithmWithAllVertex(CustomGraph graph)
         {
-            _scc.RunAlgorithmWithAllVertex(_Graph, vertices);
+            _scc.ContinueAlgorithmWithAllVertex(graph);
         }
 
-        public void SetCompletedAlgorithm(EventHandler returnIsRunningState)
+        public void StopAlgorithm(CustomGraph graph)
         {
-            if (IsSetCompletedAlgorithm) return;
-            _scc.CompletedAlgorithm += returnIsRunningState;
+            _scc.StopAlgorithm(graph);
         }
-
         public void SetRunSpeed(int speedUp)
         {
             _scc.SetRunSpeed(speedUp);
         }
-
-        public void StopAlgorithm()
+        public void SetCompletedAlgorithm(EventHandler returnIsRunningState)
         {
-            _scc.StopAlgorithm(_Graph);
+            _scc.CompletedAlgorithm += returnIsRunningState;
+            IsSetCompletedAlgorithm = true;
         }
 
-        public void TransferGraph(CustomGraph graph, Vertex startVertex)
+        public bool CheckRequirements(CustomGraph graph)
         {
-            _Graph = graph;
-            StartVertex = startVertex;
+            return _scc.CheckRequirements(graph);
         }
     }
 }

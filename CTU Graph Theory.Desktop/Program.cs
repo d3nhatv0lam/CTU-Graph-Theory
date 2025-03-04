@@ -18,6 +18,7 @@ class Program
     public static AppBuilder BuildAvaloniaApp()
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
+            .With(new SkiaOptions { MaxGpuResourceSizeBytes = 256000000 })
             .WithInterFont()
             .LogToTrace()
             .UseReactiveUI();

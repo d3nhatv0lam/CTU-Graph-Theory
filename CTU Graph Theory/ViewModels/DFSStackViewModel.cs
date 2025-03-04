@@ -7,85 +7,81 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CTU_Graph_Theory.Algorithms;
+using CTU_Graph_Theory.Algorithms.Base;
 
 namespace CTU_Graph_Theory.ViewModels
 {
     class DFSStackViewModel: ViewModelBase, IAlgorithmViewModel
     {
-        private DFSStack _dfsStack;
-        public CustomGraph _Graph { get; set; }
+        private DFSStack _scc;
         public string AlgorithmName
         {
-            get => _dfsStack.AlgorithmName;
+            get => _scc.AlgorithmName;
         }
+
         public Vertex? StartVertex
         {
-            get => _dfsStack.StartVertex;
+            get => _scc.StartVertex;
             set
             {
-                if (_dfsStack.StartVertex == value) return;
-                _dfsStack.StartVertex = value;
+                if (_scc.StartVertex == value) return;
+                _scc.StartVertex = value;
             }
         }
-        public bool IsSetCompletedAlgorithm { get; set; }
-
-        public ObservableCollection<StringPseudoCode> Pseudocodes 
-        { 
-            get => _dfsStack.Pseudocodes; 
+        public ObservableCollection<StringPseudoCode> Pseudocodes
+        {
+            get => _scc.Pseudocodes;
         }
+        public bool IsSetCompletedAlgorithm { get; set; } = false;
+
+        public ObservableCollection<RequestOfAlgorithm> Requirements => throw new NotImplementedException();
 
         public DFSStackViewModel()
         {
-            _dfsStack = new DFSStack();
-            IsSetCompletedAlgorithm = false;
+            _scc = new DFSStack();
         }
 
-        public void TransferGraph(CustomGraph graph, Vertex vertex)
+        public void TransferStartVertex(Vertex? startVertex)
         {
-            _Graph = graph;
-            StartVertex = vertex;
+            StartVertex = startVertex;
         }
 
-        public void RunAlgorithm()
+        public void RunAlgorithm(CustomGraph graph)
         {
-            _dfsStack.RunAlgorithm(_Graph);
+            _scc.RunAlgorithm(graph);
+        }
+
+        public void RunAlgorithmWithAllVertex(CustomGraph graph, ObservableCollection<Vertex> vertices)
+        {
+            _scc.RunAlgorithmWithAllVertex(graph, vertices);
         }
 
         public void PauseAlgorithm()
         {
-            _dfsStack.PauseAlgorithm();
+            _scc.PauseAlgorithm();
+        }
+        public void ContinueAlgorithm(CustomGraph graph)
+        {
+            _scc.ContinueAlgorithm(graph);
         }
 
+        public void ContinueAlgorithmWithAllVertex(CustomGraph graph)
+        {
+            _scc.ContinueAlgorithmWithAllVertex(graph);
+        }
+
+        public void StopAlgorithm(CustomGraph graph)
+        {
+            _scc.StopAlgorithm(graph);
+        }
         public void SetRunSpeed(int speedUp)
         {
-            _dfsStack.SetRunSpeed(speedUp);
+            _scc.SetRunSpeed(speedUp);
         }
-        public void ContinueAlgorithm()
-        {
-            _dfsStack.ContinueAlgorithm(_Graph);
-        }
-        public void StopAlgorithm()
-        {
-            _dfsStack.StopAlgorithm(_Graph);
-        }
-
         public void SetCompletedAlgorithm(EventHandler returnIsRunningState)
         {
-            if (IsSetCompletedAlgorithm) return;
-      
-               _dfsStack.CompletedAlgorithm += returnIsRunningState;
-           
-        }
-
-
-        public void RunAlgorithmWithAllVertex(ObservableCollection<Vertex> vertices)
-        {
-            _dfsStack.RunAlgorithmWithAllVertex(_Graph,vertices);
-        }
-
-        public void ContinueAlgorithmWithAllVertex()
-        {
-            _dfsStack.ContinueAlgorithmWithAllVertex(_Graph);
+            _scc.CompletedAlgorithm += returnIsRunningState;
+            IsSetCompletedAlgorithm = true;
         }
     }
 }

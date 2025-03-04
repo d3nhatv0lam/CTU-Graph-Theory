@@ -1,4 +1,5 @@
 ﻿using CTU_Graph_Theory.Algorithms;
+using CTU_Graph_Theory.Algorithms.Base;
 using CTU_Graph_Theory.Interfaces;
 using CTU_Graph_Theory.Models;
 using System;
@@ -13,74 +14,76 @@ namespace CTU_Graph_Theory.ViewModels
 {
     public class DFSRecursiveViewModel : ViewModelBase, IAlgorithmViewModel
     {
-        private DFSRecursive _dfsRecursive;
-        public CustomGraph _Graph { get; set; }
 
-        public string AlgorithmName { get => _dfsRecursive.AlgorithmName; }
+        private AbstractAlgorithm _scc;
+        public string AlgorithmName
+        {
+            get => _scc.AlgorithmName;
+        }
 
-        public bool IsSetCompletedAlgorithm { get; set; }
-
+        public Vertex? StartVertex
+        {
+            get => _scc.StartVertex;
+            set
+            {
+                if (_scc.StartVertex == value) return;
+                _scc.StartVertex = value;
+            }
+        }
         public ObservableCollection<StringPseudoCode> Pseudocodes
         {
-            get => _dfsRecursive.Pseudocodes;
+            get => _scc.Pseudocodes;
         }
-        public Vertex? StartVertex 
-        {
-            get => _dfsRecursive.StartVertex; 
-            set => _dfsRecursive.StartVertex = value;
-        }
+        public bool IsSetCompletedAlgorithm { get; set; } = false;
+
+        public ObservableCollection<RequestOfAlgorithm> Requirements => throw new NotImplementedException();
+
         public DFSRecursiveViewModel()
         {
-            _dfsRecursive = new DFSRecursive();
-            IsSetCompletedAlgorithm = false;
+            _scc = new DFSRecursive();
         }
 
-        public void ContinueAlgorithm()
+        public void TransferStartVertex(Vertex? startVertex)
         {
-            _dfsRecursive.ContinueAlgorithm(_Graph);
+            StartVertex = startVertex;
         }
 
-        public void ContinueAlgorithmWithAllVertex()
+        public void RunAlgorithm(CustomGraph graph)
         {
-            _dfsRecursive.ContinueAlgorithmWithAllVertex(_Graph);
+            _scc.RunAlgorithm(graph);
+        }
+
+        public void RunAlgorithmWithAllVertex(CustomGraph graph, ObservableCollection<Vertex> vertices)
+        {
+            _scc.RunAlgorithmWithAllVertex(graph, vertices);
         }
 
         public void PauseAlgorithm()
         {
-            _dfsRecursive.PauseAlgorithm();
+            _scc.PauseAlgorithm();
         }
-
-        public void RunAlgorithm()
+        public void ContinueAlgorithm(CustomGraph graph)
         {
-            _dfsRecursive.RunAlgorithm(_Graph);
+            _scc.ContinueAlgorithm(graph);
         }
 
-        public void RunAlgorithmWithAllVertex(ObservableCollection<Vertex> vertices)
+        public void ContinueAlgorithmWithAllVertex(CustomGraph graph)
         {
-            _dfsRecursive.RunAlgorithmWithAllVertex(_Graph, vertices);
+            _scc.ContinueAlgorithmWithAllVertex(graph);
         }
 
-        public void SetCompletedAlgorithm(EventHandler returnIsRunningState)
+        public void StopAlgorithm(CustomGraph graph)
         {
-            if (IsSetCompletedAlgorithm) return;
-            _dfsRecursive.CompletedAlgorithm += returnIsRunningState;
-            IsSetCompletedAlgorithm = true;
+            _scc.StopAlgorithm(graph);
         }
-
         public void SetRunSpeed(int speedUp)
         {
-            _dfsRecursive.SetRunSpeed(speedUp);
+            _scc.SetRunSpeed(speedUp);
         }
-
-        public void StopAlgorithm()
+        public void SetCompletedAlgorithm(EventHandler returnIsRunningState)
         {
-            _dfsRecursive.StopAlgorithm(_Graph);
-        }
-
-        public void TransferGraph(CustomGraph graph, Vertex startVertex)
-        {
-            _Graph = graph;
-            StartVertex = startVertex;
+            _scc.CompletedAlgorithm += returnIsRunningState;
+            IsSetCompletedAlgorithm = true;
         }
     }
 }
