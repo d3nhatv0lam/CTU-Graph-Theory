@@ -1,4 +1,5 @@
 ﻿using CTU_Graph_Theory.Algorithms.Base;
+using CTU_Graph_Theory.Interfaces;
 using CTU_Graph_Theory.Models;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace CTU_Graph_Theory.Algorithms
 {
-    public class CircledCheck: AbstractAlgorithm
+    public class CircledCheck: AbstractAlgorithm , IAllVertexRun
     {
         private Stack<Vertex> FuntionStack;
 
@@ -56,6 +57,7 @@ namespace CTU_Graph_Theory.Algorithms
         private void CleanDFS()
         {
             FuntionStack.Clear();
+            FuntionStack.TrimExcess();
         }
 
         private Task DoneAlgorithm()
@@ -65,7 +67,7 @@ namespace CTU_Graph_Theory.Algorithms
             return Task.FromResult(0);
         }
         
-        public override async void ContinueAlgorithm(CustomGraph graph)
+        public async void ContinueAlgorithm(CustomGraph graph)
         {
             base.BaseContinueAlgorithm(graph);
             var token = cts.Token;
@@ -74,39 +76,44 @@ namespace CTU_Graph_Theory.Algorithms
             EndAlgorithmState(graph);
         }
 
-        public override async void ContinueAlgorithmWithAllVertex(CustomGraph graph)
+        public async void ContinueAlgorithmWithAllVertex(CustomGraph graph)
         {
             var token = cts.Token;
-            base.BaseContinueAlgorithmWithAllVertex(graph);
+            base.BaseContinueAlgorithm(graph);
             await RunLoop(graph, token);
             while (QueueVertices.Count > 0)
             {
                 if (token.IsCancellationRequested) break;
-                StartVertex = QueueVertices.Dequeue();
-                if (StartVertex.IsVisited == true || StartVertex.IsPending == true) continue;
+                var startVertex = QueueVertices.Dequeue();
+                if (startVertex.IsVisited == true || startVertex.IsPending == true) continue;
 
-                FuntionStack.Push(StartVertex);
+                FuntionStack.Push(startVertex);
 
                 await RunLoop(graph, token);
             }
             EndAlgorithmState(graph);
         }
 
-        public override async void RunAlgorithm(CustomGraph graph)
+        public async void RunAlgorithm(CustomGraph graph, Vertex startVertex)
         {
             base.BaseRunAlgorithm(graph);
             var token = cts.Token;
 
             await PrepareState();
-            FuntionStack.Push(StartVertex);
+            FuntionStack.Push(startVertex);
 
             await RunLoop(graph,token);
             EndAlgorithmState(graph);
         }
 
-        public override async void RunAlgorithmWithAllVertex(CustomGraph graph, ObservableCollection<Vertex> vertices)
+        public async void RunAlgorithmWithAllVertex(CustomGraph graph, ObservableCollection<Vertex> vertices)
         {
-            base.BaseRunAlgorithmWithAllVertex(graph, vertices);
+            BaseRunAlgorithm(graph);
+            QueueVertices.Clear();
+            foreach (var vertex in vertices)
+                QueueVertices.Enqueue(vertex);
+
+
             var token = cts.Token;
             await PrepareState();
             while (QueueVertices.Count > 0)
@@ -114,11 +121,11 @@ namespace CTU_Graph_Theory.Algorithms
                 if (token.IsCancellationRequested) break;
 
 
-                StartVertex = QueueVertices.Dequeue();
+                var startVertex = QueueVertices.Dequeue();
 
-                if (StartVertex.IsVisited == true || StartVertex.IsPending == true) continue;
+                if (startVertex.IsVisited == true || startVertex.IsPending == true) continue;
 
-                FuntionStack.Push(StartVertex);
+                FuntionStack.Push(startVertex);
                 await RunLoop(graph, token);
             }
             EndAlgorithmState(graph);

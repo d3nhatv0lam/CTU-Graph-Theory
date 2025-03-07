@@ -1,4 +1,5 @@
 ﻿using CTU_Graph_Theory.Models;
+using Microsoft.Msagl.Core;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -25,17 +26,13 @@ namespace CTU_Graph_Theory.Algorithms.Base
    
         protected bool IsStopAlgorithm { get; set; }
         protected bool IsPauseAlgorithm {  get; set; } 
-        public Vertex? StartVertex { get; set; }
+        //public Vertex? StartVertex { get; set; }
         public string AlgorithmName { get; protected set; }
         public ObservableCollection<StringPseudoCode> Pseudocodes { get; }
         public Queue<Vertex> QueueVertices { get; }
 
         // Abstract funtion area
         protected abstract void FillPseudoCode();
-        public abstract void RunAlgorithm(CustomGraph graph);
-        public abstract void RunAlgorithmWithAllVertex(CustomGraph graph, ObservableCollection<Vertex> vertices);
-        public abstract void ContinueAlgorithm(CustomGraph graph);
-        public abstract void ContinueAlgorithmWithAllVertex(CustomGraph graph);
 
         // Funtion area
         protected void CleanGraphForAlgorithm(CustomGraph graph)
@@ -76,14 +73,14 @@ namespace CTU_Graph_Theory.Algorithms.Base
             CleanGraphForAlgorithm(graph);
         }
 
-        protected void BaseRunAlgorithmWithAllVertex(CustomGraph graph, ObservableCollection<Vertex> vertices)
-        {
-            BaseRunAlgorithm(graph);
-            QueueVertices.Clear();
-            foreach (var vertex in vertices)
-                QueueVertices.Enqueue(vertex);
-            // run algorithm
-        }
+        //protected void BaseRunAlgorithmWithAllVertex(CustomGraph graph, ObservableCollection<Vertex> vertices)
+        //{
+        //    BaseRunAlgorithm(graph);
+        //    QueueVertices.Clear();
+        //    foreach (var vertex in vertices)
+        //        QueueVertices.Enqueue(vertex);
+        //    // run algorithm
+        //}
 
         protected void BaseContinueAlgorithm(CustomGraph graph)
         {
@@ -91,13 +88,13 @@ namespace CTU_Graph_Theory.Algorithms.Base
             IsPauseAlgorithm = false;
         }
 
-        protected void BaseContinueAlgorithmWithAllVertex(CustomGraph graph)
-        {
-            BaseContinueAlgorithm(graph);
-        }
+        //protected void BaseContinueAlgorithmWithAllVertex(CustomGraph graph)
+        //{
+        //    BaseContinueAlgorithm(graph);
+        //}
 
         // Event Area
-        private event EventHandler _completedAlgorithm;
+        private event EventHandler? _completedAlgorithm;
         public event EventHandler CompletedAlgorithm
         {
             add => _completedAlgorithm += value;
@@ -113,7 +110,7 @@ namespace CTU_Graph_Theory.Algorithms.Base
 
         public AbstractAlgorithm() 
         {
-            StartVertex = null;
+            AlgorithmName = "Unnamed";
             Pseudocodes = new ObservableCollection<StringPseudoCode>();
             QueueVertices = new Queue<Vertex>();
             cts = new CancellationTokenSource();

@@ -7,8 +7,9 @@ using System.Threading.Tasks;
 
 namespace CTU_Graph_Theory.Interfaces
 {
-    public interface ITargetVertex
+    public interface IPathVertexRun
     {
-        public Vertex TargetVertex { get; set; }
+        public void RunAlgorithm(CustomGraph graph, Vertex startVertex, Vertex endVertex);
+        public void ContinueAlgorithm(CustomGraph graph);
     }
 }

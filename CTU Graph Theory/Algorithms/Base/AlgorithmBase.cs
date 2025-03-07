@@ -82,16 +82,16 @@ namespace CTU_Graph_Theory.Algorithms.Base
             CleanGraphForAlgorithm(graph);
         }
 
-        public virtual async void RunAlgorithmWithAllVertex(CustomGraph graph, ObservableCollection<Vertex> vertices)
-        {
-            IsStopAlgorithm = false;
-            IsRunning = 1;
-            CleanGraphForAlgorithm(graph);
-            QueueVertices.Clear();
-            foreach (var vertex in vertices)
-                QueueVertices.Enqueue(vertex);
-            // run algorith
-        }
+        //public virtual async void RunAlgorithmWithAllVertex(CustomGraph graph, ObservableCollection<Vertex> vertices)
+        //{
+        //    IsStopAlgorithm = false;
+        //    IsRunning = 1;
+        //    CleanGraphForAlgorithm(graph);
+        //    QueueVertices.Clear();
+        //    foreach (var vertex in vertices)
+        //        QueueVertices.Enqueue(vertex);
+        //    // run algorith
+        //}
 
         public virtual async void ContinueAlgorithmWithAllVertex(CustomGraph graph)
         {

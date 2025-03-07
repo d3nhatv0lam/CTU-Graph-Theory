@@ -8,11 +8,12 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using CTU_Graph_Theory.Algorithms.Base;
+using CTU_Graph_Theory.Interfaces;
 using CTU_Graph_Theory.Models;
 
 namespace CTU_Graph_Theory.Algorithms
 {
-    public class DFSStack : AlgorithmBase
+    public class DFSStack : AbstractAlgorithm , IAllVertexRun
     {
 
         private Stack<Vertex> stack;
@@ -45,18 +46,23 @@ namespace CTU_Graph_Theory.Algorithms
             }
         }
 
-        private void CleanBFS(CustomGraph graph)
+        private void CleanBFS()
         {
             stack.Clear();
+            stack.TrimExcess();
         }
-
-        public override async void RunAlgorithm(CustomGraph graph)
+        private void EndAlgorithmState(CustomGraph graph)
+        {
+            if (IsStopAlgorithm) base.CleanGraphForAlgorithm(graph);
+            if (stack.Count == 0) OnCompletedAlgorithm();
+        }
+        public async void RunAlgorithm(CustomGraph graph,Vertex startVertex)
         {
             var token = cts.Token;
-            base.RunAlgorithm(graph);
-            await PrepareDFSStackState(graph);
+            base.BaseRunAlgorithm(graph);
+            await PrepareDFSStackState();
            
-            stack.Push(StartVertex);
+            stack.Push(startVertex);
 
             await ChooseStartVertexState();
 
@@ -65,61 +71,62 @@ namespace CTU_Graph_Theory.Algorithms
             await RunDFSStackLoop(graph, token);
 
 
-            if (IsStopAlgorithm) base.CleanGraphForAlgorithm(graph);
-            if (stack.Count == 0) OnCompletedAlgorithm();
+            EndAlgorithmState(graph);
         }
 
-        public override async void ContinueAlgorithm(CustomGraph graph)
+        public async void ContinueAlgorithm(CustomGraph graph)
         {
-            base.ContinueAlgorithm(graph);
+            base.BaseContinueAlgorithm(graph);
             var token = cts.Token;
             await RunDFSStackLoop(graph, token);
-            if (IsStopAlgorithm) base.CleanGraphForAlgorithm(graph);
-            if (stack.Count == 0) OnCompletedAlgorithm();
+            EndAlgorithmState(graph);
         }
 
-        public override async void RunAlgorithmWithAllVertex(CustomGraph graph, ObservableCollection<Vertex> vertices)
+        public async void RunAlgorithmWithAllVertex(CustomGraph graph, ObservableCollection<Vertex> vertices)
         {
-            base.RunAlgorithmWithAllVertex(graph, vertices);
+            base.BaseRunAlgorithm(graph);
+            QueueVertices.Clear();
+            foreach (var vertex in vertices)
+                QueueVertices.Enqueue(vertex);
+
+
             var token = cts.Token;
             while (QueueVertices.Count > 0)
             {
                 if (token.IsCancellationRequested) break;
-                await PrepareDFSStackState(graph);
+                await PrepareDFSStackState();
                 await ChooseStartVertexState();
 
-                StartVertex = QueueVertices.Dequeue();
-                if (StartVertex.IsVisited == true) continue;
+                var startVertex = QueueVertices.Dequeue();
+                if (startVertex.IsVisited == true) continue;
 
-                stack.Push(StartVertex);
+                stack.Push(startVertex);
                 await RunDFSStackLoop(graph, token);
             }
-            if (IsStopAlgorithm) base.CleanGraphForAlgorithm(graph);
-            if (QueueVertices.Count == 0 && stack.Count == 0) OnCompletedAlgorithm();
+            EndAlgorithmState(graph);
         }
-        public override async void ContinueAlgorithmWithAllVertex(CustomGraph graph)
+        public async void ContinueAlgorithmWithAllVertex(CustomGraph graph)
         {
             var token = cts.Token;
-            base.ContinueAlgorithmWithAllVertex(graph);
+            base.BaseContinueAlgorithm(graph);
             await RunDFSStackLoop(graph, token);
             while (QueueVertices.Count > 0)
             {
                 if (token.IsCancellationRequested) break;
-                StartVertex = QueueVertices.Dequeue();
-                if (StartVertex.IsVisited == true) continue;
+                var startVertex = QueueVertices.Dequeue();
+                if (startVertex.IsVisited == true) continue;
 
-                stack.Push(StartVertex);
+                stack.Push(startVertex);
 
                 await RunDFSStackLoop(graph, token);
             }
-            if (IsStopAlgorithm) base.CleanGraphForAlgorithm(graph);
-            if (QueueVertices.Count == 0 && stack.Count == 0) OnCompletedAlgorithm();
+            EndAlgorithmState(graph);
         }
 
-        private async Task PrepareDFSStackState(CustomGraph graph)
+        private  Task PrepareDFSStackState()
         {
-            if (StartVertex == null) return;
-            CleanBFS(graph);
+            CleanBFS();
+            return Task.FromResult(0);
         }
 
         private async Task ChooseStartVertexState()

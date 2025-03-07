@@ -12,14 +12,13 @@ using System.Threading.Tasks;
 
 namespace CTU_Graph_Theory.Algorithms
 {
-    public class BFS : AlgorithmBase
+    public class BFS : AbstractAlgorithm , IAllVertexRun
     {
         // Algorithms
         private readonly Queue<Vertex> queue;
         public BFS()
         {
             AlgorithmName = "BFS - Duyệt theo chiều rộng";
-            Pseudocodes = new System.Collections.ObjectModel.ObservableCollection<StringPseudoCode>();
             queue = new();
             FillPseudoCode();
         }
@@ -43,85 +42,92 @@ namespace CTU_Graph_Theory.Algorithms
             
         }
 
+        public void EndAlgorithmState(CustomGraph graph)
+        {
+            if (IsStopAlgorithm) base.CleanGraphForAlgorithm(graph);
+            if (QueueVertices.Count == 0 && queue.Count == 0) OnCompletedAlgorithm();
+        }
+
         private void CleanBFS()
         {
             queue.Clear();
+            queue.TrimExcess();
         }
 
-        public override async void RunAlgorithmWithAllVertex(CustomGraph graph, ObservableCollection<Vertex> vertices)
+        public async void RunAlgorithmWithAllVertex(CustomGraph graph, ObservableCollection<Vertex> vertices)
         {
-            base.RunAlgorithmWithAllVertex(graph, vertices);
+            base.BaseRunAlgorithm(graph);
+            QueueVertices.Clear();
+            foreach (var vertex in vertices)
+                QueueVertices.Enqueue(vertex);
+
             var token = cts.Token;
             while (QueueVertices.Count > 0)
             {
                 if (token.IsCancellationRequested) break;
                 await PrepareBFSState(graph);
-                await ChooseStartVertexState();
+                
+                var startVertex = QueueVertices.Dequeue();
+                if (startVertex.IsVisited == true) continue;
+                await ChooseStartVertexState(startVertex);
 
-                StartVertex = QueueVertices.Dequeue();
-                if (StartVertex.IsVisited == true) continue;
-
-                queue.Enqueue(StartVertex);
+                queue.Enqueue(startVertex);
                 await RunBFSLoop(graph, token);
             }
-            if (IsStopAlgorithm) base.CleanGraphForAlgorithm(graph);
-            if (QueueVertices.Count == 0 && queue.Count == 0) OnCompletedAlgorithm();
+            EndAlgorithmState(graph);
         }
 
-        public override async void RunAlgorithm(CustomGraph graph)
+        public async void RunAlgorithm(CustomGraph graph,Vertex startVertex)
         {
             var token = cts.Token;
-            base.RunAlgorithm(graph);
+            base.BaseRunAlgorithm(graph);
 
             await PrepareBFSState(graph);
-            queue.Enqueue(StartVertex);
-            await ChooseStartVertexState();
+            queue.Enqueue(startVertex);
+            await ChooseStartVertexState(startVertex);
             // clone token để xóa biết đường tự hủy
             await RunBFSLoop(graph,token);
 
-            if (IsStopAlgorithm) base.CleanGraphForAlgorithm(graph);
-            if (queue.Count == 0) OnCompletedAlgorithm();
+            EndAlgorithmState(graph);
         }
 
-        public override async void ContinueAlgorithm(CustomGraph graph)
+        public async void ContinueAlgorithm(CustomGraph graph)
         {
-            base.ContinueAlgorithm(graph);
+            base.BaseContinueAlgorithm(graph);
             var token = cts.Token;
             await RunBFSLoop(graph,token);
-            if (IsStopAlgorithm) base.CleanGraphForAlgorithm(graph);
-            if (queue.Count == 0) OnCompletedAlgorithm();
+            EndAlgorithmState(graph);
         }
 
-        public override async void ContinueAlgorithmWithAllVertex(CustomGraph graph)
+        public async void ContinueAlgorithmWithAllVertex(CustomGraph graph)
         {
             var token = cts.Token;
-            base.ContinueAlgorithmWithAllVertex(graph);
+            base.BaseContinueAlgorithm(graph);
             await RunBFSLoop(graph, token);
             while (QueueVertices.Count > 0)
             {
                 if (token.IsCancellationRequested) break;
-                StartVertex = QueueVertices.Dequeue();
-                if (StartVertex.IsVisited == true) continue;
+                var startVertex  = QueueVertices.Dequeue();
+                if (startVertex.IsVisited == true) continue;
                 
-                queue.Enqueue(StartVertex);
+                queue.Enqueue(startVertex);
                 
                 await RunBFSLoop(graph, token);
                 //if (token.IsCancellationRequested) return;
             }
-            if (IsStopAlgorithm) base.CleanGraphForAlgorithm(graph);
-            if (QueueVertices.Count == 0 && queue.Count == 0) OnCompletedAlgorithm();
+            EndAlgorithmState(graph);
         }
 
-        private async Task PrepareBFSState(CustomGraph graph)
+        private Task PrepareBFSState(CustomGraph graph)
         {
-            if (StartVertex == null) return;
             CleanBFS();
+            return Task.FromResult(0);
         }
 
-        private async Task ChooseStartVertexState()
+        private async Task ChooseStartVertexState(Vertex u)
         {
             Pseudocodes[0].IsSelectionCode = true;
-            Pseudocodes[0].FillVertextIntoCode(StartVertex);
+            Pseudocodes[0].FillVertextIntoCode(u);
             await Task.Delay(TimeDelayOfLineCode);
             Pseudocodes[0].IsSelectionCode = false;
         }

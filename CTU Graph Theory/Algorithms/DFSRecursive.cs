@@ -7,11 +7,12 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using CTU_Graph_Theory.Algorithms.Base;
+using CTU_Graph_Theory.Interfaces;
 using CTU_Graph_Theory.Models;
 
 namespace CTU_Graph_Theory.Algorithms
 {
-    public class DFSRecursive : AbstractAlgorithm
+    public class DFSRecursive : AbstractAlgorithm , IAllVertexRun
     {
         private Stack<Vertex> FuntionStack;
 
@@ -43,8 +44,9 @@ namespace CTU_Graph_Theory.Algorithms
         private void CleanDFS()
         {
             FuntionStack.Clear();
+            FuntionStack.TrimExcess();
         }
-        public override async void ContinueAlgorithm(CustomGraph graph)
+        public async void ContinueAlgorithm(CustomGraph graph)
         {
             base.BaseContinueAlgorithm(graph);
             var token = cts.Token;
@@ -53,39 +55,43 @@ namespace CTU_Graph_Theory.Algorithms
             EndAlgorithmState(graph);
         }
 
-        public override async void ContinueAlgorithmWithAllVertex(CustomGraph graph)
+        public async void ContinueAlgorithmWithAllVertex(CustomGraph graph)
         {
             var token = cts.Token;
-            base.BaseContinueAlgorithmWithAllVertex(graph);
+            base.BaseContinueAlgorithm(graph);
             await RunDFSLoop(graph, token);
             while (QueueVertices.Count > 0)
             {
                 if (token.IsCancellationRequested) break;
-                StartVertex = QueueVertices.Dequeue();
-                if (StartVertex.IsVisited == true) continue;
+                var startVertex = QueueVertices.Dequeue();
+                if (startVertex.IsVisited == true) continue;
 
-                FuntionStack.Push(StartVertex);
+                FuntionStack.Push(startVertex);
 
                 await RunDFSLoop(graph, token);
             }
             EndAlgorithmState(graph);
         }
 
-        public override async void RunAlgorithm(CustomGraph graph)
+        public async void RunAlgorithm(CustomGraph graph, Vertex startVertex)
         {
             base.BaseRunAlgorithm(graph);
             var token = cts.Token;
 
             await PrepareState();
-            FuntionStack.Push(StartVertex);
+            FuntionStack.Push(startVertex);
             await RunDFSLoop(graph,token);
 
             EndAlgorithmState(graph);
         }
 
-        public override async void RunAlgorithmWithAllVertex(CustomGraph graph, ObservableCollection<Vertex> vertices)
+        public async void RunAlgorithmWithAllVertex(CustomGraph graph, ObservableCollection<Vertex> vertices)
         {
-            base.BaseRunAlgorithmWithAllVertex(graph, vertices);
+            base.BaseRunAlgorithm(graph);
+            QueueVertices.Clear();
+            foreach (var vertex in vertices)
+                QueueVertices.Enqueue(vertex);
+
             var token = cts.Token;
             await PrepareState();
             while (QueueVertices.Count > 0)
@@ -93,11 +99,11 @@ namespace CTU_Graph_Theory.Algorithms
                 if (token.IsCancellationRequested) break;
 
 
-                StartVertex = QueueVertices.Dequeue();
+                 var startVertex = QueueVertices.Dequeue();
                 
-                if (StartVertex.IsVisited == true) continue;
+                if (startVertex.IsVisited == true) continue;
 
-                FuntionStack.Push(StartVertex);
+                FuntionStack.Push(startVertex);
                 await RunDFSLoop(graph, token);
             }
             EndAlgorithmState(graph);
@@ -109,10 +115,10 @@ namespace CTU_Graph_Theory.Algorithms
             if (QueueVertices.Count == 0 && FuntionStack.Count == 0) OnCompletedAlgorithm();
         }
 
-        private async Task PrepareState()
+        private  Task PrepareState()
         {
-            if (StartVertex == null) return;
             CleanDFS();
+            return Task.FromResult(0);
         }
 
         private async Task RunDFSLoop(CustomGraph graph,CancellationToken token)
@@ -174,10 +180,10 @@ namespace CTU_Graph_Theory.Algorithms
             Pseudocodes[0].IsSelectionCode = false;
         }
 
-        private async Task<Vertex> GetVertexState()
+        private Task<Vertex> GetVertexState()
         {
             Vertex u = FuntionStack.Pop();
-            return u;
+            return Task.FromResult(u);
         }
 
         private async Task<bool> IsVertexMarkedState(Vertex u)

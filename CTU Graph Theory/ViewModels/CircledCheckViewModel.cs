@@ -11,76 +11,62 @@ using CTU_Graph_Theory.Algorithms;
 
 namespace CTU_Graph_Theory.ViewModels
 {
-    public class CircledCheckViewModel : IAlgorithmViewModel
+    public class CircledCheckViewModel : IAlgorithmViewModel , IAllVertexRun
     {
-        private AbstractAlgorithm _scc;
+        private CircledCheck _circledCheck;
         public string AlgorithmName
         {
-            get => _scc.AlgorithmName;
+            get => _circledCheck.AlgorithmName;
         }
 
-        public Vertex? StartVertex
-        {
-            get => _scc.StartVertex;
-            set
-            {
-                if (_scc.StartVertex == value) return;
-                _scc.StartVertex = value;
-            }
-        }
+     
         public ObservableCollection<StringPseudoCode> Pseudocodes
         {
-            get => _scc.Pseudocodes;
+            get => _circledCheck.Pseudocodes;
         }
-        public bool IsSetCompletedAlgorithm { get; set; } = false;
-
-        public ObservableCollection<RequestOfAlgorithm> Requirements => throw new NotImplementedException();
+        public bool IsSetCompletedAlgorithm { get; set; }
 
         public CircledCheckViewModel()
         {
-            _scc = new CircledCheck();
+            _circledCheck = new CircledCheck();
+            IsSetCompletedAlgorithm = false;
         }
 
-        public void TransferStartVertex(Vertex? startVertex)
+        public void RunAlgorithm(CustomGraph graph, Vertex startVertex)
         {
-            StartVertex = startVertex;
-        }
-
-        public void RunAlgorithm(CustomGraph graph)
-        {
-            _scc.RunAlgorithm(graph);
+            _circledCheck.RunAlgorithm(graph, startVertex);
         }
 
         public void RunAlgorithmWithAllVertex(CustomGraph graph, ObservableCollection<Vertex> vertices)
         {
-            _scc.RunAlgorithmWithAllVertex(graph, vertices);
+            _circledCheck.RunAlgorithmWithAllVertex(graph, vertices);
         }
 
         public void PauseAlgorithm()
         {
-            _scc.PauseAlgorithm();
+            _circledCheck.PauseAlgorithm();
         }
         public void ContinueAlgorithm(CustomGraph graph)
         {
-            _scc.ContinueAlgorithm(graph);
+            _circledCheck.ContinueAlgorithm(graph);
         }
 
         public void ContinueAlgorithmWithAllVertex(CustomGraph graph)
         {
-            _scc.ContinueAlgorithmWithAllVertex(graph);
+            _circledCheck.ContinueAlgorithmWithAllVertex(graph);
         }
 
         public void StopAlgorithm(CustomGraph graph)
         {
-            _scc.StopAlgorithm(graph);
+            _circledCheck.StopAlgorithm(graph);
         }
         public void SetRunSpeed(int speedUp)
         {
-            _scc.SetRunSpeed(speedUp);
+            _circledCheck.SetRunSpeed(speedUp);
         }
         public void SetCompletedAlgorithm(EventHandler returnIsRunningState)
         {
-            _scc.CompletedAlgorithm += returnIsRunningState;
+            _circledCheck.CompletedAlgorithm += returnIsRunningState;
             IsSetCompletedAlgorithm = true;
         }
     }

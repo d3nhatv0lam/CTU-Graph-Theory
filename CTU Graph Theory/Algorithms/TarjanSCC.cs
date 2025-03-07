@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace CTU_Graph_Theory.Algorithms
 {
-    public class TarjanSCC : AbstractAlgorithm, IAlgorithmRequirement
+    public class TarjanSCC : AbstractAlgorithm,IVertexRun, IAllVertexRun, IAlgorithmRequirement
     {
         public ObservableCollection<RequestOfAlgorithm> Requirements { get; }
 
@@ -93,7 +93,7 @@ namespace CTU_Graph_Theory.Algorithms
             k = 0;
         }
 
-        public override async void ContinueAlgorithm(CustomGraph graph)
+        public async void ContinueAlgorithm(CustomGraph graph)
         {
             base.BaseContinueAlgorithm(graph);
             var token = cts.Token;
@@ -101,52 +101,55 @@ namespace CTU_Graph_Theory.Algorithms
             EndAlgorithmState(graph);
         }
 
-        public override async void ContinueAlgorithmWithAllVertex(CustomGraph graph)
+        public async void ContinueAlgorithmWithAllVertex(CustomGraph graph)
         {
-            base.BaseContinueAlgorithmWithAllVertex(graph);
+            base.BaseContinueAlgorithm(graph);
             var token = cts.Token;
             await RunLoop(graph, token);
             while (QueueVertices.Count > 0)
             {
                 if (token.IsCancellationRequested) break;
-                StartVertex = QueueVertices.Dequeue();
+                var startVertex = QueueVertices.Dequeue();
 
-                if (StartVertex.IsVisited == true) continue;
+                if (startVertex.IsVisited == true) continue;
 
-                if (StartVertex != null)
-                    funtionStack.Push((StartVertex, 0, RecursiveState.Entry));
+                if (startVertex != null)
+                    funtionStack.Push((startVertex, 0, RecursiveState.Entry));
                 await RunLoop(graph, token);
             }
             EndAlgorithmState(graph);
         }
 
-        public override async void RunAlgorithm(CustomGraph graph)
+        public async void RunAlgorithm(CustomGraph graph,Vertex startVertex)
         {
             var token = cts.Token;
             base.BaseRunAlgorithm(graph);
             await PrepareState();
 
-            if (StartVertex != null)
-                funtionStack.Push((StartVertex, 0,RecursiveState.Entry));
+            funtionStack.Push((startVertex, 0,RecursiveState.Entry));
 
             await RunLoop(graph, token);
             EndAlgorithmState(graph);
         }
 
-        public override async void RunAlgorithmWithAllVertex(CustomGraph graph, ObservableCollection<Vertex> vertices)
+        public  async void RunAlgorithmWithAllVertex(CustomGraph graph, ObservableCollection<Vertex> vertices)
         {
-            base.BaseRunAlgorithmWithAllVertex(graph,vertices);
+
+            base.BaseRunAlgorithm(graph);
+            QueueVertices.Clear();
+            foreach (var vertex in vertices)
+                QueueVertices.Enqueue(vertex);
+
             var token = cts.Token;
             await PrepareState();
             while (QueueVertices.Count > 0)
             {
                 if (token.IsCancellationRequested) break;
-                StartVertex = QueueVertices.Dequeue();
+                Vertex startVertex  = QueueVertices.Dequeue();
 
-                if (StartVertex.IsVisited == true) continue;
+                if (startVertex.IsVisited == true) continue;
 
-                if (StartVertex != null)
-                    funtionStack.Push((StartVertex, 0, RecursiveState.Entry));
+                funtionStack.Push((startVertex, 0, RecursiveState.Entry));
                 await RunLoop(graph, token);
             }
             EndAlgorithmState(graph);

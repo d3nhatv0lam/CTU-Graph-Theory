@@ -126,8 +126,8 @@
 
 			<Border Grid.Row="0" Grid.Column="0" Padding="10">
 				<Grid RowDefinitions="* 0.1*">
-					<paz:ZoomBorder Grid.Row="0" 
-								Stretch="Uniform" ZoomSpeed="1.5" 
+					<paz:ZoomBorder Grid.Row="0"
+								Stretch="Uniform" ZoomSpeed="1.5"
 								 MaxZoomX="2" MaxZoomY="2"
 								 PanButton="Left"  VirtualizingStackPanel.VerticalSnapPointsChanged=""
 								 EnableConstrains="true"
@@ -179,7 +179,7 @@
 								<Style Selector="agc|TextSticker.Pending">
 									<Setter Property="BorderForeground" Value="#FFCC00"/>
 								</Style>
-								
+
 								<Style Selector="agc|TextSticker.PointedTo">
 									<Setter Property="BorderForeground" Value="#0000FF"/>
 								</Style>
@@ -364,48 +364,58 @@
 					</ComboBox>
 
 					<Grid Grid.Row="2"
-						  ColumnDefinitions="auto * *"
+						  RowDefinitions="* auto auto">
+
+						<Grid Grid.Row="0"
+							  ColumnDefinitions="auto * *"
 							>
-						<TextBlock Grid.Column="0"
+							<TextBlock Grid.Column="0"
 								   Text="Chọn đỉnh bắt đầu:"
 									VerticalAlignment="Center"
 									HorizontalAlignment="Center"
 									FontWeight="Bold"/>
 
-						<ComboBox Grid.Column="1"
-								  IsEnabled="{Binding !IsRunningAlgorithm}"
-								  ItemsSource="{Binding Vertices}"
-								  SelectedItem="{Binding StartVertex}"
-								  MinWidth="70"
-								 HorizontalAlignment="Center"
-								  MaxDropDownHeight="200">
+							<ComboBox Grid.Column="1"
+									  IsEnabled="{Binding IsEnableStartVertexSelection}"
+									  ItemsSource="{Binding Vertices}"
+									  SelectedItem="{Binding StartVertex}"
+									  MinWidth="70"
+									 HorizontalAlignment="Center"
+									  MaxDropDownHeight="200">
 
-							<ComboBox.ItemTemplate>
-								<DataTemplate DataType="{x:Type model:Vertex}">
-									<TextBlock Text="{Binding Title,Converter={StaticResource SelectAllConvert}}"
-											    VerticalAlignment="Center"
-												 HorizontalAlignment="Stretch"
-												FontWeight="Bold"
-												FontSize="18"/>
-								</DataTemplate>
-							</ComboBox.ItemTemplate>
-						</ComboBox>
+								<ComboBox.ItemTemplate>
+									<DataTemplate DataType="{x:Type model:Vertex}">
+										<TextBlock Text="{Binding Title,Converter={StaticResource SelectAllConvert}}"
+													VerticalAlignment="Center"
+													 HorizontalAlignment="Stretch"
+													FontWeight="Bold"
+													FontSize="18"/>
+									</DataTemplate>
+								</ComboBox.ItemTemplate>
+							</ComboBox>
 
-						<Button Grid.Column="2" Classes="accent" Classes.IsRunningAlgorithm ="{Binding IsRunningAlgorithm}"
-								Command="{Binding RunAlgorithmCommand}">
-							<Button.Styles>
-								<Style Selector="Button">
-									<Setter Property="Content" Value="Duyệt"/>
-								</Style>
-								<Style Selector="Button.IsRunningAlgorithm">
-									<Setter Property="Content" Value="Dừng"/>
-									<Setter Property="Background" Value="#D31A38"/>
-								</Style>
-							</Button.Styles>
+							<Button Grid.Column="2" Classes="accent" Classes.IsRunningAlgorithm ="{Binding IsRunningAlgorithm}"
+									Command="{Binding RunAlgorithmCommand}">
+								<Button.Styles>
+									<Style Selector="Button">
+										<Setter Property="Content" Value="Duyệt"/>
+									</Style>
+									<Style Selector="Button.IsRunningAlgorithm">
+										<Setter Property="Content" Value="Dừng"/>
+										<Setter Property="Background" Value="#D31A38"/>
+									</Style>
+								</Button.Styles>
+
+							</Button>
+						</Grid>
 						
-						</Button>
-					</Grid>
+						<CheckBox Classes="accent"
+								  Grid.Row="1" 
+								 Content="Duyệt tất cả đỉnh!"  
+								IsChecked="{Binding IsSelectAllVertex}"/>
 
+					</Grid>
+			
 					<Separator Grid.Row="3"/>
 
 					<!--// mã giả //-->
@@ -413,12 +423,12 @@
 						<TextBlock Grid.Row="0" VerticalAlignment="Center"
 								   Classes="Headline6"
 								   Text="Mã giả:"/>
-						
+
 						<ScrollViewer Grid.Row="1">
 							<ItemsRepeater  Margin="10 10 0 0"
 									ItemsSource="{Binding SelectedAlgorithm.Pseudocodes}"
 									VerticalAlignment="Top"
-									HorizontalAlignment="Left"							  
+									HorizontalAlignment="Left"
 									>
 								<ItemsRepeater.Layout>
 									<StackLayout Spacing="5"/>
@@ -449,7 +459,7 @@
 						<TextBlock DockPanel.Dock="Top" Text="Yêu cầu thuật toán" Classes="Headline6"/>
 						<TransitioningContentControl DockPanel.Dock="Top" Content="{Binding SelectedAlgorithm}"/>
 					</DockPanel>
-					
+
 				</Grid>
 			</Border>
 
