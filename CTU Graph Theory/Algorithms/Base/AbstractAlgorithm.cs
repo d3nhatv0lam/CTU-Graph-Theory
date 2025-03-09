@@ -57,6 +57,8 @@ namespace CTU_Graph_Theory.Algorithms.Base
             IsStopAlgorithm = true;
             PauseAlgorithm();
             CleanGraphForAlgorithm(graph);
+            QueueVertices.Clear();
+            QueueVertices.TrimExcess();
         }
 
         public virtual void CleanGraphAfterStop(CustomGraph graph)

@@ -32,10 +32,12 @@ namespace CTU_Graph_Theory.ViewModels
         private string _graphData = string.Empty;
         private List<IAlgorithmViewModel> _algorithmList;
         private IAlgorithmViewModel? _selectedAlgorithm = null;
+        private List<RequestOfAlgorithm> _algorithmRequiments;
         private ObservableCollection<Vertex> _vertices;
         private Vertex? _startVertex = null;
+        private bool _isAllowSelectAllVertex = false;
         private bool _isSelectAllVertex = false;
-        private bool _isAlgorithmRequirementAccept = false;
+        private bool _isAlgorithmRequirementAccept = true;
         private bool _isRunningAlgorithm = false;
         private bool _isPauseAlgorithm = false;
         private bool _isEnableStartVertexSelection = true;
@@ -83,7 +85,15 @@ namespace CTU_Graph_Theory.ViewModels
         {
             get => _selectedAlgorithm;
             set => this.RaiseAndSetIfChanged(ref _selectedAlgorithm, value);
-            
+        }
+        public List<RequestOfAlgorithm> AlgorithmRequiments
+        {
+            get
+            {
+                if (_algorithmRequiments == null) _algorithmRequiments = new() { new RequestOfAlgorithm("") { IsDoneRequest = true} }; 
+                return _algorithmRequiments;
+            }
+            set => this.RaiseAndSetIfChanged(ref _algorithmRequiments, value);
         }
         public ObservableCollection<Vertex> Vertices
         {
@@ -94,6 +104,11 @@ namespace CTU_Graph_Theory.ViewModels
         {
             get => _startVertex;
             set => this.RaiseAndSetIfChanged(ref _startVertex, value);
+        }
+        public bool IsAllowSelectAllVertex
+        {
+            get => _isAllowSelectAllVertex;
+            set => this.RaiseAndSetIfChanged(ref _isAllowSelectAllVertex, value);
         }
         public bool IsSelectAllVertex
         {
@@ -161,6 +176,7 @@ namespace CTU_Graph_Theory.ViewModels
             AlgorithmList.Add(new DFSRecursiveViewModel());
             AlgorithmList.Add(new CircledCheckViewModel());
             AlgorithmList.Add(new TarjanSCCViewModel());
+            AlgorithmList.Add(new MooreDijkstraViewModel());
         }
 
         private void InitObservable()
@@ -183,11 +199,24 @@ namespace CTU_Graph_Theory.ViewModels
                 });
 
             // StartVertex Selectable
-            this.WhenAnyValue(x => x.IsSelectAllVertex, x => x.IsRunningAlgorithm).Subscribe(tuple => IsEnableStartVertexSelection = (!tuple.Item1 && !tuple.Item2));
-            // Algorithm Requirement
-            this.WhenAnyValue(x => x.MainGraph, x => x.SelectedAlgorithm).Where((tuple) => tuple.Item2 != null).Subscribe(tuple => { if (tuple.Item2 is IAlgorithmRequirementViewModel algorithm) IsAlgorithmRequirementAccept = algorithm.CheckRequirements(tuple.Item1); else IsAlgorithmRequirementAccept = true; });
-            // change algorithm - first choose this algorithm
-            this.WhenAnyValue(x => x.SelectedAlgorithm).Where(algorithm => algorithm?.IsSetCompletedAlgorithm == false).Subscribe(algorithm => algorithm?.SetCompletedAlgorithm(OnAlgorithmCompleted) );
+            this.WhenAnyValue(x => x.IsAllowSelectAllVertex, x => x.IsSelectAllVertex, x => x.IsRunningAlgorithm).Subscribe(tuple => IsEnableStartVertexSelection = !tuple.Item1 || (!tuple.Item2 && !tuple.Item3) );
+            // Algorithm Changed Requirement
+            this.WhenAnyValue(x => x.MainGraph, x => x.SelectedAlgorithm).Where((tuple) => tuple.Item2 != null).Subscribe(tuple => 
+            { 
+                if (tuple.Item2 is IAlgorithmRequirementViewModel algorithm)
+                {
+                    IsAlgorithmRequirementAccept = algorithm.CheckRequirements(tuple.Item1);
+                    AlgorithmRequiments = algorithm.Requirements;
+                }
+                else
+                {
+                    // set all is true to Aniamte in UI
+                    AlgorithmRequiments.ForEach(x => x.IsDoneRequest = true);
+                    IsAlgorithmRequirementAccept = true;
+                }
+            });
+            // change algorithm -> Check Is allow Choose all Vertex -> Check first choose this algorithm
+            this.WhenAnyValue(x => x.SelectedAlgorithm).Do(algorithm => { if (algorithm is IAllVertexRun allowAlgorithmCheck) IsAllowSelectAllVertex = true; else IsAllowSelectAllVertex = false; }).Where(algorithm => algorithm?.IsSetCompletedAlgorithm == false).Subscribe(algorithm => algorithm?.SetCompletedAlgorithm(OnAlgorithmCompleted));
             // set run speed when change Slider or change Selectedalgorithn
             this.WhenAnyValue(x => x.SelectedAlgorithm,x => x.MultiplierSpeed).Subscribe(tuple => tuple.Item1?.SetRunSpeed(tuple.Item2));
             // command check can activate
@@ -219,11 +248,16 @@ namespace CTU_Graph_Theory.ViewModels
                 IsRunningAlgorithm = true;
                 IsPauseAlgorithm = false;
 
-                if (SelectedAlgorithm is IAllVertexRun selectedAlgorithm)
+                if (SelectedAlgorithm is IAllVertexRun selectedAlgorithmAllVertexRun)
                 {
-                    if (IsSelectAllVertex) selectedAlgorithm?.RunAlgorithmWithAllVertex(MainGraph, Vertices);
-                    else selectedAlgorithm?.RunAlgorithm(MainGraph, StartVertex);
-                }   
+                    if (IsSelectAllVertex) selectedAlgorithmAllVertexRun?.RunAlgorithmWithAllVertex(MainGraph, Vertices);
+                    else selectedAlgorithmAllVertexRun?.RunAlgorithm(MainGraph, StartVertex);
+                }
+                else if (SelectedAlgorithm is IVertexRun selectedAlgorithmVertexRun)
+                {
+                    selectedAlgorithmVertexRun?.RunAlgorithm(MainGraph, StartVertex);
+                }
+
                 },CanRunAlgorithmCommand);
             PauseAlgorithmCommand = ReactiveCommand.Create(() => { SelectedAlgorithm?.PauseAlgorithm(); IsPauseAlgorithm = true;}, CanPauseAlgorithmCommand);
 

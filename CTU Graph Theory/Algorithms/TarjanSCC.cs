@@ -14,7 +14,7 @@ namespace CTU_Graph_Theory.Algorithms
 {
     public class TarjanSCC : AbstractAlgorithm,IVertexRun, IAllVertexRun, IAlgorithmRequirement
     {
-        public ObservableCollection<RequestOfAlgorithm> Requirements { get; }
+        public List<RequestOfAlgorithm> Requirements { get; }
 
         private enum RecursiveState
         {
@@ -68,7 +68,7 @@ namespace CTU_Graph_Theory.Algorithms
         public void FillIAlgorithmRequirement()
         {
             if (Requirements.Count != 0) return;
-            Requirements.Add(new RequestOfAlgorithm("Đồ thị có hướng"));
+            Requirements.Add(new RequestOfAlgorithm("Phải là đồ thị có hướng"));
         }
 
         public bool CheckRequirements(CustomGraph graph)

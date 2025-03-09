@@ -6,9 +6,19 @@
              x:Class="CTU_Graph_Theory.Views.InformationView">
 
 	<Grid>
-		<TextBlock Classes="Headline6" 
-				   HorizontalAlignment="Center" 
-				   Text="Tôi làm cái này vì 0.5đ Lý thuyết đồ thị thầy Thức"/>
+		<StackPanel Orientation="Vertical" Margin="0 20 0 0">
+			<StackPanel.Styles>
+				<Style Selector="TextBlock">
+					<Setter Property="HorizontalAlignment" Value="Center"/>
+				</Style>
+			</StackPanel.Styles>
+			<TextBlock Classes="Headline6"
+				   Text="Tôi làm cái này vì 0.5đ Lý thuyết đồ thị"/>
+			<TextBlock Classes="Headline6"
+					   Text="Cảm ơn các bạn đã quan tâm đến ứng dụng của mình"/>
+			<TextBlock Classes="Headline6"
+					   Text="Hehe Donate đi~"/>
+		</StackPanel>
 	</Grid>
 	
 </UserControl>

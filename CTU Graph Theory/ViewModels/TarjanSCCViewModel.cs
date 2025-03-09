@@ -23,7 +23,7 @@ namespace CTU_Graph_Theory.ViewModels
         }
         public bool IsSetCompletedAlgorithm { get; set; }
 
-        public ObservableCollection<RequestOfAlgorithm> Requirements
+        public List<RequestOfAlgorithm> Requirements
         {
             get => _scc.Requirements;
         }

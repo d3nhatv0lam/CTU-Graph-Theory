@@ -75,7 +75,7 @@ namespace CTU_Graph_Theory.Algorithms.Base
         }
 
         protected virtual void FillPseudoCode() { }
-        public virtual async void RunAlgorithm(CustomGraph graph)
+        public virtual void RunAlgorithm(CustomGraph graph)
         {
             IsStopAlgorithm = false;
             IsRunning = 1;

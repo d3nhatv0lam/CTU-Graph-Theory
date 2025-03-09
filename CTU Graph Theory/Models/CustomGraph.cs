@@ -10,7 +10,6 @@ using System.Runtime.CompilerServices;
 using System.Runtime.Intrinsics;
 using System.Text;
 using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace CTU_Graph_Theory.Models
 {
@@ -35,11 +34,15 @@ namespace CTU_Graph_Theory.Models
         public ObservableCollection<Vertex> Vertices { get; private set; }
         public int VetexCount { get => Vertices.Count; }
         public int EdgeCount { get; private set; }
+        public bool IsWeightGraph { get; private set; }
+        public bool IsHasNegativeWeight { get; private set; }
 
         public CustomGraph() 
         {
             TypeOfGraph = GraphType.SimpleGraph;
             DirectTypeOfGraph = GraphDirectType.UnDirected;
+            EdgeCount = 0;
+            IsWeightGraph = false;
             Vertices = new ObservableCollection<Vertex>();
         }
 
@@ -124,9 +127,21 @@ namespace CTU_Graph_Theory.Models
             return null;
         }
 
-        public List<ShowableEdge> GetAllEdges(Vertex u,Vertex v)
+        public ShowableEdge? GetEdgeWithMinWeight(Vertex? u, Vertex? v)
+        {
+            if (u == null || v == null) return null;
+            if (!IsWeightGraph) return null;
+
+            List < ShowableEdge > edgeList = GetAllEdges(u, v);
+            ShowableEdge? edge = edgeList.MinBy(x => (Int64)x.Label);
+            return edge;
+        }
+
+        public List<ShowableEdge> GetAllEdges(Vertex? u,Vertex? v)
         {
             List<ShowableEdge> edges = new List<ShowableEdge>();
+            if (u == null || v == null) return edges;
+
             foreach (ShowableEdge edge in this.Edges)
             {
                 Vertex? v1 = edge.Tail as Vertex;
@@ -189,6 +204,7 @@ namespace CTU_Graph_Theory.Models
             newGraph.TypeOfGraph = graph.TypeOfGraph;
             newGraph.Vertices = new ObservableCollection<Vertex>(graph.Vertices.Select(vertex => vertex));
             newGraph.EdgeCount = graph.EdgeCount;
+            newGraph.IsWeightGraph = graph.IsWeightGraph;
             // add edge for graph
             foreach (ShowableEdge edge in graph.Edges)
             {
@@ -213,6 +229,7 @@ namespace CTU_Graph_Theory.Models
             Edge.Symbol DirectGraphSymbol = newGraph.IsUnDirectedGraph() ? DirectGraphSymbol = Edge.Symbol.None: DirectGraphSymbol = Edge.Symbol.Arrow;
             HashSet<Vertex> set = new HashSet<Vertex>();
             int edgeCount = 0;
+            bool isHasNegativeWeight = false;
 
             foreach (var data in graphData)
             {
@@ -232,7 +249,7 @@ namespace CTU_Graph_Theory.Models
 
                             u = Vertex.CreateNewVertex(nodeData[0]);
                             v = Vertex.EmptyVertex;
-                            newEdge = new ShowableEdge(u, v, ShowableEdge.Visible.NotShow);
+                            newEdge = new ShowableEdge(u, v, ShowableEdge.Visible.NotShow,"empty");
                             set.Add(u);
                         }
                         break;
@@ -274,6 +291,8 @@ namespace CTU_Graph_Theory.Models
                             if (hasEdge != null && newGraph.IsSimpleGraph()) newGraph.TypeOfGraph = GraphType.MultiGraph;
 
                             if (Int64.TryParse(nodeData[2], out weight))
+                            {
+                                isHasNegativeWeight = weight < 0;
                                 if (u.Title == v.Title)
                                 {
                                     newEdge = new ShowableEdge(u, u, ShowableEdge.Visible.Show, weight, Edge.Symbol.None, DirectGraphSymbol);
@@ -286,6 +305,7 @@ namespace CTU_Graph_Theory.Models
                                     set.Add(u);
                                     set.Add(v);
                                 }
+                            }   
                             edgeCount++;
                         }   
                         break;
@@ -297,8 +317,9 @@ namespace CTU_Graph_Theory.Models
             vertexList.Sort((x,y) => x.Compare(y));
 
             newGraph.Vertices = new ObservableCollection<Vertex>(vertexList);
-            
             newGraph.EdgeCount = edgeCount;
+            newGraph.IsWeightGraph = newGraph.Edges.All(x => (x.Label as string) != string.Empty);
+            newGraph.IsHasNegativeWeight = isHasNegativeWeight;
             return newGraph;
         }
     }

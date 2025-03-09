@@ -41,10 +41,12 @@ public partial class VisualizationGraphView : ReactiveUserControl<VisualizationG
 
     private void TextBlock_PropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
     {
-        if (sender is TextBlock textBlock)
+        if (sender is TextBlock textBlock && e.Property.ToString() == nameof(textBlock.Background))
         {
             textBlock.BringIntoView();
         }
 
     }
+
+
 }

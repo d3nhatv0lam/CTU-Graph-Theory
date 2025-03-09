@@ -10,7 +10,7 @@ namespace CTU_Graph_Theory.Interfaces
 {
     public interface IAlgorithmRequirementViewModel
     {
-        public ObservableCollection<RequestOfAlgorithm> Requirements { get; }
+        public List<RequestOfAlgorithm> Requirements { get; }
         public bool CheckRequirements(CustomGraph graph);
     }
 }
