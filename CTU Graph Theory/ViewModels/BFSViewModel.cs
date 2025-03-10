@@ -27,6 +27,17 @@ namespace CTU_Graph_Theory.ViewModels
         {
             get => _bfs.Pseudocodes;
         }
+
+        public ObservableCollection<ObservableCollection<string>> Result
+        {
+            get
+            {
+                return _bfs.Result;
+            }
+        }
+
+
+
         public bool IsSetCompletedAlgorithm { get; set; }
 
 

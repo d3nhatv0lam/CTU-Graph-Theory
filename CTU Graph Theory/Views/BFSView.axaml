@@ -2,13 +2,41 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="400"
+             mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="200"
 			 xmlns:vm ="using:CTU_Graph_Theory.ViewModels"
+			 xmlns:System="clr-namespace:System;assembly=mscorlib"
+			 xmlns:converter ="using:CTU_Graph_Theory.Converters"
 			 x:DataType="vm:BFSViewModel"
+			 
              x:Class="CTU_Graph_Theory.Views.BFSView">
 
+	<UserControl.Resources>
+		<converter:LastItemVisibilityConverter x:Key ="LastItemVisibility"/>
+	</UserControl.Resources>
 	
-	<Grid>
+	<Grid RowDefinitions="auto *">
+		<TextBlock Grid.Row="0" Classes="Headline6" FontWeight="Bold" Text="Thứ tự duyệt:"/>
+		
+		<ScrollViewer  Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Hidden">
+				<ItemsRepeater  ItemsSource="{Binding Result}">
+					<ItemsRepeater.ItemTemplate>
+							<DataTemplate>
+								<ItemsRepeater ItemsSource="{Binding}">
+									<ItemsRepeater.Layout>
+										<StackLayout Orientation="Horizontal" Spacing="4"/>
+									</ItemsRepeater.Layout>
+									<ItemsRepeater.ItemTemplate>
+
+											<DataTemplate DataType="{x:Type System:String}">
+												<TextBlock Text="{Binding}" FontSize="20" FontWeight="Bold"/>
+											</DataTemplate>
+
+									</ItemsRepeater.ItemTemplate>
+								</ItemsRepeater>
+							</DataTemplate>
+					</ItemsRepeater.ItemTemplate>
+				</ItemsRepeater>
+		</ScrollViewer>
 		
 	</Grid>
 </UserControl>

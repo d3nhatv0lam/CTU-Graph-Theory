@@ -16,6 +16,11 @@ namespace CTU_Graph_Theory.Algorithms
     {
         // Algorithms
         private readonly Queue<Vertex> queue;
+        private ObservableCollection<ObservableCollection<string>> _result = new();
+        public ObservableCollection<ObservableCollection<string>> Result
+        {
+            get => _result;
+        }
         public BFS()
         {
             AlgorithmName = "BFS - Duyệt theo chiều rộng";
@@ -52,6 +57,7 @@ namespace CTU_Graph_Theory.Algorithms
         {
             queue.Clear();
             queue.TrimExcess();
+            
         }
 
         public async void RunAlgorithmWithAllVertex(CustomGraph graph, ObservableCollection<Vertex> vertices)
@@ -60,6 +66,12 @@ namespace CTU_Graph_Theory.Algorithms
             QueueVertices.Clear();
             foreach (var vertex in vertices)
                 QueueVertices.Enqueue(vertex);
+
+            foreach (var item in Result)
+            {
+                item.Clear();
+            }
+            Result.Clear();
 
             var token = cts.Token;
             while (QueueVertices.Count > 0)
@@ -70,7 +82,7 @@ namespace CTU_Graph_Theory.Algorithms
                 var startVertex = QueueVertices.Dequeue();
                 if (startVertex.IsVisited == true) continue;
                 await ChooseStartVertexState(startVertex);
-
+                Result.Add(new ObservableCollection<string>());
                 queue.Enqueue(startVertex);
                 await RunBFSLoop(graph, token);
             }
@@ -82,9 +94,17 @@ namespace CTU_Graph_Theory.Algorithms
             var token = cts.Token;
             base.BaseRunAlgorithm(graph);
 
+            foreach (var item in Result)
+            {
+                item.Clear();
+            }
+            Result.Clear();
+
             await PrepareBFSState(graph);
             queue.Enqueue(startVertex);
             await ChooseStartVertexState(startVertex);
+
+            Result.Add(new ObservableCollection<string>());
             // clone token để xóa biết đường tự hủy
             await RunBFSLoop(graph,token);
 
@@ -111,7 +131,7 @@ namespace CTU_Graph_Theory.Algorithms
                 if (startVertex.IsVisited == true) continue;
                 
                 queue.Enqueue(startVertex);
-                
+                Result.Add(new ObservableCollection<string>());
                 await RunBFSLoop(graph, token);
                 //if (token.IsCancellationRequested) return;
             }
@@ -152,6 +172,7 @@ namespace CTU_Graph_Theory.Algorithms
                 if (isMarked) continue;
 
                 await MarkVertexState(u);
+                Result.Last().Add(u.Title);
 
                 // draw adjacent => update into UI
                 if (u.ParentVertex != null)

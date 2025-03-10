@@ -471,10 +471,10 @@
 					<!--// mã giả //-->
 					<Grid Grid.Row="4" RowDefinitions="0.1* *">
 						<TextBlock Grid.Row="0" VerticalAlignment="Center"
-								   Classes="Headline6"
+								   Classes="Headline6" FontWeight="Bold"
 								   Text="Mã giả:"/>
 
-						<ScrollViewer Grid.Row="1">
+						<ScrollViewer Grid.Row="1" Padding="10">
 							<ItemsRepeater  Margin="10 10 0 0"
 									ItemsSource="{Binding SelectedAlgorithm.Pseudocodes}"
 									VerticalAlignment="Top"
@@ -500,13 +500,13 @@
 									</DataTemplate>
 								</ItemsRepeater.ItemTemplate>
 							</ItemsRepeater>
+
 						</ScrollViewer>
 
 					</Grid>
 					<Separator Grid.Row="5"/>
 					<!--// Result of Algorithm //-->
 					<DockPanel Grid.Row="6">
-						<TextBlock DockPanel.Dock="Top" Text="Yêu cầu thuật toán" Classes="Headline6"/>
 						<TransitioningContentControl DockPanel.Dock="Top" Content="{Binding SelectedAlgorithm}"/>
 					</DockPanel>
 
