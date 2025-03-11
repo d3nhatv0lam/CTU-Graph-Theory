@@ -10,9 +10,6 @@
 			 
              x:Class="CTU_Graph_Theory.Views.BFSView">
 
-	<UserControl.Resources>
-		<converter:LastItemVisibilityConverter x:Key ="LastItemVisibility"/>
-	</UserControl.Resources>
 	
 	<Grid RowDefinitions="auto *">
 		<TextBlock Grid.Row="0" Classes="Headline6" FontWeight="Bold" Text="Thứ tự duyệt:"/>

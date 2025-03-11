@@ -22,6 +22,7 @@ namespace CTU_Graph_Theory.Models
         }
 
         public bool _isVisited = false;
+        public bool _isPointTo = false;
 
         // kiểm tra đã duyệt trên UI
         public bool IsVisited
@@ -32,6 +33,16 @@ namespace CTU_Graph_Theory.Models
                 this.RaisePropertyChanging(new PropertyChangingEventArgs(nameof(IsVisited)));
                 _isVisited = value;
                 this.RaisePropertyChanged(new PropertyChangedEventArgs(nameof(IsVisited)));
+            }
+        }
+        public bool IsPointTo
+        {
+            get => _isPointTo;
+            set
+            {
+                this.RaisePropertyChanging(new PropertyChangingEventArgs(nameof(IsPointTo)));
+                _isPointTo = value;
+                this.RaisePropertyChanged(new PropertyChangedEventArgs(nameof(IsPointTo)));
             }
         }
 

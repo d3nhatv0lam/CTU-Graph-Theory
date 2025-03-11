@@ -207,6 +207,9 @@
 								<Style Selector="agc|Connection.Visited">
 									<Setter Property="Brush" Value="Red"/>
 								</Style>
+								<Style Selector="agc|Connection.PointTo">
+									<Setter Property="Brush" Value="#0000FF"/>
+								</Style>
 							</agc:GraphPanel.Styles>
 
 							<agc:GraphPanel.DataTemplates>
@@ -229,6 +232,7 @@
 													Classes.Show="{Binding IsShowEdge}"
 													Classes.Visited="{Binding IsVisited}"
 													Classes.NotVisited ="{Binding !IsVisited}"
+													Classes.PointTo="{Binding IsPointTo}"
 													PropertyChanged="Connection_PropertyChanged"
 													/>
 								</DataTemplate>
@@ -236,6 +240,7 @@
 								<DataTemplate DataType="{x:Type System:Int64}">
 									<TextBlock Text="{Binding}"/>
 								</DataTemplate>
+								<!--// Vertex with no Edge template //-->
 								<DataTemplate DataType="{x:Type System:String}">
 									<TextBlock Height="0" Width="0"></TextBlock>
 								</DataTemplate>
@@ -474,34 +479,37 @@
 								   Classes="Headline6" FontWeight="Bold"
 								   Text="Mã giả:"/>
 
-						<ScrollViewer Grid.Row="1" Padding="10">
-							<ItemsRepeater  Margin="10 10 0 0"
-									ItemsSource="{Binding SelectedAlgorithm.Pseudocodes}"
-									VerticalAlignment="Top"
-									HorizontalAlignment="Left"
+						<Border Grid.Row="1" Padding="10">
+							<ScrollViewer HorizontalScrollBarVisibility="Disabled" >
+								<ItemsRepeater
+										ItemsSource="{Binding SelectedAlgorithm.Pseudocodes}"
+										VerticalAlignment="Top"
+										HorizontalAlignment="Left"
 									>
-								<ItemsRepeater.Layout>
-									<StackLayout Spacing="5"/>
-								</ItemsRepeater.Layout>
-								<ItemsRepeater.Styles>
-									<Style Selector="TextBlock.SelectedLine">
-										<Setter Property="Background" Value="LightBlue"/>
-									</Style>
-								</ItemsRepeater.Styles>
+									<ItemsRepeater.Layout>
+										<StackLayout Spacing="5"/>
+									</ItemsRepeater.Layout>
+									<ItemsRepeater.Styles>
+										<Style Selector="TextBlock.SelectedLine">
+											<Setter Property="Background" Value="LightBlue"/>
+										</Style>
+									</ItemsRepeater.Styles>
 
-								<ItemsRepeater.ItemTemplate>
-									<DataTemplate>
-										<TextBlock  Classes.SelectedLine="{Binding IsSelectionCode}"
-													FontWeight="SemiBold"
-													Text="{Binding CodeWithSlectedVertex}"
-													TextWrapping="Wrap"
-													PropertyChanged="TextBlock_PropertyChanged"
+									<ItemsRepeater.ItemTemplate>
+										<DataTemplate>
+											<TextBlock  Classes.SelectedLine="{Binding IsSelectionCode}"
+														FontWeight="SemiBold"
+														Text="{Binding CodeWithSlectedVertex}"
+														TextWrapping="WrapWithOverflow"
+														PropertyChanged="TextBlock_PropertyChanged"
 											/>
-									</DataTemplate>
-								</ItemsRepeater.ItemTemplate>
-							</ItemsRepeater>
+										</DataTemplate>
+									</ItemsRepeater.ItemTemplate>
+								</ItemsRepeater>
 
-						</ScrollViewer>
+							</ScrollViewer>
+
+						</Border>
 
 					</Grid>
 					<Separator Grid.Row="5"/>

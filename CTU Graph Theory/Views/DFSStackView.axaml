@@ -9,30 +9,6 @@
 	
 	
 	<Grid RowDefinitions="0.1* *">
-		<TextBlock Grid.Row="0" VerticalAlignment="Center"
-				   Classes="Headline6"
-				   Text="Mã giả:"/>
-
-		<ItemsRepeater Grid.Row="1" Margin="10 10 0 0"
-						ItemsSource="{Binding Pseudocodes}"
-					   VerticalAlignment="Top"
-					   HorizontalAlignment="Center">
-			<ItemsRepeater.Styles>
-				<Style Selector="TextBlock.SelectedLine">
-					<Setter Property="Background" Value="LightBlue"/>
-				</Style>
-			</ItemsRepeater.Styles>
-
-			<ItemsRepeater.ItemTemplate>
-				<DataTemplate>
-					<TextBlock Classes.SelectedLine="{Binding IsSelectionCode}"
-							   FontWeight="SemiBold"
-							   Text="{Binding Code}"
-							   TextWrapping="Wrap"
-							   />
-				</DataTemplate>
-			</ItemsRepeater.ItemTemplate>
-		</ItemsRepeater>
 
 	</Grid>
 </UserControl>

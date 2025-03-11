@@ -177,6 +177,7 @@ namespace CTU_Graph_Theory.ViewModels
             AlgorithmList.Add(new CircledCheckViewModel());
             AlgorithmList.Add(new TarjanSCCViewModel());
             AlgorithmList.Add(new MooreDijkstraViewModel());
+            AlgorithmList.Add(new BellmanFordViewModel());
         }
 
         private void InitObservable()
@@ -263,11 +264,13 @@ namespace CTU_Graph_Theory.ViewModels
 
             ContinueAlgorithmCommand = ReactiveCommand.Create(() => 
             {
-                if (SelectedAlgorithm is IAllVertexRun selectedAlgorithm)
+                if (SelectedAlgorithm is IAllVertexRun selectedAllVertexAlgorithm)
                 {
-                    if (IsSelectAllVertex) selectedAlgorithm?.ContinueAlgorithmWithAllVertex(MainGraph);
-                    else selectedAlgorithm?.ContinueAlgorithm(MainGraph);
+                    if (IsSelectAllVertex) selectedAllVertexAlgorithm?.ContinueAlgorithmWithAllVertex(MainGraph);
+                    else selectedAllVertexAlgorithm?.ContinueAlgorithm(MainGraph);
                 }
+                else if (SelectedAlgorithm is IVertexRun selectedVertexAlgorithm) selectedVertexAlgorithm.ContinueAlgorithm(MainGraph);
+
                 IsPauseAlgorithm = false; 
             },CanContinueAlgorithmCommand);
         }
