@@ -185,6 +185,7 @@ namespace CTU_Graph_Theory.ViewModels
             AlgorithmList.Add(new MooreDijkstraViewModel());
             AlgorithmList.Add(new BellmanFordViewModel());
             AlgorithmList.Add(new KruskalViewModel());
+            AlgorithmList.Add(new PrimViewModel());
         }
 
         private void InitObservable()

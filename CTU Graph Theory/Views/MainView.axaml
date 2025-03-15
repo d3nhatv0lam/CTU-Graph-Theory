@@ -75,7 +75,7 @@
 		<controls:ColorZone Grid.Row="0" Grid.Column="1" Height="56" Padding="12" Mode="Accent">
 			<Grid ColumnDefinitions="Auto,24,*">
 				<ToggleButton x:Name="ExtendButton" Grid.Column="0" Theme="{StaticResource MaterialFlatToggleButton}" Padding="4" Width="{Binding $self.Bounds.Height}" Content="{icons:MaterialIconExt Menu}" />
-				<TextBlock Grid.Column="2" Classes="Headline6" VerticalAlignment="Center" Text="Material Design Demo" />
+				<TextBlock Grid.Column="2" Classes="Headline6" VerticalAlignment="Center" Text="Graph Visualizater" />
 			</Grid>
 		</controls:ColorZone>
 		

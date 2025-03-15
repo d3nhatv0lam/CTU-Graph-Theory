@@ -12,6 +12,10 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
 
     <ErrorReport>prompt</ErrorReport>
+
+    <PlatformTarget>AnyCPU</PlatformTarget>
+
+    <ApplicationIcon>image.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DebugType>none</DebugType>
@@ -21,6 +25,9 @@
     <DebugType>none</DebugType>
     <WarningLevel>8</WarningLevel>
   </PropertyGroup>
+  <ItemGroup>
+    <Content Include="image.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Avalonia.Angle.Windows.Natives" Version="2.1.22087.20231008" />

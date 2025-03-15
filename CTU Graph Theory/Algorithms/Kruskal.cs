@@ -87,7 +87,6 @@ namespace CTU_Graph_Theory.Algorithms
             }
             if (currentEdge == graph.EdgeCount)
                 OnCompletedAlgorithm();
-
         }
 
         private void CleanAlgorithm()

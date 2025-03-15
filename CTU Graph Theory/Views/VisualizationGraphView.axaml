@@ -355,7 +355,7 @@
 							   Text="Thuật toán"
 							   VerticalAlignment="Center"
 							   />
-
+					<!--// algorithm selection //-->
 					<ComboBox Grid.Row="1"
 							  IsEnabled="{Binding !IsRunningAlgorithm}"
 							  Theme="{StaticResource MaterialOutlineComboBox}"
@@ -364,9 +364,17 @@
 							  SelectedItem="{Binding SelectedAlgorithm}"
 							  MaxDropDownHeight="200"
 							  >
+
+						
+						<ComboBox.ItemsPanel>
+							<ItemsPanelTemplate>
+									<StackPanel/>
+							</ItemsPanelTemplate>
+						</ComboBox.ItemsPanel>
+						
 						<ComboBox.ItemTemplate>
 							<DataTemplate x:DataType="{x:Type interface:IAlgorithmViewModel}">
-								<TextBlock Text="{Binding AlgorithmName}" VerticalAlignment="Center"/>
+								<TextBlock Text="{Binding AlgorithmName}" VerticalAlignment="Center" ToolTip.Tip="{Binding AlgorithmName}"/>
 							</DataTemplate>
 						</ComboBox.ItemTemplate>
 					</ComboBox>
@@ -411,14 +419,20 @@
 									VerticalAlignment="Center"
 									HorizontalAlignment="Center"
 									FontWeight="Bold"/>
-
+								<!--// select vertex start //--> 
 								<ComboBox Grid.Column="1" Margin="10 0 0 0"
 										  IsEnabled="{Binding IsEnableStartVertexSelection}"
 										  ItemsSource="{Binding Vertices}"
 										  SelectedItem="{Binding StartVertex}"
 										 HorizontalAlignment="Center"
-										  MaxDropDownHeight="200">
+										  MaxDropDownHeight="200" MinWidth="70">
 
+									<ComboBox.ItemsPanel>
+										<ItemsPanelTemplate>
+											<StackPanel/>
+										</ItemsPanelTemplate>
+									</ComboBox.ItemsPanel>
+									
 									<ComboBox.ItemTemplate>
 										<DataTemplate DataType="{x:Type model:Vertex}">
 											<TextBlock Text="{Binding Title,Converter={StaticResource SelectAllConvert}}"
@@ -430,7 +444,7 @@
 									</ComboBox.ItemTemplate>
 								</ComboBox>
 							</Grid>
-
+							<!--// run algorithm button //-->
 							<Border Grid.Column="1" Padding="5 1 5 1">
 								<Button Classes="accent" Classes.IsRunningAlgorithm ="{Binding IsRunningAlgorithm}"
 									Command="{Binding RunAlgorithmCommand}">
@@ -448,7 +462,7 @@
 							</Border>
 							
 						</Grid>
-
+							<!--// Select all vertex //-->
 						<CheckBox Classes="accent" Classes.hide ="{Binding !IsAllowSelectAllVertex}"
 								  Grid.Row="1"
 								 Content="Duyệt tất cả đỉnh!"
@@ -467,7 +481,7 @@
 								</Style>
 							</CheckBox.Styles>
 						</CheckBox>
-
+						<!--// request algorithm //-->
 						<ScrollViewer x:Name="scollviewer" Grid.Row="2" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
 							<ItemsRepeater ItemsSource="{Binding AlgorithmRequiments}">
 								<ItemsRepeater.Styles>

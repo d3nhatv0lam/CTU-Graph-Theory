@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace CTU_Graph_Theory.Models
 {
-    public class Vertex : ReactiveObject
+    public class Vertex : ReactiveObject, IComparable<Vertex>
     {
         public static Vertex EmptyVertex = new Vertex("empty", Visible.NotShow);
 
@@ -106,9 +106,9 @@ namespace CTU_Graph_Theory.Models
             IsPointedTo = false;
         }
 
-        public int Compare(Vertex v)
+        public int CompareTo(Vertex? v)
         {
-            
+            if (v == null) return 1;
             var regex = new Regex("^(d+)");
 
             if (Int32.TryParse(Title,out var uTitle) && Int32.TryParse(v.Title,out var vTitle))
@@ -145,5 +145,6 @@ namespace CTU_Graph_Theory.Models
         {
             return Title;
         }
+
     }
 }

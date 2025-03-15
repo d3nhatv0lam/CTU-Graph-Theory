@@ -8,7 +8,7 @@
              x:Class="CTU_Graph_Theory.Views.KruskalView">
    <Grid>
 	   <TextBlock Classes="Headline6" VerticalAlignment="Center" HorizontalAlignment="Center"
-				  Text="{Binding MinWeight,StringFormat=Trọng số cây khung: {0}}"
+				  Text="{Binding MinWeight,StringFormat=Tổng trọng số cây khung: {0}}"
                     FontWeight="Bold"/>
    </Grid>
 </UserControl>

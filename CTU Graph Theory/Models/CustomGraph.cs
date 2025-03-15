@@ -103,7 +103,7 @@ namespace CTU_Graph_Theory.Models
                 else
                 if (DirectTypeOfGraph == GraphDirectType.UnDirected && Vertex.IsVertexEqual(x, v)) neighboursVertex.Add(u);
             }
-            neighboursVertex.Sort((x, y) => x.Compare(y));
+            neighboursVertex.Sort((x, y) => x.CompareTo(y));
             return neighboursVertex;
         }
 
@@ -316,7 +316,7 @@ namespace CTU_Graph_Theory.Models
             }
             //sort Vertex List
             var vertexList = set.ToList();
-            vertexList.Sort((x,y) => x.Compare(y));
+            vertexList.Sort((x,y) => x.CompareTo(y));
 
             newGraph.Vertices = new ObservableCollection<Vertex>(vertexList);
             newGraph.EdgeCount = edgeCount;
