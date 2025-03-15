@@ -1,5 +1,6 @@
 ﻿using CTU_Graph_Theory.Models;
 using Microsoft.Msagl.Core;
+using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace CTU_Graph_Theory.Algorithms.Base
 {
-    public abstract class AbstractAlgorithm
+    public abstract class AbstractAlgorithm: ReactiveObject
     {
         // field area
         private const int BASE_SPEED = 2100;

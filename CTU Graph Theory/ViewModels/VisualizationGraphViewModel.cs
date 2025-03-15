@@ -41,6 +41,7 @@ namespace CTU_Graph_Theory.ViewModels
         private bool _isRunningAlgorithm = false;
         private bool _isPauseAlgorithm = false;
         private bool _isEnableStartVertexSelection = true;
+        private bool _isNonSelectStartVertex = false;
         private int _multiplierSpeed = 1;
 
         public CustomGraph MainGraph
@@ -135,6 +136,11 @@ namespace CTU_Graph_Theory.ViewModels
             get => _isPauseAlgorithm;
             set => this.RaiseAndSetIfChanged(ref _isPauseAlgorithm, value);
         }
+        public bool IsNonSelectStartVertex
+        {
+            get => _isNonSelectStartVertex;
+            set => this.RaiseAndSetIfChanged(ref _isNonSelectStartVertex, value);
+        }
         public int MultiplierSpeed
         {
             get => _multiplierSpeed;
@@ -178,6 +184,7 @@ namespace CTU_Graph_Theory.ViewModels
             AlgorithmList.Add(new TarjanSCCViewModel());
             AlgorithmList.Add(new MooreDijkstraViewModel());
             AlgorithmList.Add(new BellmanFordViewModel());
+            AlgorithmList.Add(new KruskalViewModel());
         }
 
         private void InitObservable()
@@ -216,12 +223,23 @@ namespace CTU_Graph_Theory.ViewModels
                     IsAlgorithmRequirementAccept = true;
                 }
             });
-            // change algorithm -> Check Is allow Choose all Vertex -> Check first choose this algorithm
-            this.WhenAnyValue(x => x.SelectedAlgorithm).Do(algorithm => { if (algorithm is IAllVertexRun allowAlgorithmCheck) IsAllowSelectAllVertex = true; else IsAllowSelectAllVertex = false; }).Where(algorithm => algorithm?.IsSetCompletedAlgorithm == false).Subscribe(algorithm => algorithm?.SetCompletedAlgorithm(OnAlgorithmCompleted));
+            // change algorithm -> Check -> Check first choose this algorithm
+            this.WhenAnyValue(x => x.SelectedAlgorithm)
+                .Do(algorithm => 
+                { 
+                    if (algorithm is IAllVertexRun allowAlgorithmCheck) 
+                        IsAllowSelectAllVertex = true; 
+                    else IsAllowSelectAllVertex = false;
+                    if (algorithm is INonStartVertexRun allowChooseStartVertex)
+                        IsNonSelectStartVertex = true;
+                    else IsNonSelectStartVertex = false;
+                })
+                .Where(algorithm => algorithm?.IsSetCompletedAlgorithm == false).Subscribe(algorithm => algorithm?.SetCompletedAlgorithm(OnAlgorithmCompleted));
             // set run speed when change Slider or change Selectedalgorithn
             this.WhenAnyValue(x => x.SelectedAlgorithm,x => x.MultiplierSpeed).Subscribe(tuple => tuple.Item1?.SetRunSpeed(tuple.Item2));
             // command check can activate
-            CanRunAlgorithmCommand = this.WhenAnyValue(x => x.SelectedAlgorithm, x => x.StartVertex, x => x.IsSelectAllVertex, x => x.IsAlgorithmRequirementAccept, (algorithm, startVertex, isSelectedAllVertex, requirementAccept) => (algorithm != null) && (startVertex != null || isSelectedAllVertex == true) && (requirementAccept == true));
+            CanRunAlgorithmCommand = this.WhenAnyValue(x => x.SelectedAlgorithm, x => x.StartVertex, x => x.IsSelectAllVertex, x => x.IsAlgorithmRequirementAccept,x => x.IsNonSelectStartVertex, (algorithm, startVertex, isSelectedAllVertex, requirementAccept, isNonSelectStartVertex) => (algorithm != null) &&
+                                                                                                                                                                    (startVertex != null || isSelectedAllVertex == true || isNonSelectStartVertex == true) && (requirementAccept == true));
             CanPauseAlgorithmCommand = this.WhenAnyValue(x => x.IsRunningAlgorithm, x => x.IsPauseAlgorithm , (isRunning,isPause) => isRunning == true && isPause == false);
             CanContinueAlgorithmCommand = this.WhenAnyValue(x => x.IsPauseAlgorithm, isPaused => isPaused == true);
         }
@@ -258,6 +276,10 @@ namespace CTU_Graph_Theory.ViewModels
                 {
                     selectedAlgorithmVertexRun?.RunAlgorithm(MainGraph, StartVertex);
                 }
+                else if (SelectedAlgorithm is INonStartVertexRun selectedAlgorithmNonstartVertex)
+                {
+                    selectedAlgorithmNonstartVertex?.RunAlgorithm(MainGraph);
+                }
 
                 },CanRunAlgorithmCommand);
             PauseAlgorithmCommand = ReactiveCommand.Create(() => { SelectedAlgorithm?.PauseAlgorithm(); IsPauseAlgorithm = true;}, CanPauseAlgorithmCommand);
@@ -270,7 +292,7 @@ namespace CTU_Graph_Theory.ViewModels
                     else selectedAllVertexAlgorithm?.ContinueAlgorithm(MainGraph);
                 }
                 else if (SelectedAlgorithm is IVertexRun selectedVertexAlgorithm) selectedVertexAlgorithm.ContinueAlgorithm(MainGraph);
-
+                else if (SelectedAlgorithm is INonStartVertexRun selectedAlgorithmNonstartVertex) selectedAlgorithmNonstartVertex.ContinueAlgorithm(MainGraph);
                 IsPauseAlgorithm = false; 
             },CanContinueAlgorithmCommand);
         }

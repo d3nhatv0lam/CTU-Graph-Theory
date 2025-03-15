@@ -93,11 +93,11 @@ namespace CTU_Graph_Theory.Algorithms.Base
         //    // run algorith
         //}
 
-        public virtual async void ContinueAlgorithmWithAllVertex(CustomGraph graph)
+        public virtual void ContinueAlgorithmWithAllVertex(CustomGraph graph)
         {
             IsRunning = 1;
         }
-        public virtual async void ContinueAlgorithm(CustomGraph graph)
+        public virtual void ContinueAlgorithm(CustomGraph graph)
         {
             IsRunning = 1;
         }

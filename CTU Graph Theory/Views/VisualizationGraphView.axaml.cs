@@ -5,6 +5,7 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using Avalonia.ReactiveUI;
+using Avalonia.Threading;
 using AvaloniaGraphControl;
 using CTU_Graph_Theory.Models;
 using CTU_Graph_Theory.ViewModels;
@@ -43,6 +44,8 @@ public partial class VisualizationGraphView : ReactiveUserControl<VisualizationG
     {
         if (sender is TextBlock textBlock && e.Property.ToString() == nameof(textBlock.Background))
         {
+            textBlock.InvalidateMeasure();
+            textBlock.InvalidateArrange();
             textBlock.BringIntoView();
         }
 

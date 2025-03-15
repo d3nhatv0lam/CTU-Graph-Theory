@@ -205,6 +205,7 @@ namespace CTU_Graph_Theory.Models
             newGraph.Vertices = new ObservableCollection<Vertex>(graph.Vertices.Select(vertex => vertex));
             newGraph.EdgeCount = graph.EdgeCount;
             newGraph.IsWeightGraph = graph.IsWeightGraph;
+            newGraph.IsHasNegativeWeight = graph.IsHasNegativeWeight;
             // add edge for graph
             foreach (ShowableEdge edge in graph.Edges)
             {
@@ -292,7 +293,8 @@ namespace CTU_Graph_Theory.Models
 
                             if (Int64.TryParse(nodeData[2], out weight))
                             {
-                                isHasNegativeWeight = weight < 0;
+
+                                    isHasNegativeWeight = isHasNegativeWeight  || (weight < 0);
                                 if (u.Title == v.Title)
                                 {
                                     newEdge = new ShowableEdge(u, u, ShowableEdge.Visible.Show, weight, Edge.Symbol.None, DirectGraphSymbol);
