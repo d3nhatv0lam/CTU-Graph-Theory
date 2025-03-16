@@ -19,8 +19,8 @@ namespace CTU_Graph_Theory.Algorithms
         private List<ShowableEdge> SortedEdges;
         private Int64 _minWeightInt;
 
-        private event EventHandler<Int64> _updateMinWeight;
-        public event EventHandler<Int64> UpdateMinWeight
+        private event EventHandler<Int64>? _updateMinWeight;
+        public event EventHandler<Int64>? UpdateMinWeight
         {
             add => _updateMinWeight += value;
             remove => _updateMinWeight -= value;

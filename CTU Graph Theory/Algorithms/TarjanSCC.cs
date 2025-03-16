@@ -26,6 +26,7 @@ namespace CTU_Graph_Theory.Algorithms
         private readonly Dictionary<Vertex, List<Vertex>> Neighbours;
         private readonly Stack<Vertex> SCCStack;
         private int k;
+        public ObservableCollection<ObservableCollection<string>> Result { get; }
 
         public TarjanSCC()
         {
@@ -36,6 +37,7 @@ namespace CTU_Graph_Theory.Algorithms
             funtionStack = new();
             Neighbours = new();
             SCCStack = new();
+            Result = new ObservableCollection<ObservableCollection<string>>();
             k = 0;
             FillPseudoCode();
             FillIAlgorithmRequirement();
@@ -105,6 +107,7 @@ namespace CTU_Graph_Theory.Algorithms
         {
             base.BaseContinueAlgorithm(graph);
             var token = cts.Token;
+
             await RunLoop(graph, token);
             while (QueueVertices.Count > 0)
             {
@@ -124,10 +127,13 @@ namespace CTU_Graph_Theory.Algorithms
         {
             var token = cts.Token;
             base.BaseRunAlgorithm(graph);
+            foreach (var item in Result)
+            {
+                item.Clear();
+            }
+            Result.Clear();
             await PrepareState();
-
             funtionStack.Push((startVertex, 0,RecursiveState.Entry));
-
             await RunLoop(graph, token);
             EndAlgorithmState(graph);
         }
@@ -139,6 +145,12 @@ namespace CTU_Graph_Theory.Algorithms
             QueueVertices.Clear();
             foreach (var vertex in vertices)
                 QueueVertices.Enqueue(vertex);
+
+            foreach (var item in Result)
+            {
+                item.Clear();
+            }
+            Result.Clear();
 
             var token = cts.Token;
             await PrepareState();
@@ -249,9 +261,11 @@ namespace CTU_Graph_Theory.Algorithms
                         await SCCFoundState();
                         List<Vertex> SCCVertex = new List<Vertex>();
                         Vertex v;
+                        Result.Add(new ObservableCollection<string>());
                         do
                         {
                             v = SCCStack.Pop();
+                            Result.Last().Insert(0, v.Title);
                             v.UnSetPending();
                             SCCVertex.Add(v);
                         } while (v != u);

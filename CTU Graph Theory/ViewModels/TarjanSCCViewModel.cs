@@ -21,6 +21,11 @@ namespace CTU_Graph_Theory.ViewModels
         {
             get => _scc.Pseudocodes;
         }
+
+        public ObservableCollection<ObservableCollection<string>> Result
+        {
+            get => _scc.Result;
+        }
         public bool IsSetCompletedAlgorithm { get; set; }
 
         public List<RequestOfAlgorithm> Requirements

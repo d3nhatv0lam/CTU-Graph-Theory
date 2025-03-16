@@ -5,7 +5,6 @@
              mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="200"
 			 xmlns:vm ="using:CTU_Graph_Theory.ViewModels"
 			 xmlns:System="clr-namespace:System;assembly=mscorlib"
-			 xmlns:converter ="using:CTU_Graph_Theory.Converters"
 			 x:DataType="vm:BFSViewModel"
 			 
              x:Class="CTU_Graph_Theory.Views.BFSView">

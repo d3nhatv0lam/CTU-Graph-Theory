@@ -5,28 +5,32 @@
              mc:Ignorable="d" d:DesignWidth="250" d:DesignHeight="250"
 			 xmlns:vm="using:CTU_Graph_Theory.ViewModels"
 			 x:DataType="vm:TarjanSCCViewModel"
+			 xmlns:System="clr-namespace:System;assembly=mscorlib"
              x:Class="CTU_Graph_Theory.Views.TarjanSCCView">
-	<Grid>
-		<ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-			<ItemsRepeater ItemsSource="{Binding Requirements}">
-				<ItemsRepeater.Styles>
-					<Style Selector="TextBlock.DoneRequest">
-						<Setter Property="Foreground" Value="Green"/>
-					</Style>
-				</ItemsRepeater.Styles>
+	
+	<Grid RowDefinitions="auto *">
+		<TextBlock Grid.Row="0" Classes="Headline6" FontWeight="Bold" Text="Các Bộ phận liên thông mạnh:"/>
+
+		<ScrollViewer  Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Hidden">
+			<ItemsRepeater  ItemsSource="{Binding Result}">
 				<ItemsRepeater.ItemTemplate>
-						<DataTemplate>
-							<TextBlock Classes.DoneRequest ="{Binding IsDoneRequest}"
-									   Classes ="Subtitle1"
-										FontWeight="SemiBold"
-										FontFamily="Arial"
-										Text="{Binding RequestString, StringFormat=+ {0}}"
-										TextWrapping="Wrap"
-										Margin="10 0 0 0"
-								/>
-						</DataTemplate>
-					</ItemsRepeater.ItemTemplate>
+					<DataTemplate>
+						<ItemsRepeater ItemsSource="{Binding}">
+							<ItemsRepeater.Layout>
+								<StackLayout Orientation="Horizontal" Spacing="4"/>
+							</ItemsRepeater.Layout>
+							<ItemsRepeater.ItemTemplate>
+
+								<DataTemplate DataType="{x:Type System:String}">
+									<TextBlock Text="{Binding}" FontSize="20" FontWeight="Bold"/>
+								</DataTemplate>
+
+							</ItemsRepeater.ItemTemplate>
+						</ItemsRepeater>
+					</DataTemplate>
+				</ItemsRepeater.ItemTemplate>
 			</ItemsRepeater>
 		</ScrollViewer>
+
 	</Grid>
 </UserControl>

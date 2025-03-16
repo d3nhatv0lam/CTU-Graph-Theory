@@ -17,12 +17,28 @@ namespace CTU_Graph_Theory.Algorithms
     {
         public List<RequestOfAlgorithm> Requirements { get ;}
         private int loopTime;
+        private Int64 _minWeight;
         private Dictionary<Vertex, Int64> Pi;
+
+        private event EventHandler<Int64>? _updateMinWeight;
+        public event EventHandler<Int64>? UpdateMinWeight
+        {
+            add => _updateMinWeight += value;
+            remove => _updateMinWeight -= value;
+        }
+        private void OnUpdateMinWeight(Int64 minWeight)
+        {
+            if (_updateMinWeight != null)
+            {
+                _updateMinWeight(this, minWeight);
+            }
+        }
         public Prim()
         {
             AlgorithmName = "Prim - Cây khung nhỏ nhất vô hướng của một bộ phận liên thông";
             Pi = new();
             Requirements = new();
+            _minWeight = 0;
             loopTime = 0;
             FillPseudoCode();
             FillIAlgorithmRequirement();
@@ -78,6 +94,8 @@ namespace CTU_Graph_Theory.Algorithms
         private void CleanAlgorithm()
         {
             loopTime = 0;
+            _minWeight = 0;
+            OnUpdateMinWeight(_minWeight);
             Pi.Clear();
             Pi.TrimExcess();
         }
@@ -168,7 +186,8 @@ namespace CTU_Graph_Theory.Algorithms
                 ShowableEdge? visitedEdge = graph.GetEdgeWithMinWeight(u.ParentVertex, u);
                 if (visitedEdge != null)
                 {
-                    visitedEdge.IsVisited = true;
+                    visitedEdge.IsVisited = true; 
+                    _minWeight += (Int64)visitedEdge.Label;
                 }
 
                 foreach (var v in graph.NeighboursOfVertex(u))
@@ -193,6 +212,8 @@ namespace CTU_Graph_Theory.Algorithms
                 loopTime++;
             }
             await FillLastVertexState(graph);
+            
+            OnUpdateMinWeight(_minWeight);
         } 
 
         private async Task WhileLoopState()
@@ -261,6 +282,7 @@ namespace CTU_Graph_Theory.Algorithms
             if (edgeColored != null)
             {
                 edgeColored.IsVisited = true;
+                _minWeight += (Int64)edgeColored.Label;
             }
         }
     }
