@@ -17,7 +17,10 @@ Trực quan bằng mã giả và thay đổi màu sắc/trạng thái trong đ�
 7. Kruskal - Cây khung nhỏ nhất vô hướng
 8. Prim - Cây khung nhỏ nhất vô hướng
 ## ⚙️ Cách cài đặt và sử dụng
-1. Tải file nén `.zip` có hệ điều hành tương ứng. Ví dụ `Window x64 -> x64.zip` 
-2. Giải nén file `.zip` vừa tải xuống
-3. Mở file `CTU Graph Theory.Desktop.exe`.
-4. Trải nghiệm!
+1. Tải file nén `.zip` có hệ điều hành tương ứng [Tại đây](https://github.com/d3nhatv0lam/CTU-Graph-Theory/releases). Ví dụ
+*  `Window x64 -> x64.zip` 
+*  `Window x86 -> x86.zip`
+*  `...`
+3. Giải nén file `.zip` vừa tải xuống
+4. Mở file `CTU Graph Theory.Desktop.{Định dạng của hệ điều hành}`.
+5. Trải nghiệm!
