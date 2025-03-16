@@ -19,13 +19,21 @@ namespace CTU_Graph_Theory.ViewModels
             get => _dfsStack.AlgorithmName;
         }
 
-      
+
+
         public ObservableCollection<StringPseudoCode> Pseudocodes
         {
             get => _dfsStack.Pseudocodes;
         }
         public bool IsSetCompletedAlgorithm { get; set; }
 
+        public ObservableCollection<ObservableCollection<string>> Result
+        {
+            get
+            {
+                return _dfsStack.Result;
+            }
+        }
 
         public DFSStackViewModel()
         {

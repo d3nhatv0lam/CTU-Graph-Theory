@@ -15,11 +15,13 @@ namespace CTU_Graph_Theory.Algorithms
     public class DFSRecursive : AbstractAlgorithm , IAllVertexRun
     {
         private Stack<Vertex> FuntionStack;
+        public ObservableCollection<ObservableCollection<string>> Result { get; }
 
         public DFSRecursive() : base()
         {
             AlgorithmName = "DFS - Duyệt theo chiều sâu (đệ quy)";
-            FuntionStack = new Stack<Vertex>();
+            FuntionStack = new Stack<Vertex>(); 
+            Result = new();
             FillPseudoCode();
         }
 
@@ -78,8 +80,15 @@ namespace CTU_Graph_Theory.Algorithms
             base.BaseRunAlgorithm(graph);
             var token = cts.Token;
 
+            foreach (var item in Result)
+            {
+                item.Clear();
+            }
+            Result.Clear();
+
             await PrepareState();
             FuntionStack.Push(startVertex);
+            Result.Add(new ObservableCollection<string>());
             await RunDFSLoop(graph,token);
 
             EndAlgorithmState(graph);
@@ -91,6 +100,12 @@ namespace CTU_Graph_Theory.Algorithms
             QueueVertices.Clear();
             foreach (var vertex in vertices)
                 QueueVertices.Enqueue(vertex);
+
+            foreach (var item in Result)
+            {
+                item.Clear();
+            }
+            Result.Clear();
 
             var token = cts.Token;
             await PrepareState();
@@ -104,6 +119,7 @@ namespace CTU_Graph_Theory.Algorithms
                 if (startVertex.IsVisited == true) continue;
 
                 FuntionStack.Push(startVertex);
+                Result.Add(new ObservableCollection<string>());
                 await RunDFSLoop(graph, token);
             }
             EndAlgorithmState(graph);
@@ -151,6 +167,7 @@ namespace CTU_Graph_Theory.Algorithms
 
                 
                 await VisitVertexU(u);
+                Result.Last().Add(u.Title);
                 // draw adjacent => update into UI
                 if (u.ParentVertex != null)
                 {

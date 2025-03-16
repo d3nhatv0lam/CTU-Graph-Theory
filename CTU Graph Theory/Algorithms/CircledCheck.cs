@@ -13,12 +13,35 @@ namespace CTU_Graph_Theory.Algorithms
 {
     public class CircledCheck: AbstractAlgorithm , IAllVertexRun
     {
+        private enum FuntionState
+        {
+            Entry,
+            Exit
+        };
         private Stack<Vertex> FuntionStack;
+        private Dictionary<Vertex, List<Vertex>> NeigboursOfVertex;
+
+        private Stack<(Vertex, int, FuntionState)> FunctionStack;
+        private bool _isHasCricled;
+        private event EventHandler<bool?>? _returnIsCricleCheck;
+        public event EventHandler<bool?> ReturnIsCricleCheck
+        {
+            add => _returnIsCricleCheck += value;
+            remove => _returnIsCricleCheck -= value;
+        }
+
+        private void OnReturnIsCricleCheck(bool? isCricleCheck)
+        {
+            _returnIsCricleCheck?.Invoke(this, isCricleCheck);
+        }
 
         public CircledCheck(): base()
         {
             AlgorithmName = "CircledCheck - Kiểm tra đồ thị chứa chu trình";
             FuntionStack = new();
+            FunctionStack = new();
+            NeigboursOfVertex = new Dictionary<Vertex, List<Vertex>>();
+            _isHasCricled = false;
             FillPseudoCode();
         }
         protected override void FillPseudoCode()
@@ -56,8 +79,18 @@ namespace CTU_Graph_Theory.Algorithms
 
         private void CleanDFS()
         {
+            _isHasCricled = false;
+            FunctionStack.Clear();
+            FunctionStack.TrimExcess();
             FuntionStack.Clear();
             FuntionStack.TrimExcess();
+            foreach (var (key,value) in NeigboursOfVertex)
+            {
+                value.Clear();
+                value.TrimExcess();
+            }
+            NeigboursOfVertex.Clear();
+            NeigboursOfVertex.TrimExcess();
         }
 
         private Task DoneAlgorithm()
@@ -87,8 +120,8 @@ namespace CTU_Graph_Theory.Algorithms
                 var startVertex = QueueVertices.Dequeue();
                 if (startVertex.IsVisited == true || startVertex.IsPending == true) continue;
 
-                FuntionStack.Push(startVertex);
-
+                //FuntionStack.Push(startVertex);
+                FunctionStack.Push((startVertex, 0, FuntionState.Entry));
                 await RunLoop(graph, token);
             }
             EndAlgorithmState(graph);
@@ -100,8 +133,8 @@ namespace CTU_Graph_Theory.Algorithms
             var token = cts.Token;
 
             await PrepareState();
-            FuntionStack.Push(startVertex);
-
+            //FuntionStack.Push(startVertex);
+            FunctionStack.Push((startVertex, 0, FuntionState.Entry));
             await RunLoop(graph,token);
             EndAlgorithmState(graph);
         }
@@ -124,8 +157,8 @@ namespace CTU_Graph_Theory.Algorithms
                 var startVertex = QueueVertices.Dequeue();
 
                 if (startVertex.IsVisited == true || startVertex.IsPending == true) continue;
-
-                FuntionStack.Push(startVertex);
+                FunctionStack.Push((startVertex, 0, FuntionState.Entry));
+                //FuntionStack.Push(startVertex);
                 await RunLoop(graph, token);
             }
             EndAlgorithmState(graph);
@@ -135,194 +168,320 @@ namespace CTU_Graph_Theory.Algorithms
         {
             if (IsStopAlgorithm) base.CleanGraphForAlgorithm(graph);
             if (QueueVertices.Count == 0 && FuntionStack.Count == 0) OnCompletedAlgorithm();
+            OnReturnIsCricleCheck(_isHasCricled);
         }
 
         private Task PrepareState()
         {
-            CleanDFS();
+            CleanDFS(); 
+            OnReturnIsCricleCheck(null);
             return Task.FromResult(0);
         }
 
         private async Task RunLoop(CustomGraph graph, CancellationToken token)
         {
-            while (FuntionStack.Count > 0)
+            while(FunctionStack.Count > 0)
             {
                 if (token.IsCancellationRequested)
                 {
                     await Task.Delay(100);
                     return;
                 }
-                if (graph.IsDirectedGraph())
-                    await JoinDirectedFuntionState();
-                else await JoinUnDirectedFuintionState();
-                // double check to avoid spam pause-continue
-                if (token.IsCancellationRequested)
+
+                var (u, loopIndex, state) = FunctionStack.Pop();
+
+                if (!u.IsPending)
                 {
-                    await Task.Delay(100);
-                    return;
-                }
-
-                Vertex u = GetVertexState().Result;
-                // update Point to vertex into UI
-                u.SetPointTo();
-
-                if (graph.IsDirectedGraph())
-                    await SetDirectedPendingState(u);
-                else await SetUnDirectedPendingState(u);
-
-                u.UnSetPointedTo();
-                // draw adjacent => update into UI
-                //if (u.ParentVertex != null)
-                //{
-                //    ShowableEdge? AdjacentEdge = graph.GetEdge(u.ParentVertex, u);
-                //    if (AdjacentEdge != null)
-                //        AdjacentEdge.IsVisited = true;
-                //}
-
-                List<Vertex> reverseNeighBours = graph.NeighboursOfVertex(u);
-                reverseNeighBours.Reverse();
-                // need to push stack and Pause Algorithm
-                foreach (Vertex v in reverseNeighBours)
-                {
-                    FuntionStack.Push(v);
-                    if (graph.IsDirectedGraph() && v.ParentVertex == null) v.ParentVertex = u;
-                    if (graph.IsUnDirectedGraph() && v.IsVisited == false && v.IsPending == false) v.ParentVertex = u;
-                    //v.ParentVertex = u;
-                }
-
-                if (reverseNeighBours.Count == 0 && FuntionStack.Count > 0)
-                {
-                    Vertex v = u, topOfFuntionStack = FuntionStack.Peek();
                     if (graph.IsDirectedGraph())
-                    {
-                        await DirectedForLoopState();
-                        await DirectedSetVisitedVertexUState(u);
-                        while (v.ParentVertex != null && v.ParentVertex != topOfFuntionStack.ParentVertex)
-                        {
-                            await DirectedSetVisitedVertexUState(v);
-                            v.UnSetPointedTo();
-                            v = v.ParentVertex;
-                        }
-                        await UnDirectedSetVisitedVertexUState(v);
-                        v.UnSetPointedTo();
-                    }  
-                    else
-                    {
-                        await UnDirectedForLoopState();
-                        await UnDirectedSetVisitedVertexUState(u);
-                        while (v.ParentVertex != null && v.ParentVertex != topOfFuntionStack.ParentVertex)
-                        {
-                            await UnDirectedSetVisitedVertexUState(v);
-                            v.UnSetPointedTo();
-                            v = v.ParentVertex;
-                        }
-                        await UnDirectedSetVisitedVertexUState(v);
-                        v.UnSetPointedTo();
-                    }
-                    continue;
+                        await JoinDirectedFuntionState();
+                    else await JoinUnDirectedFuintionState();
+
+                    u.SetPointTo();
                 }
 
-
-
-                while (FuntionStack.Count > 0)
+                if (state == FuntionState.Entry)
                 {
-                    // try get to check in Pseucode
-                    Vertex nextFuntionVertex = FuntionStack.Pop();
+                    
+                    if (!NeigboursOfVertex.ContainsKey(u))
+                        NeigboursOfVertex.Add(u, graph.NeighboursOfVertex(u));
 
-                    if (graph.IsDirectedGraph())
-                    {
-                        await DirectedForLoopState();
-                        nextFuntionVertex.SetPointTo();
+                    var neigbours = NeigboursOfVertex[u];
 
-                        await DirectedIfUnVisitedState();
-                        if (nextFuntionVertex.IsVisited == false && nextFuntionVertex.IsPending == false)
-                        {
-                            await DirectedNextLoopState();
-                            // push again to Recursive
-                            FuntionStack.Push(nextFuntionVertex);
-                            break;
-                        }
-                        if (nextFuntionVertex.IsVisited == false && nextFuntionVertex.IsPending == true)
-                        {
-                            await DirectedCircleFoundState();
-                            await DoneAlgorithm();
-                            nextFuntionVertex.UnSetPointedTo();
-                            if (graph.GetEdge(u, nextFuntionVertex) == null)
-                                await ColoredFullCircle(graph, nextFuntionVertex.ParentVertex, nextFuntionVertex);
-                            else await ColoredFullCircle(graph, u, nextFuntionVertex);
-                            
-                            return;
-                        }
-                    }
-                    else
+                    if (loopIndex < neigbours.Count)
                     {
-                        await UnDirectedForLoopState();
-                        nextFuntionVertex.SetPointTo();
-                        await UnDirectedIfParentState();
-                        if (nextFuntionVertex == u.ParentVertex)
+                        if (!u.IsVisited && !u.IsPending)
                         {
-                            await UnDirectedContinueState();
-                            nextFuntionVertex.UnSetPointedTo();
-                            continue;
+                            if (graph.IsDirectedGraph())
+                                await SetDirectedPendingState(u);
+                            else await SetUnDirectedPendingState(u);
+
+                            u.UnSetPointedTo();
+                            u.SetPending();
                         }
-                        await UnDirectedIfUnVisitedState();
-                        if (nextFuntionVertex.IsVisited == false && nextFuntionVertex.IsPending == false)
-                        {
-                            await UnDirectedNextLoopState();
-                            // push again to Recursive 
-                            FuntionStack.Push(nextFuntionVertex);
-                            nextFuntionVertex.UnSetPointedTo();
-                            break;
-                        }
-                        await UnDirectedIfCircleFoundState();
-                        if (nextFuntionVertex.IsPending == true)
-                        {
-                            await UnDirectedCircleFoundState();
-                            await DoneAlgorithm();
-                            await ColoredFullCircle(graph, u, nextFuntionVertex);
-                            nextFuntionVertex.UnSetPointedTo();
-                            return;
-                        }
-                    }
-                    nextFuntionVertex.UnSetPointedTo();
-                    // when didn't do anything, check all
-                    bool isAllVisited = reverseNeighBours.All(vertex => vertex.IsVisited == true);
-                    if (isAllVisited)
-                    {
+                           
+                        var v = neigbours[loopIndex];
+
+                        v.SetPointTo();
                         if (graph.IsDirectedGraph())
-                            await DirectedSetVisitedVertexUState(u);
-                        else await UnDirectedSetVisitedVertexUState(u);
+                        {
+                            await DirectedForLoopState();
+                            await DirectedIfUnVisitedState();
+                            if (v.IsVisited == false && v.IsPending == false)
+                            {
+                                v.ParentVertex = u;
+                                FunctionStack.Push((u, loopIndex + 1, FuntionState.Entry));
+                                FunctionStack.Push((v, 0, FuntionState.Entry));
+                                await DirectedNextLoopState();
+                                continue;
+                            }
+                            
+                            if (v.IsVisited == false && v.IsPending == true)
+                            {
+                                v.UnSetPointedTo();
+                                await DirectedCircleFoundState();
+                                await DoneAlgorithm();
+                                await ColoredFullCircle(graph, u, v);
+                                OnReturnIsCricleCheck(_isHasCricled);
+                                return;
+                            }
+
+                            // nếu 2 trường hợp trên k xảy ra thì phải tăng loopIndex
+                            FunctionStack.Push((u, loopIndex + 1, FuntionState.Entry));
+                            v.UnSetPointedTo();
+                        }
+                        else
+                        {
+                            await UnDirectedForLoopState();
+                            await UnDirectedIfParentState();
+                            if (v == u.ParentVertex)
+                            {
+                                await UnDirectedContinueState();
+                                v.UnSetPointedTo();
+                                FunctionStack.Push((u, loopIndex + 1, FuntionState.Entry));
+                                continue;
+                            }
+                            await UnDirectedIfUnVisitedState();
+                            if (v.IsVisited == false && v.IsPending == false)
+                            {
+                                await UnDirectedNextLoopState();
+                                v.ParentVertex = u;
+                                FunctionStack.Push((u, loopIndex + 1, FuntionState.Entry));
+                                FunctionStack.Push((v, 0, FuntionState.Entry));
+                                continue;
+                            }
+                            await UnDirectedIfCircleFoundState();
+                            if (v.IsVisited == false && v.IsPending == true)
+                            {
+                                await UnDirectedCircleFoundState();
+                                v.UnSetPointedTo(); 
+                                await DoneAlgorithm();
+                                await ColoredFullCircle(graph, u, v);
+                                OnReturnIsCricleCheck(_isHasCricled);
+                                return;
+                            }
+                            // nếu 2 trường hợp trên k xảy ra thì phải tăng loopIndex
+                            FunctionStack.Push((u, loopIndex + 1, FuntionState.Entry));
+                            v.UnSetPointedTo();
+                        }
+                    }
+                    else
+                    {
+                        u.SetPointTo();
+                        FunctionStack.Push((u, loopIndex, FuntionState.Exit));
                     }
                 }
+                else if (state == FuntionState.Exit)
+                {
+                    
+                    if (graph.IsDirectedGraph())
+                        await DirectedSetVisitedVertexUState(u);
+                    else await UnDirectedSetVisitedVertexUState(u);
+                    u.SetVitsited();
+                }
+                u.UnSetPointedTo();
+            }
+        }
+
+        //private async Task RunLoop(CustomGraph graph, CancellationToken token)
+        //{
+        //    while (FuntionStack.Count > 0)
+        //    {
+        //        if (token.IsCancellationRequested)
+        //        {
+        //            await Task.Delay(100);
+        //            return;
+        //        }
+        //        if (graph.IsDirectedGraph())
+        //            await JoinDirectedFuntionState();
+        //        else await JoinUnDirectedFuintionState();
+        //        // double check to avoid spam pause-continue
+        //        if (token.IsCancellationRequested)
+        //        {
+        //            await Task.Delay(100);
+        //            return;
+        //        }
+
+        //        Vertex u = GetVertexState().Result;
+        //        // update Point to vertex into UI
+        //        u.SetPointTo();
+
+        //        if (graph.IsDirectedGraph())
+        //            await SetDirectedPendingState(u);
+        //        else await SetUnDirectedPendingState(u);
+
+        //        u.UnSetPointedTo();
+        //        // draw adjacent => update into UI
+        //        //if (u.ParentVertex != null)
+        //        //{
+        //        //    ShowableEdge? AdjacentEdge = graph.GetEdge(u.ParentVertex, u);
+        //        //    if (AdjacentEdge != null)
+        //        //        AdjacentEdge.IsVisited = true;
+        //        //}
+
+        //        List<Vertex> reverseNeighBours = graph.NeighboursOfVertex(u);
+        //        reverseNeighBours.Reverse();
+        //        // need to push stack and Pause Algorithm
+        //        foreach (Vertex v in reverseNeighBours)
+        //        {
+        //            FuntionStack.Push(v);
+        //            if (graph.IsDirectedGraph() && v.ParentVertex == null) v.ParentVertex = u;
+        //            if (graph.IsUnDirectedGraph() && v.IsVisited == false && v.IsPending == false) v.ParentVertex = u;
+        //            //v.ParentVertex = u;
+        //        }
+
+        //        if (reverseNeighBours.Count == 0 && FuntionStack.Count > 0)
+        //        {
+        //            Vertex v = u, topOfFuntionStack = FuntionStack.Peek();
+        //            if (graph.IsDirectedGraph())
+        //            {
+        //                await DirectedForLoopState();
+        //                await DirectedSetVisitedVertexUState(u);
+        //                while (v.ParentVertex != null && v.ParentVertex != topOfFuntionStack.ParentVertex)
+        //                {
+        //                    await DirectedSetVisitedVertexUState(v);
+        //                    v.UnSetPointedTo();
+        //                    v = v.ParentVertex;
+        //                }
+        //                await UnDirectedSetVisitedVertexUState(v);
+        //                v.UnSetPointedTo();
+        //            }  
+        //            else
+        //            {
+        //                await UnDirectedForLoopState();
+        //                await UnDirectedSetVisitedVertexUState(u);
+        //                while (v.ParentVertex != null && v.ParentVertex != topOfFuntionStack.ParentVertex)
+        //                {
+        //                    await UnDirectedSetVisitedVertexUState(v);
+        //                    v.UnSetPointedTo();
+        //                    v = v.ParentVertex;
+        //                }
+        //                await UnDirectedSetVisitedVertexUState(v);
+        //                v.UnSetPointedTo();
+        //            }
+        //            continue;
+        //        }
+
+
+
+        //        while (FuntionStack.Count > 0)
+        //        {
+        //            // try get to check in Pseucode
+        //            Vertex nextFuntionVertex = FuntionStack.Pop();
+
+        //            if (graph.IsDirectedGraph())
+        //            {
+        //                await DirectedForLoopState();
+        //                nextFuntionVertex.SetPointTo();
+
+        //                await DirectedIfUnVisitedState();
+        //                if (nextFuntionVertex.IsVisited == false && nextFuntionVertex.IsPending == false)
+        //                {
+        //                    await DirectedNextLoopState();
+        //                    // push again to Recursive
+        //                    FuntionStack.Push(nextFuntionVertex);
+        //                    break;
+        //                }
+        //                if (nextFuntionVertex.IsVisited == false && nextFuntionVertex.IsPending == true)
+        //                {
+        //                    await DirectedCircleFoundState();
+        //                    await DoneAlgorithm();
+        //                    nextFuntionVertex.UnSetPointedTo();
+        //                    if (graph.GetEdge(u, nextFuntionVertex) == null)
+        //                        await ColoredFullCircle(graph, nextFuntionVertex.ParentVertex, nextFuntionVertex);
+        //                    else await ColoredFullCircle(graph, u, nextFuntionVertex);
+                            
+        //                    return;
+        //                }
+        //            }
+        //            else
+        //            {
+        //                await UnDirectedForLoopState();
+        //                nextFuntionVertex.SetPointTo();
+        //                await UnDirectedIfParentState();
+        //                if (nextFuntionVertex == u.ParentVertex)
+        //                {
+        //                    await UnDirectedContinueState();
+        //                    nextFuntionVertex.UnSetPointedTo();
+        //                    continue;
+        //                }
+        //                await UnDirectedIfUnVisitedState();
+        //                if (nextFuntionVertex.IsVisited == false && nextFuntionVertex.IsPending == false)
+        //                {
+        //                    await UnDirectedNextLoopState();
+        //                    // push again to Recursive 
+        //                    FuntionStack.Push(nextFuntionVertex);
+        //                    nextFuntionVertex.UnSetPointedTo();
+        //                    break;
+        //                }
+        //                await UnDirectedIfCircleFoundState();
+        //                if (nextFuntionVertex.IsPending == true)
+        //                {
+        //                    await UnDirectedCircleFoundState();
+        //                    await DoneAlgorithm();
+        //                    await ColoredFullCircle(graph, u, nextFuntionVertex);
+        //                    nextFuntionVertex.UnSetPointedTo();
+        //                    return;
+        //                }
+        //            }
+        //            nextFuntionVertex.UnSetPointedTo();
+        //            // when didn't do anything, check all
+        //            bool isAllVisited = reverseNeighBours.All(vertex => vertex.IsVisited == true);
+        //            if (isAllVisited)
+        //            {
+        //                if (graph.IsDirectedGraph())
+        //                    await DirectedSetVisitedVertexUState(u);
+        //                else await UnDirectedSetVisitedVertexUState(u);
+        //            }
+        //        }
 
   
 
-                if (FuntionStack.Count == 0)
-                {
-                    if (graph.IsDirectedGraph())
-                    {
-                        while (u != null)
-                        {
-                            await DirectedSetVisitedVertexUState(u);
-                            u.UnSetPointedTo();
-                            u = u.ParentVertex;
-                        }
-                    }
-                    else
-                    {
-                        while (u != null)
-                        {
-                            await UnDirectedSetVisitedVertexUState(u);
-                            u.UnSetPointedTo();
-                            u = u.ParentVertex;
-                        }
-                    }     
-                }
-                //if (graph.IsDirectedGraph())
-                //    await DirectedSetVisitedVertexUState(u);
-                //else await UnDirectedSetVisitedVertexUState(u);
-            }
-        }
+        //        if (FuntionStack.Count == 0)
+        //        {
+        //            if (graph.IsDirectedGraph())
+        //            {
+        //                while (u != null)
+        //                {
+        //                    await DirectedSetVisitedVertexUState(u);
+        //                    u.UnSetPointedTo();
+        //                    u = u.ParentVertex;
+        //                }
+        //            }
+        //            else
+        //            {
+        //                while (u != null)
+        //                {
+        //                    await UnDirectedSetVisitedVertexUState(u);
+        //                    u.UnSetPointedTo();
+        //                    u = u.ParentVertex;
+        //                }
+        //            }     
+        //        }
+        //        //if (graph.IsDirectedGraph())
+        //        //    await DirectedSetVisitedVertexUState(u);
+        //        //else await UnDirectedSetVisitedVertexUState(u);
+        //    }
+        //}
 
         // Share State //
 
@@ -333,6 +492,7 @@ namespace CTU_Graph_Theory.Algorithms
         }
         private Task ColoredFullCircle(CustomGraph graph,Vertex u,Vertex v)
         {
+            _isHasCricled = true;
             ShowableEdge? AdjacentEdge = graph.GetEdge(u, v);
             if (AdjacentEdge != null)
                 AdjacentEdge.IsVisited = true;

@@ -179,7 +179,7 @@ namespace CTU_Graph_Theory.Algorithms
 
                 var (u, neighBourIndex, state) = funtionStack.Pop();
                 u.SetPointTo();
-                if (state ==RecursiveState.Entry)
+                if (state == RecursiveState.Entry)
                 {
                     await JoinFuntionState();
 

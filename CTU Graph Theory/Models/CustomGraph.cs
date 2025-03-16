@@ -282,19 +282,17 @@ namespace CTU_Graph_Theory.Models
                         break;
                     case 3:
                         {
-                            u = newGraph.GetOrCreateVertex(nodeData[0]);
-                            v = newGraph.GetOrCreateVertex(nodeData[1]);
-                            var emptyVertexEdge = newGraph.GetEdge(u, Vertex.EmptyVertex);
-                            if (emptyVertexEdge != null) newGraph.Edges.Remove(emptyVertexEdge);
-
-                            var hasEdge = newGraph.GetEdge(u, v);
-                            // chỉ kiểm tra đa hướng khi là simplegraph
-                            if (hasEdge != null && newGraph.IsSimpleGraph()) newGraph.TypeOfGraph = GraphType.MultiGraph;
-
                             if (Int64.TryParse(nodeData[2], out weight))
                             {
+                                u = newGraph.GetOrCreateVertex(nodeData[0]);
+                                v = newGraph.GetOrCreateVertex(nodeData[1]);
+                                var emptyVertexEdge = newGraph.GetEdge(u, Vertex.EmptyVertex);
+                                if (emptyVertexEdge != null) newGraph.Edges.Remove(emptyVertexEdge);
 
-                                    isHasNegativeWeight = isHasNegativeWeight  || (weight < 0);
+                                var hasEdge = newGraph.GetEdge(u, v);
+                                // chỉ kiểm tra đa hướng khi là simplegraph
+                                if (hasEdge != null && newGraph.IsSimpleGraph()) newGraph.TypeOfGraph = GraphType.MultiGraph;
+                                isHasNegativeWeight = isHasNegativeWeight  || (weight < 0);
                                 if (u.Title == v.Title)
                                 {
                                     newEdge = new ShowableEdge(u, u, ShowableEdge.Visible.Show, weight, Edge.Symbol.None, DirectGraphSymbol);
@@ -307,8 +305,8 @@ namespace CTU_Graph_Theory.Models
                                     set.Add(u);
                                     set.Add(v);
                                 }
+                                edgeCount++;
                             }   
-                            edgeCount++;
                         }   
                         break;
                 }

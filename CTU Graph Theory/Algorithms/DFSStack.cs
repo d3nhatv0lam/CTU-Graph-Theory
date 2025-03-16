@@ -17,9 +17,11 @@ namespace CTU_Graph_Theory.Algorithms
     {
 
         private Stack<Vertex> stack;
+        public ObservableCollection<ObservableCollection<string>> Result { get; }
         public DFSStack() : base()
         {
             this.AlgorithmName = "DFS - Duyệt theo chiều sâu bằng Stack";
+            Result = new ObservableCollection<ObservableCollection<string>>();
             stack = new Stack<Vertex>();
             FillPseudoCode();
         }
@@ -61,7 +63,13 @@ namespace CTU_Graph_Theory.Algorithms
             var token = cts.Token;
             base.BaseRunAlgorithm(graph);
             await PrepareDFSStackState();
-           
+            foreach (var result in Result)
+            {
+                result.Clear();
+            }
+            Result.Clear();
+
+            Result.Add(new ObservableCollection<string>());
             stack.Push(startVertex);
 
             await ChooseStartVertexState();
@@ -89,6 +97,11 @@ namespace CTU_Graph_Theory.Algorithms
             foreach (var vertex in vertices)
                 QueueVertices.Enqueue(vertex);
 
+            foreach (var result in Result)
+            {
+                result.Clear();
+            }
+            Result.Clear();
 
             var token = cts.Token;
             while (QueueVertices.Count > 0)
@@ -99,7 +112,7 @@ namespace CTU_Graph_Theory.Algorithms
 
                 var startVertex = QueueVertices.Dequeue();
                 if (startVertex.IsVisited == true) continue;
-
+                Result.Add(new ObservableCollection<string>());
                 stack.Push(startVertex);
                 await RunDFSStackLoop(graph, token);
             }
@@ -116,8 +129,8 @@ namespace CTU_Graph_Theory.Algorithms
                 var startVertex = QueueVertices.Dequeue();
                 if (startVertex.IsVisited == true) continue;
 
+                Result.Add(new ObservableCollection<string>());
                 stack.Push(startVertex);
-
                 await RunDFSStackLoop(graph, token);
             }
             EndAlgorithmState(graph);
@@ -220,6 +233,7 @@ namespace CTU_Graph_Theory.Algorithms
             u.SetVitsited();
             await Task.Delay(this.TimeDelayOfLineCode);
             Pseudocodes[5].IsSelectionCode = Pseudocodes[6].IsSelectionCode = false;
+            Result.Last().Add(u.Title);
         }
         private async Task ForLoopState()
         {

@@ -8,28 +8,44 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CTU_Graph_Theory.Algorithms;
+using ReactiveUI;
 
 namespace CTU_Graph_Theory.ViewModels
 {
-    public class CircledCheckViewModel : IAlgorithmViewModel , IAllVertexRun
+    public class CircledCheckViewModel :ViewModelBase, IAlgorithmViewModel , IAllVertexRun
     {
         private CircledCheck _circledCheck;
+        private string _isHasCricleString;
         public string AlgorithmName
         {
             get => _circledCheck.AlgorithmName;
         }
 
-     
+
+
+
         public ObservableCollection<StringPseudoCode> Pseudocodes
         {
             get => _circledCheck.Pseudocodes;
         }
         public bool IsSetCompletedAlgorithm { get; set; }
 
+        public string IsHasCricleString
+        {
+            get => _isHasCricleString;
+            set => this.RaiseAndSetIfChanged(ref _isHasCricleString, value);
+        }
+
         public CircledCheckViewModel()
         {
             _circledCheck = new CircledCheck();
             IsSetCompletedAlgorithm = false;
+            _circledCheck.ReturnIsCricleCheck += _circledCheck_OnReturnIsCircleCheck;
+        }
+
+        private void _circledCheck_OnReturnIsCircleCheck(object? sender, bool? e)
+        {
+            IsHasCricleString = (e == null) ? "": (e == true) ? "Đồ thị có chu trình" : "Đồ thị không có chu trình";
         }
 
         public void RunAlgorithm(CustomGraph graph, Vertex startVertex)

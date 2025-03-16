@@ -21,6 +21,13 @@ namespace CTU_Graph_Theory.ViewModels
             get => _dfsRecursive.AlgorithmName;
         }
 
+        public ObservableCollection<ObservableCollection<string>> Result
+        {
+            get
+            {
+                return _dfsRecursive.Result;
+            }
+        }
         public ObservableCollection<StringPseudoCode> Pseudocodes
         {
             get => _dfsRecursive.Pseudocodes;

@@ -4,12 +4,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
 			 xmlns:vm="using:CTU_Graph_Theory.ViewModels"
-			
-			 x:DataType="vm:DFSStackViewModel"
+			 x:DataType="vm:DFSRecursiveViewModel"
 			  xmlns:System="clr-namespace:System;assembly=mscorlib"
-             x:Class="CTU_Graph_Theory.Views.DFSStackView">
-
-
+             x:Class="CTU_Graph_Theory.Views.DFSRecursiveView">
 	<Grid RowDefinitions="auto *">
 		<TextBlock Grid.Row="0" Classes="Headline6" FontWeight="Bold" Text="Thứ tự duyệt:"/>
 
