@@ -105,13 +105,14 @@ namespace CTU_Graph_Theory.Algorithms
         {
             Requirements.Add(new RequestOfAlgorithm("Đồ thị phải vô hướng"));
             Requirements.Add(new RequestOfAlgorithm("Đồ thị phải có đầy đủ trọng số"));
+            Requirements.Add(new RequestOfAlgorithm("Đồ thị phải liên thông (chỉ có 1 bộ phận liên thông)"));
         }
 
         public bool CheckRequirements(CustomGraph graph)
         {
             Requirements[0].IsDoneRequest = graph.IsUnDirectedGraph();
             Requirements[1].IsDoneRequest = graph.IsWeightGraph;
-
+            Requirements[2].IsDoneRequest = graph.IsUnDirectedConnectedGraph;
             return Requirements.All(x => x.IsDoneRequest);
         }
 
@@ -220,9 +221,17 @@ namespace CTU_Graph_Theory.Algorithms
                     await Task.Delay(100);
                     return;
                 }
-                await LoopState();
 
                 ShowableEdge edge = SortedEdges.ElementAt(currentEdge);
+                if (edge.IsShowEdge == false)
+                {
+                    currentEdge++;
+                    continue;
+                }
+
+                await LoopState();
+
+                
                 edge.IsPointTo = true;
 
                 await GetEdgeDataState();

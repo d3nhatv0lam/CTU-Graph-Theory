@@ -81,6 +81,7 @@ namespace CTU_Graph_Theory.Algorithms
         {
             Requirements[0].IsDoneRequest = graph.IsUnDirectedGraph();
             Requirements[1].IsDoneRequest = graph.IsWeightGraph;
+            Requirements[2].IsDoneRequest = graph.IsUnDirectedConnectedGraph;
             return Requirements.All(x => x.IsDoneRequest);
         }
 
@@ -89,6 +90,7 @@ namespace CTU_Graph_Theory.Algorithms
         {
             Requirements.Add(new RequestOfAlgorithm("Đồ thị phải vô hướng"));
             Requirements.Add(new RequestOfAlgorithm("Dồ thị phải có đầy đủ trọng số"));
+            Requirements.Add(new RequestOfAlgorithm("Đồ thị phải liên thông (chỉ có 1 bộ phận liên thông)"));
         }
 
         private void CleanAlgorithm()
@@ -107,7 +109,7 @@ namespace CTU_Graph_Theory.Algorithms
                 base.CleanGraphForAlgorithm(graph);
                 CleanAlgorithm();
             }
-            if (loopTime == graph.EdgeCount - 1)
+            if (loopTime == graph.VetexCount - 1)
                 OnCompletedAlgorithm();
         }
 
@@ -175,6 +177,8 @@ namespace CTU_Graph_Theory.Algorithms
                 if (u == null)
                 {
                     await ReturnState();
+                    loopTime = graph.VetexCount -  1;
+                    OnUpdateMinWeight(_minWeight);
                     return;
                 }
                 u.SetPointTo();

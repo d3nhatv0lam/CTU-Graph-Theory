@@ -134,7 +134,8 @@ namespace CTU_Graph_Theory.Algorithms
 
                 foreach (ShowableEdge edge in graph.Edges)
                 {
-                    
+                    if (edge.IsShowEdge == false) continue;
+
                     await ForLoopEdgeState();
                     edge.IsPointTo = true;
 

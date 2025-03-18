@@ -36,6 +36,7 @@ namespace CTU_Graph_Theory.Models
         public int EdgeCount { get; private set; }
         public bool IsWeightGraph { get; private set; }
         public bool IsHasNegativeWeight { get; private set; }
+        public bool IsUnDirectedConnectedGraph { get; private set; }
 
         public CustomGraph() 
         {
@@ -195,6 +196,35 @@ namespace CTU_Graph_Theory.Models
             }
         }
 
+        // co 1 BPLT duy nhat
+        public bool IsConnectedOnUnDirected()
+        {
+            if (Vertices.Count == 0) return true;
+            GraphDirectType currentType = this.DirectTypeOfGraph;
+
+            DirectTypeOfGraph = GraphDirectType.UnDirected;
+            Queue<Vertex> queue = new Queue<Vertex>();
+
+            queue.Enqueue(Vertices.First());
+
+            while (queue.Count > 0)
+            {
+                Vertex u = queue.Dequeue();
+                u.IsVisited = true;
+                foreach (var v in this.NeighboursOfVertex(u))
+                {
+                    if (!v.IsVisited)
+                        queue.Enqueue(v);
+                }
+            }
+
+            bool result = Vertices.All(x => x.IsVisited);
+            foreach (var item in Vertices)
+                item.IsVisited = false;
+            DirectTypeOfGraph = currentType;
+            return result;
+        }
+
         public static CustomGraph CreateNewGraphFromChangeGraphType(CustomGraph graph, GraphDirectType newType)
         {
             if (graph.DirectTypeOfGraph == newType) return graph;
@@ -206,6 +236,7 @@ namespace CTU_Graph_Theory.Models
             newGraph.EdgeCount = graph.EdgeCount;
             newGraph.IsWeightGraph = graph.IsWeightGraph;
             newGraph.IsHasNegativeWeight = graph.IsHasNegativeWeight;
+            newGraph.IsUnDirectedConnectedGraph = graph.IsUnDirectedConnectedGraph;
             // add edge for graph
             foreach (ShowableEdge edge in graph.Edges)
             {
@@ -320,6 +351,7 @@ namespace CTU_Graph_Theory.Models
             newGraph.EdgeCount = edgeCount;
             newGraph.IsWeightGraph = newGraph.Edges.All(x => (x.Label as string) != string.Empty);
             newGraph.IsHasNegativeWeight = isHasNegativeWeight;
+            newGraph.IsUnDirectedConnectedGraph = newGraph.IsConnectedOnUnDirected();
             return newGraph;
         }
     }

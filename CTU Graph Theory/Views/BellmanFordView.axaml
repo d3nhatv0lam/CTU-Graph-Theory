@@ -11,5 +11,5 @@
 			   FontWeight="Bold"
 			   VerticalAlignment="Center"
 			   HorizontalAlignment="Center"
-			   Text="Kết quá tướng ứng trên đồ thị!"/>
+			   Text="Kết quả tương ứng trên đồ thị!"/>
 </UserControl>

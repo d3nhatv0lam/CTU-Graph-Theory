@@ -44,6 +44,7 @@ namespace CTU_Graph_Theory.ViewModels
         private bool _isNonSelectStartVertex = false;
         private int _multiplierSpeed = 1;
 
+
         public CustomGraph MainGraph
         {
             get => _mainGraph;
@@ -238,7 +239,7 @@ namespace CTU_Graph_Theory.ViewModels
                 .Where(algorithm => algorithm?.IsSetCompletedAlgorithm == false).Subscribe(algorithm => algorithm?.SetCompletedAlgorithm(OnAlgorithmCompleted));
             // set run speed when change Slider or change Selectedalgorithn
             this.WhenAnyValue(x => x.SelectedAlgorithm,x => x.MultiplierSpeed).Subscribe(tuple => tuple.Item1?.SetRunSpeed(tuple.Item2));
-            // command check can activate
+            //  check command can activate
             CanRunAlgorithmCommand = this.WhenAnyValue(x => x.SelectedAlgorithm, x => x.StartVertex, x => x.IsSelectAllVertex, x => x.IsAlgorithmRequirementAccept,x => x.IsNonSelectStartVertex, (algorithm, startVertex, isSelectedAllVertex, requirementAccept, isNonSelectStartVertex) => (algorithm != null) &&
                                                                                                                                                                     (startVertex != null || isSelectedAllVertex == true || isNonSelectStartVertex == true) && (requirementAccept == true));
             CanPauseAlgorithmCommand = this.WhenAnyValue(x => x.IsRunningAlgorithm, x => x.IsPauseAlgorithm , (isRunning,isPause) => isRunning == true && isPause == false);
