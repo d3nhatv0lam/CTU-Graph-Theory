@@ -1,3 +1,6 @@
+# Thông báo lưu trữ dự án 💾
+*Dự án hiện đã không còn được phát triển tiếp tục vì đã xong môn Lý thuyết đồ thị. Một vấn đề nữa là codebase của dự án không phù hợp để mở rộng quá lớn.*
+*Nếu các bạn muốn dọc thêm từ codebase này thì có thể fork về. Cảm ơn các bạn đã quan tâm* ❤️
 # 🚀 Trực quan hóa lý thuyết đồ thị
 **Ứng dụng desktop cho phép trực quan hóa đồ thị và các thuật toán trong đồ thị**
 ## ⭐ Giới thiệu
